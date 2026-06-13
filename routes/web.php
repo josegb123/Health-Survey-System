@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Users\Index;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'livewire.auth.login')->name('home');
@@ -9,6 +10,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__ . '/settings.php';
+
+Route::get('users/index', Index::class)->name('users.index');
+
+
+
 
 // fallback route for smart redirection
 Route::fallback(function () {
