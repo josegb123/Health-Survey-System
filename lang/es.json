@@ -71,5 +71,8 @@
     "The user has been created successfully.": "El usuario ha sido creado correctamente.",
     "No puedes eliminar tu propia cuenta de usuario en sesión.": "No puede eliminar su propia cuenta de usuario en sesión.",
     "Operación cancelada. Debe existir al menos un administrador en el sistema.": "Operación cancelada. Debe existir al menos un administrador en el sistema.",
-    "No se puede cambiar el rol del único administrador del sistema.": "No se puede cambiar el rol del único administrador del sistema."
+    "No se puede cambiar el rol del único administrador del sistema.": "No se puede cambiar el rol del único administrador del sistema.",
+    "Enable": "Habilitada",
+    "Active": "Activa",
+    "Inactive": "Inactiva"
 }

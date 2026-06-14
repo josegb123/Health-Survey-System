@@ -16,7 +16,7 @@
         <flux:table.columns>
             <flux:table.column>{{ __('Name') }}</flux:table.column>
             <flux:table.column>{{ __('Role') }}</flux:table.column>
-            <flux:table.column>{{ __('Created At') }}</flux:table.column>
+            <flux:table.column>{{ __('Enable') }}</flux:table.column>
             <flux:table.column>{{ __('Actions') }}</flux:table.column>
         </flux:table.columns>
 
@@ -44,7 +44,7 @@
 
                     {{-- Fecha de creación formateada --}}
                     <flux:table.cell class="text-gray-500 text-sm">
-                        {{ $user->created_at->format('Y-m-d H:i') }}
+                        {{ $user->is_active ? __('Active') : __('Inactive') }}
                     </flux:table.cell>
 
                     {{-- Botones de acción alineados a la derecha --}}
