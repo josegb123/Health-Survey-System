@@ -13,12 +13,12 @@ class InsurerSeeder extends Seeder
     public function run(): void
     {
         $insurers = [
-            ['name' => 'EPS Sura - Contributivo', 'type' => 'contributivo', 'is_active' => true],
-            ['name' => 'EPS Sanitas - Contributivo', 'type' => 'contributivo', 'is_active' => true],
-            ['name' => 'Nueva EPS - Contributivo', 'type' => 'contributivo', 'is_active' => true],
-            ['name' => 'Nueva EPS - Subsidiado', 'type' => 'subsidiado', 'is_active' => true],
-            ['name' => 'Mutual Ser - Subsidiado', 'type' => 'subsidiado', 'is_active' => true],
-            ['name' => 'Coosalud - Subsidiado', 'type' => 'subsidiado', 'is_active' => true],
+            ['name' => 'EPS Sura - Contributivo', 'type' => 'contributory', 'is_active' => true],
+            ['name' => 'EPS Sanitas - Contributivo', 'type' => 'contributory', 'is_active' => true],
+            ['name' => 'Nueva EPS - Contributivo', 'type' => 'contributory', 'is_active' => true],
+            ['name' => 'Nueva EPS - Subsidiado', 'type' => 'subsidized', 'is_active' => true],
+            ['name' => 'Mutual Ser - Subsidiado', 'type' => 'subsidized', 'is_active' => true],
+            ['name' => 'Coosalud - Subsidiado', 'type' => 'subsidized', 'is_active' => true],
         ];
 
         foreach ($insurers as $insurer) {
