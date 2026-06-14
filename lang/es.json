@@ -74,5 +74,9 @@
     "No se puede cambiar el rol del único administrador del sistema.": "No se puede cambiar el rol del único administrador del sistema.",
     "Enable": "Habilitada",
     "Active": "Activa",
-    "Inactive": "Inactiva"
+    "Inactive": "Inactiva",
+    "Repeat password": "Repita la contraseña",
+    "Confirm Password": "Confirma la contraseña",
+    "Active Account": "Cuenta activa",
+    "Allow this user to log into the application.": "Permitir que este usuario inicie sesión en la aplicación."
 }

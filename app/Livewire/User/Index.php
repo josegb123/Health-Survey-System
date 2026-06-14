@@ -21,7 +21,9 @@ class Index extends Component
     public string $name = '';
     public string $email = '';
     public string $password = '';
+    public string $password_confirmation = ''; // Requerida para la regla 'confirmed'
     public string $role = '';
+    public bool $is_active = true; // Atributo de estado dedicado
 
     // Estado del modal y control de excepciones
     public ?User $editingUser = null;
@@ -42,8 +44,10 @@ class Index extends Component
                 'max:255',
                 $userId ? Rule::unique('users', 'email')->ignore($userId) : 'unique:users,email'
             ],
-            'password' => [$userId ? 'nullable' : 'required', 'string', 'min:8'],
+            // 'confirmed' busca automáticamente la propiedad password_confirmation
+            'password' => [$userId ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'string', Rule::in(['admin', 'user'])],
+            'is_active' => ['required', 'boolean'],
         ];
     }
 
@@ -53,7 +57,17 @@ class Index extends Component
     public function openCreateModal(): void
     {
         $this->resetErrorBag();
-        $this->reset(['name', 'email', 'password', 'role', 'editingUser', 'errorMessage']);
+        $this->reset([
+            'name',
+            'email',
+            'password',
+            'password_confirmation',
+            'role',
+            'editingUser',
+            'errorMessage'
+        ]);
+
+        $this->is_active = true; // Por defecto activo al crear
 
         $this->js("Flux.modal('user-form-modal').show()");
     }
@@ -64,13 +78,13 @@ class Index extends Component
     public function openEditModal(User $user): void
     {
         $this->resetErrorBag();
-        $this->reset(['password', 'errorMessage']);
+        $this->reset(['password', 'password_confirmation', 'errorMessage']);
 
         $this->editingUser = $user;
         $this->name = $user->name;
         $this->email = $user->email;
+        $this->is_active = $user->is_active; // Carga el estado real de la DB
 
-        // Flujo alternativo: Soporte para Spatie Permission (getRoleNames) o propiedad nativa (role)
         $this->role = method_exists($user, 'getRoleNames')
             ? ($user->getRoleNames()->first() ?? '')
             : ($user->role ?? '');
@@ -113,6 +127,9 @@ class Index extends Component
     {
         $validated = $this->validate();
 
+        // Condición de limpieza: Se remueve la confirmación para evitar fallos de persistencia en las Actions
+        unset($validated['password_confirmation']);
+
         try {
             if ($this->editingUser) {
                 $updateUser($this->editingUser, $validated);
@@ -133,10 +150,9 @@ class Index extends Component
             }
 
             $this->js("Flux.modal('user-form-modal').close()");
-            $this->reset(['name', 'email', 'password', 'role', 'editingUser', 'errorMessage']);
+            $this->reset(['name', 'email', 'password', 'password_confirmation', 'role', 'editingUser', 'errorMessage']);
 
         } catch (Exception $e) {
-            // Si la excepción fue lanzada manualmente desde nuestra Action con texto en inglés, se traduce.
             $this->errorMessage = __($e->getMessage());
         }
     }
