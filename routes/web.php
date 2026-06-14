@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Users\Index;
+use App\Livewire\User\Index;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'livewire.auth.login')->name('home');

@@ -1,37 +1,79 @@
-<div>
-    <div class="py-3">
-        <flux:button>Crear Usuario</flux:button>
+<div class="space-y-6 p-6">
+    {{-- Cabecera de la Tabla: Título y Acciones Principales --}}
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <flux:heading size="xl">{{ __('Users Management') }}</flux:heading>
+            <flux:text class="mt-1">{{ __('Manage your application users, roles and permissions.') }}</flux:text>
+        </div>
+
+        <flux:button wire:click="openCreateModal" variant="primary" icon="plus">
+            {{ __('Add User') }}
+        </flux:button>
     </div>
-    <flux:table :paginate="$users" pagination:scroll-to="#users">
+
+    {{-- Tabla de Datos Principal --}}
+    <flux:table :paginate="$users">
         <flux:table.columns>
-            <flux:table.column>Nombre</flux:table.column>
-            <flux:table.column>Rol</flux:table.column>
-            <flux:table.column>Estado</flux:table.column>
-            <flux:table.column>Acciones</flux:table.column>
+            <flux:table.column>{{ __('Name') }}</flux:table.column>
+            <flux:table.column>{{ __('Role') }}</flux:table.column>
+            <flux:table.column>{{ __('Created At') }}</flux:table.column>
+            <flux:table.column>{{ __('Actions') }}</flux:table.column>
         </flux:table.columns>
 
         <flux:table.rows>
             @forelse ($users as $user)
-                <flux:table.row>
-                    <flux:table.cell>{{ $user->name }}</flux:table.cell>
-                    <flux:table.cell>{{ $user->roles[0]->name }}</flux:table.cell>
-                    <flux:table.cell>
-                        <flux:badge color="green" size="sm" inset="top bottom">{{ $user->created_at }}</flux:badge>
+                <flux:table.row :key="$user->id">
+                    {{-- Información básica del Usuario --}}
+                    <flux:table.cell class="font-medium">
+                        <div class="flex flex-col">
+                            <span>{{ $user->name }}</span>
+                            <span class="text-xs text-gray-500 font-normal">{{ $user->email }}</span>
+                        </div>
                     </flux:table.cell>
-                    <flux:table.cell variant="strong" class="flex gap-x-2">
-                        <flux:button variant="primary">Editar</flux:button>
 
-                        <flux:button variant="danger">Eliminar</flux:button>
+                    {{-- Flujo alternativo: Control de errores si el usuario no tiene roles --}}
+                    <flux:table.cell>
+                        @if ($user->roles->isNotEmpty())
+                            <flux:badge size="sm" color="zinc" inset="top bottom">
+                                {{ $user->roles->first()->name }}
+                            </flux:badge>
+                        @else
+                            <span class="text-xs text-gray-400 italic">{{ __('No role assigned') }}</span>
+                        @endif
+                    </flux:table.cell>
 
+                    {{-- Fecha de creación formateada --}}
+                    <flux:table.cell class="text-gray-500 text-sm">
+                        {{ $user->created_at->format('Y-m-d H:i') }}
+                    </flux:table.cell>
+
+                    {{-- Botones de acción alineados a la derecha --}}
+                    <flux:table.cell>
+                        <div class="flex gap-x-2">
+                            <flux:button size="sm" variant="subtle"
+                                wire:click="openEditModal({{ $user->id }})" icon="pencil">
+                                {{ __('Edit') }}
+                            </flux:button>
+
+                            <flux:button size="sm" variant="danger" wire:click="deleteUser({{ $user->id }})"
+                                wire:confirm="{{ __('Are you absolutely sure you want to delete :name? This action cannot be undone.', ['name' => $user->name]) }}"
+                                icon="trash">
+                                {{ __('Delete') }}
+                            </flux:button>
+                        </div>
                     </flux:table.cell>
                 </flux:table.row>
             @empty
+                {{-- Estado vacío estructuralmente correcto para HTML/Flux --}}
                 <flux:table.row>
-                    <p>sin usuarios en la base de datos</p>
-
+                    <flux:table.cell colspan="4" class="text-center py-8 text-gray-400 italic">
+                        {{ __('No users found in the database.') }}
+                    </flux:table.cell>
                 </flux:table.row>
             @endforelse
-
         </flux:table.rows>
     </flux:table>
+
+    {{-- Inclusión del Modal --}}
+    @include('livewire.users.__partials.user-modal')
 </div>
