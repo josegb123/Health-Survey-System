@@ -78,5 +78,11 @@
     "Repeat password": "Repita la contraseña",
     "Confirm Password": "Confirma la contraseña",
     "Active Account": "Cuenta activa",
-    "Allow this user to log into the application.": "Permitir que este usuario inicie sesión en la aplicación."
+    "Allow this user to log into the application.": "Permitir que este usuario inicie sesión en la aplicación.",
+
+    "General Satisfaction Survey": "Encuesta de Satisfacción General",
+    "Survey to evaluate the quality of service provided to the patient.": "Encuesta para evaluar la calidad del servicio prestado al paciente.",
+    "Rate your overall satisfaction with the service (1 to 5)": "Califique su satisfacción general con el servicio (1 a 5)",
+    "Was the staff courteous and professional?": "¿El personal fue cortés y profesional?",
+    "What aspects of our service could be improved?": "¿Qué aspectos de nuestro servicio podrían mejorarse?"
 }

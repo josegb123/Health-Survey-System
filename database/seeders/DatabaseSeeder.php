@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             InsurerSeeder::class,
             PatientSeeder::class,
+            SurveyTemplateSeeder::class,
+            SurveyQuestionSeeder::class,
 
         ]);
 

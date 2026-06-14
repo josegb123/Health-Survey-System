@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['title', 'is_active'])]
@@ -13,4 +14,13 @@ class SurveyTemplate extends Model
     /** @use HasFactory<\Database\Factories\SurveyTemplateFactory> */
     use HasFactory, SoftDeletes;
 
+
+    /**
+     * (Summary of surveyQuestions)
+     * @return HasMany<SurveyQuestion, SurveyTemplate>
+     */
+    public function surveyQuestions(): HasMany
+    {
+        return $this->hasMany(SurveyQuestion::class);
+    }
 }
