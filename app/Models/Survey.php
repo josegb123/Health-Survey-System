@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\URL;
+
+#[Fillable('survey_template_id', 'patient_id', 'signature_path', 'status', 'completed_at', )]
+class Survey extends Model
+{
+    /** @use HasFactory<\Database\Factories\SurveyFactory> */
+    use HasFactory, SoftDeletes;
+
+    /**
+     * Mapeo de estados para la UI de forma agnóstica al idioma.
+     */
+    public static function statuses(): array
+    {
+        return [
+            'draft' => __('Draft'),
+            'completed' => __('Completed'),
+        ];
+    }
+
+    /*
+     * Accessor dinámico para obtener la URL segura y temporal de la firma.
+     * Uso en Blade: {{ $survey->signature_url }}
+     *
+    protected function signatureUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if (!$this->signature_path) {
+                    return null;
+                }
+
+                // Genera una URL firmada por Laravel que expira en 15 minutos
+                return URL::temporarySignedRoute(
+                    'surveys.signature', // Nombre de la ruta privada que crearemos
+                    now()->addMinutes(15),
+                    ['survey' => $this->id]
+                );
+            }
+        );
+    } */
+
+    /**
+     * Casts automáticos de Eloquent para el manejo de fechas con Carbon.
+     */
+    protected function casts(): array
+    {
+        return [
+            'completed_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Una encuesta pertenece a una plantilla.
+     */
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(SurveyTemplate::class, 'survey_template_id');
+    }
+
+    /**
+     * Una encuesta es respondida por un paciente.
+     */
+    public function patient(): BelongsTo
+    {
+        return $this->belongsTo(Patient::class);
+    }
+}

@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             PatientSeeder::class,
             SurveyTemplateSeeder::class,
             SurveyQuestionSeeder::class,
+            SurveySeeder::class,
 
         ]);
 

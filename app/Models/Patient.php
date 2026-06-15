@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable('name', 'dni', 'dni', 'name', 'email', 'nationality', 'address', 'phone', 'insurer_id')]
@@ -20,5 +21,14 @@ class Patient extends Model
     public function insurer(): BelongsTo
     {
         return $this->belongsTo(Insurer::class);
+    }
+
+    /**
+     * Summary of surveys
+     * @return HasMany<Survey, Patient>
+     */
+    public function surveys(): HasMany
+    {
+        return $this->hasMany(Survey::class);
     }
 }
