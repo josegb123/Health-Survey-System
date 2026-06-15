@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             SurveyTemplateSeeder::class,
             SurveyQuestionSeeder::class,
             SurveySeeder::class,
-
+            SurveyAnswerSeeder::class,
         ]);
 
 
