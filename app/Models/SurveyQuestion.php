@@ -8,11 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable('survey_template_id', 'question_text', 'field_type', 'order')]
+#[Fillable('survey_template_id', 'question_text', 'field_type', 'options', 'order', 'is_required')]
 class SurveyQuestion extends Model
 {
     /** @use HasFactory<\Database\Factories\SurveyQuestionFactory> */
     use HasFactory;
+
+    protected $casts = [
+        'options' => 'array',
+        'is_required' => 'boolean',
+    ];
 
     /**
      * Una pregunta pertenece a una plantilla.

@@ -16,28 +16,33 @@ class SurveyQuestionSeeder extends Seeder
             // Si no hay plantillas, creamos la de satisfacción por defecto
             $template = SurveyTemplate::create([
                 'title' => 'General Satisfaction Survey',
-                'description' => 'Survey to evaluate the quality of service provided to the patient.',
                 'is_active' => true
             ]);
             $templates = collect([$template]);
         }
 
         foreach ($templates as $template) {
-            // Set de preguntas fijas de satisfacción con traducción universal
+            // Set de preguntas fijas de satisfacción estructuradas correctamente
             $questions = [
                 [
                     'question_text' => 'Rate your overall satisfaction with the service (1 to 5)',
                     'field_type' => 'number',
+                    'options' => null,
+                    'is_required' => true,
                     'order' => 1
                 ],
                 [
                     'question_text' => 'Was the staff courteous and professional?',
-                    'field_type' => 'radio', // Para respuestas tipo Sí/No
+                    'field_type' => 'radio',
+                    'options' => ['Yes', 'No'], // ¡Corregido! Opciones para el componente de la UI
+                    'is_required' => true,
                     'order' => 2
                 ],
                 [
                     'question_text' => 'What aspects of our service could be improved?',
                     'field_type' => 'text',
+                    'options' => null,
+                    'is_required' => false, // Opcional para que el paciente no esté obligado a escribir
                     'order' => 3
                 ],
             ];
@@ -51,6 +56,8 @@ class SurveyQuestionSeeder extends Seeder
                     ],
                     [
                         'field_type' => $question['field_type'],
+                        'options' => $question['options'],     // Sincronizado
+                        'is_required' => $question['is_required'], // Sincronizado
                         'order' => $question['order']
                     ]
                 );

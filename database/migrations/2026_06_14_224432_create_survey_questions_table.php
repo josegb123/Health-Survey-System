@@ -15,8 +15,10 @@ return new class extends Migration {
             $table->foreignId('survey_template_id')->constrained('survey_templates')->onDelete('cascade');
 
             $table->string('question_text');
-            $table->string('field_type'); // text, number, radio, select
-            $table->integer('order')->default(0); // Para ordenar las preguntas en la UI y la generacion de reportes
+            $table->string('field_type');
+            $table->json('options')->nullable();
+            $table->boolean('is_required')->default(true);
+            $table->integer('order')->default(0);
 
             $table->timestamps();
             $table->softDeletes();

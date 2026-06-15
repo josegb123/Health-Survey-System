@@ -26,12 +26,21 @@ class SurveyQuestionFactory extends Factory
             'Please leave any additional comments or suggestions to improve.'
         ];
 
+        // Definimos el tipo de campo primero para condicionar las opciones
+        $fieldType = $this->faker->randomElement(['text', 'number', 'radio', 'select']);
+
+        // Flujo alternativo: Si es radio o select, generamos un array de opciones válidas
+        $options = in_array($fieldType, ['radio', 'select'])
+            ? ['Excellent', 'Good', 'Regular', 'Bad']
+            : null;
+
         return [
             'survey_template_id' => SurveyTemplate::factory(),
-            // Guardamos la llave en inglés dentro de __() para la traducción universal
-            'question_text' => $this->faker->randomElement($satisfactionQuestions),
-            'field_type' => $this->faker->randomElement(['text', 'number', 'radio', 'select']),
-            'order' => $this->faker->numberBetween(1, 5),
+            'question_text'      => $this->faker->randomElement($satisfactionQuestions),
+            'field_type'         => $fieldType,
+            'options'            => $options, // Sincronizado con la migración
+            'is_required'        => $this->faker->boolean(80), // 80% de probabilidad de ser obligatoria
+            'order'              => $this->faker->numberBetween(1, 10),
         ];
     }
 }
