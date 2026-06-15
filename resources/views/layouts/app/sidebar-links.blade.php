@@ -21,6 +21,13 @@
             'icon' => 'document-text',
             'navigate' => true,
         ],
+        [
+            'label' => 'Ajustes del sistema',
+            'route' => 'admin.settings',
+            'active_pattern' => 'admin.settings.*',
+            'icon' => 'cog',
+            'navigate' => true,
+        ],
     ];
 @endphp
 

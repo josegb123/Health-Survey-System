@@ -26,7 +26,7 @@ return new class extends Migration {
 
             // Datos Legales de la Entidad (Cabeceras de reportes y facturas)
             $table->string('company_name')->default('Clinical System');
-            $table->string('company_dni')->nullable(); // NIT / Rut / Identificación fiscal
+            $table->string('company_dni')->nullable()->default('0000000'); // NIT / Rut / Identificación fiscal
 
             // Extras recomendados para flujos alternativos
             $table->string('mail_from_address')->nullable();
