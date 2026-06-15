@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('dni');
+            $table->unsignedBigInteger('dni')->unique();
             $table->string('name');
             $table->string('email')->nullable();
             $table->string('nationality')->default('Colombiana');
