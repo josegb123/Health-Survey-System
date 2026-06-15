@@ -31,9 +31,17 @@ class SystemSetting extends Model
      */
     public static function set(): self
     {
-        return Cache::rememberForever(self::CACHE_KEY, function () {
-            // Retorna el primer registro, si no existe lo crea con los valores por defecto de la migración
-            return self::firstOrCreate(['id' => 1]);
+        // 1. Guardamos o recuperamos un array plano en lugar de la clase serializada
+        $data = Cache::rememberForever(self::CACHE_KEY, function () {
+            $setting = self::firstOrCreate(['id' => 1]);
+            return $setting->toArray();
         });
+
+        // 2. Hidratamos una nueva instancia del modelo con los datos del array plano
+        $instance = new self();
+        $instance->forceFill($data);
+        $instance->exists = true; // Indicamos a Eloquent que este registro ya existe en la Base de Datos
+
+        return $instance;
     }
 }
