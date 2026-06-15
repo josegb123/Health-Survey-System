@@ -19,13 +19,13 @@ class DashboardMetricsService
     }
 
     /**
-     * Obtiene la meta mensual configurada en el sistema.
+     * Obtiene la meta mensual configurada desde el registro único indexado.
      */
     public function getMonthlyGoal(): int
     {
-        // Buscamos en la tabla de configuraciones, si no existe devolvemos 100 por defecto
-        $setting = SystemSetting::where('key', 'survey_monthly_goal')->first();
-        return $setting ? (int) $setting->value : 100;
+        // Consumimos tu método optimizado con caché y leemos la propiedad fillable
+        $settings = SystemSetting::set();
+        return $settings->survey_monthly_goal ?? 100; // 100 de respaldo si viene nulo
     }
 
     /**
@@ -35,18 +35,17 @@ class DashboardMetricsService
     {
         $monthlyGoal = $this->getMonthlyGoal();
 
-        // Adaptamos la meta al switch del periodo seleccionado (Mes o Trimestre)
+        // Añadimos el caso para multiplicar por 12 si se selecciona el año
         $calculatedGoal = match ($period) {
             'quarter' => $monthlyGoal * 3,
-            default => $monthlyGoal, // 'month'
+            'year' => $monthlyGoal * 12, // <-- Línea añadida
+            default => $monthlyGoal,
         };
 
-        // Contamos las encuestas completadas en ese rango específico
         $completedCount = Survey::where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->count();
 
-        // Evitamos división por cero en el flujo alternativo
         $percentage = $calculatedGoal > 0
             ? round(($completedCount / $calculatedGoal) * 100, 1)
             : 0;
