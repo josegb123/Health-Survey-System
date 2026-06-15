@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable('survey_template_id', 'question_text', 'field_type', 'order')]
 class SurveyQuestion extends Model
@@ -23,11 +23,11 @@ class SurveyQuestion extends Model
     }
 
     /**
-     * Summary of answer
-     * @return HasOne<SurveyAnswer, SurveyQuestion>
+     * Summary of answers
+     * @return HasMany<SurveyAnswer, SurveyQuestion>
      */
-    public function answer(): HasOne
+    public function answers(): HasMany
     {
-        return $this->hasOne(SurveyAnswer::class);
+        return $this->hasMany(SurveyAnswer::class);
     }
 }
