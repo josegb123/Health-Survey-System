@@ -32,8 +32,9 @@ class Dashboard extends Component
         $this->endDate = Carbon::now()->endOfDay()->toDateTimeString();
 
         $this->startDate = match ($this->period) {
-            'week'  => Carbon::now()->subDays(7)->startOfDay()->toDateTimeString(),
-            'year'  => Carbon::now()->subYear()->startOfDay()->toDateTimeString(),
+            'week' => Carbon::now()->subDays(7)->startOfDay()->toDateTimeString(),
+            'quarter' => Carbon::now()->subMonths(3)->startOfDay()->toDateTimeString(),
+            'year' => Carbon::now()->subYear()->startOfDay()->toDateTimeString(),
             default => Carbon::now()->subMonth()->startOfDay()->toDateTimeString(),
         };
     }
