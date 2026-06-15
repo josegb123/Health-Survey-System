@@ -14,6 +14,13 @@
             'icon' => 'user',
             'navigate' => true,
         ],
+        [
+            'label' => 'Encuestas',
+            'route' => 'admin.survey-templates.index',
+            'active_pattern' => 'admin.survey-templates.*',
+            'icon' => 'document-text',
+            'navigate' => true,
+        ],
     ];
 @endphp
 
