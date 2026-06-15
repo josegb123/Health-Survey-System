@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Dashboard;
 use App\Livewire\User\Index;
 use Illuminate\Support\Facades\Route;
 use App\Services\SurveyProcessorService;
@@ -9,7 +10,7 @@ use App\Livewire\Admin\SurveyTemplateIndex;
 Route::view('/', 'livewire.auth.login')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('admin/dashboard', Dashboard::class)->name('dashboard');
     Route::get('users/index', Index::class)->name('users.index');
 
     // Rutas de Administración del Backend
