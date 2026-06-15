@@ -29,7 +29,7 @@ class CreateSurveyAnswersAction
             $rowsToInsert[] = [
                 'survey_id' => $surveyId,
                 'survey_question_id' => $questionId,
-                'answer_text' => is_array($answerValue) ? json_encode($answerValue) : (string) $answerValue,
+                'answer_value' => is_array($answerValue) ? json_encode($answerValue) : (string) $answerValue,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
