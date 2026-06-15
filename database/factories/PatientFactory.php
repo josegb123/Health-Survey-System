@@ -19,6 +19,7 @@ class PatientFactory extends Factory
     public function definition(): array
     {
         return [
+            'document_type' => $this->faker->randomElement(['CC', 'CE', 'PA']),
             'dni' => $this->faker->numberBetween(10000000, 1199999999),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),

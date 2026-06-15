@@ -31,7 +31,6 @@ class DatabaseSeeder extends Seeder
         // Inicializa el registro único de configuraciones globales
         SystemSetting::set();
 
-        $this->command->info('System settings initialized successfully.');
         // The user is created from env file vars
         User::factory()->create([
             'name' => env('ADMIN_NAME', 'Administrador por Defecto'),

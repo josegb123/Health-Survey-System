@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
+            $table->string('document_type', 5)->default('CC');
             $table->unsignedBigInteger('dni')->unique();
             $table->string('name');
             $table->string('email')->nullable();

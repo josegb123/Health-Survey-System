@@ -9,11 +9,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable('name', 'dni', 'dni', 'name', 'email', 'nationality', 'address', 'phone', 'insurer_id')]
+#[Fillable('name', 'document_type', 'dni', 'email', 'nationality', 'address', 'phone', 'insurer_id')]
 class Patient extends Model
 {
     /** @use HasFactory<\Database\Factories\PatientFactory> */
     use HasFactory, SoftDeletes;
+
+    /**
+     * Retorna los tipos de documento soportados por el sistema y sus traducciones.
+     */
+    public static function documentTypes(): array
+    {
+        return [
+            'CC' => __('Cédula de Ciudadanía'),
+            'CE' => __('Cédula de Extranjería'),
+            'PA' => __('Pasaporte'),
+            'TI' => __('Tarjeta de Identidad'),
+        ];
+    }
 
     /**
      * Relación inversa: Un paciente pertenece a una aseguradora (EPS).
