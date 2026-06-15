@@ -32,4 +32,13 @@ class SurveyTemplate extends Model
     {
         return $this->hasMany(Survey::class);
     }
+
+    /**
+     * Summary of questions
+     * @return HasMany<SurveyQuestion, SurveyTemplate>
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(SurveyQuestion::class);
+    }
 }
