@@ -34,6 +34,9 @@ return new class extends Migration {
             $table->integer('session_timeout_minutes')->default(30);
             $table->boolean('is_maintenance_mode')->default(false);
 
+            // Metricas
+            $table->integer('survey_monthly_goal')->default(100);
+
             $table->timestamps();
         });
     }
