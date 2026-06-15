@@ -23,7 +23,8 @@ class Dashboard extends Component
         // Notifica de forma reactiva al subcomponentes hijo
         $this->dispatch('dashboard-filter-updated', [
             'startDate' => $this->startDate,
-            'endDate' => $this->endDate
+            'endDate' => $this->endDate,
+            'period' => $this->period, // <-- Línea crucial añadida
         ]);
     }
 
@@ -37,6 +38,8 @@ class Dashboard extends Component
             'year' => Carbon::now()->subYear()->startOfDay()->toDateTimeString(),
             default => Carbon::now()->subMonth()->startOfDay()->toDateTimeString(),
         };
+
+
     }
 
     public function render()
