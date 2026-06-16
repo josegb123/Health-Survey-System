@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
+use Database\Factories\SurveyFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\URL;
 
-#[Fillable('survey_template_id', 'patient_id', 'signature_path', 'status', 'completed_at', )]
+#[Fillable('survey_template_id', 'patient_id', 'signature_path', 'status', 'rating', 'completed_at', )]
 class Survey extends Model
 {
-    /** @use HasFactory<\Database\Factories\SurveyFactory> */
+    /** @use HasFactory<SurveyFactory> */
     use HasFactory, SoftDeletes;
 
     /**
@@ -78,6 +79,7 @@ class Survey extends Model
 
     /**
      * Summary of answers
+     *
      * @return HasMany<SurveyAnswer, Survey>
      */
     public function answers(): HasMany
