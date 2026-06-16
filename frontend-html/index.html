@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div
+        class="max-w-2xl mx-auto p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+        <div id="survey-loading" class="text-zinc-500 italic text-sm">Cargando cuestionario...</div>
+
+        <form id="dynamic-survey-form" class="space-y-6 hidden">
+            <h2 id="survey-title" class="text-xl font-bold text-zinc-900 dark:text-white"></h2>
+
+
+            <div id="survey-questions-container" class="space-y-5"></div>
+
+            <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
+                <button type="submit"
+                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors shadow-sm">
+                    Enviar Respuestas
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuración inicial del entorno
+            const TEMPLATE_ID = 1; // ID dinámico de la plantilla
+            const API_BASE_URL = 'http://localhost:8000/api';
+
+            const loadingEl = document.getElementById('survey-loading');
+            const formEl = document.getElementById('dynamic-survey-form');
+            const titleEl = document.getElementById('survey-title');
+            const containerEl = document.getElementById('survey-questions-container');
+
+            let localQuestionsCache = [];
+
+            // 1. OBTENER LOS DATOS DEL API (GET)
+            fetch(`${API_BASE_URL}/survey-templates/${TEMPLATE_ID}`)
+                .then(response => response.json())
+                .then(res => {
+                    if (!res.success) throw new Error(res.message);
+
+                    localQuestionsCache = res.data.questions;
+                    renderSurvey(res.data);
+                })
+                .catch(err => {
+                    loadingEl.textContent = `Error: ${err.message}`;
+                    loadingEl.classList.add('text-red-500');
+                });
+
+            // 2. RENDERIZADOR DINÁMICO DE CAMPOS
+            function renderSurvey(surveyData) {
+                titleEl.textContent = surveyData.title;
+                containerEl.innerHTML = ''; // Limpiar contenedor
+
+                surveyData.questions.forEach((q) => {
+                    const questionWrapper = document.createElement('div');
+                    questionWrapper.className = 'space-y-2 question-block';
+                    questionWrapper.dataset.questionId = q.id;
+                    questionWrapper.dataset.required = q.is_required;
+
+                    // Renderizar la etiqueta (Label)
+                    const label = document.createElement('label');
+                    label.className = 'block text-sm font-medium text-zinc-700 dark:text-zinc-300';
+                    label.innerHTML = `${q.question_text} ${q.is_required ? '<span class="text-red-500">*</span>' : ''}`;
+                    questionWrapper.appendChild(label);
+
+                    // Selector de elemento por tipo de campo (field_type)
+                    let inputElement;
+
+                    switch (q.field_type) {
+                        case 'number':
+                            inputElement = document.createElement('input');
+                            inputElement.type = 'number';
+                            inputElement.min = '1';
+                            inputElement.max = '5';
+                            inputElement.className = 'w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
+                            inputElement.placeholder = 'Ej: 5';
+                            inputElement.name = `q-${q.id}`;
+                            questionWrapper.appendChild(inputElement);
+                            break;
+
+                        case 'text':
+                            inputElement = document.createElement('textarea');
+                            inputElement.rows = 3;
+                            inputElement.className = 'w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
+                            inputElement.placeholder = 'Escriba su respuesta aquí...';
+                            inputElement.name = `q-${q.id}`;
+                            questionWrapper.appendChild(inputElement);
+                            break;
+
+                        case 'radio':
+                            const radioContainer = document.createElement('div');
+                            radioContainer.className = 'flex flex-col gap-2 mt-1';
+
+                            q.options.forEach((option, idx) => {
+                                const row = document.createElement('label');
+                                row.className = 'flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 cursor-pointer';
+
+                                const radio = document.createElement('input');
+                                radio.type = 'radio';
+                                radio.name = `q-${q.id}`;
+                                radio.value = option;
+                                radio.className = 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700';
+
+                                row.appendChild(radio);
+                                row.append(option);
+                                radioContainer.appendChild(row);
+                            });
+                            questionWrapper.appendChild(radioContainer);
+                            break;
+
+                        case 'select':
+                            inputElement = document.createElement('select');
+                            inputElement.className = 'w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
+                            inputElement.name = `q-${q.id}`;
+
+                            const defaultOpt = document.createElement('option');
+                            defaultOpt.value = '';
+                            defaultOpt.textContent = 'Seleccione una opción...';
+                            inputElement.appendChild(defaultOpt);
+
+                            q.options.forEach(option => {
+                                const opt = document.createElement('option');
+                                opt.value = option;
+                                opt.textContent = option;
+                                inputElement.appendChild(opt);
+                            });
+                            questionWrapper.appendChild(inputElement);
+                            break;
+                    }
+
+                    // Contenedor oculto para mensajes de error
+                    const errorSpan = document.createElement('p');
+                    errorSpan.className = 'text-xs text-red-500 font-medium hidden error-message';
+                    questionWrapper.appendChild(errorSpan);
+
+                    containerEl.appendChild(questionWrapper);
+                });
+
+                // Ocultar loader y mostrar formulario
+                loadingEl.classList.add('hidden');
+                formEl.classList.remove('hidden');
+            }
+
+            // 3. CAPTURA DEL VALOR POR TIPO DE ELEMENTO
+            function getQuestionValue(block, type) {
+                if (type === 'radio') {
+                    const checkedRadio = block.querySelector('input[type="radio"]:checked');
+                    return checkedRadio ? checkedRadio.value : null;
+                } else {
+                    const input = block.querySelector('input, textarea, select');
+                    return input ? input.value.trim() : null;
+                }
+            }
+
+            // 4. VALIDACIÓN Y PROCESAMIENTO DEL ENVÍO (POST)
+            formEl.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let hasErrors = false;
+                const payloadAnswers = [];
+                const blocks = containerEl.querySelectorAll('.question-block');
+
+                blocks.forEach((block) => {
+                    const qId = parseInt(block.dataset.questionId);
+                    const isRequired = block.dataset.required === 'true';
+
+                    // Buscamos el tipo de campo desde la caché local
+                    const originalQuestion = localQuestionsCache.find(q => q.id === qId);
+                    const type = originalQuestion ? originalQuestion.field_type : 'text';
+
+                    const value = getQuestionValue(block, type);
+                    const errorSpan = block.querySelector('.error-message');
+
+                    // Resetear estados visuales de error previos
+                    errorSpan.classList.add('hidden');
+                    errorSpan.textContent = '';
+
+                    // Validar obligatoriedad
+                    if (isRequired && (value === null || value === '')) {
+                        errorSpan.textContent = 'Este campo es obligatorio.';
+                        errorSpan.classList.remove('hidden');
+                        hasErrors = true;
+                    }
+                    // Validación numérica opcional cliente (Rango 1 a 5)
+                    else if (type === 'number' && value !== '' && value !== null) {
+                        const num = parseInt(value);
+                        if (num < 1 || num > 5) {
+                            errorSpan.textContent = 'El valor debe estar entre 1 y 5.';
+                            errorSpan.classList.remove('hidden');
+                            hasErrors = true;
+                        }
+                    }
+
+                    // Insertar al array estructurado si pasa filtros locales
+                    payloadAnswers.push({
+                        question_id: qId,
+                        value: type === 'number' && value !== '' ? parseInt(value) : value
+                    });
+                });
+
+                if (hasErrors) {
+                    // Detener flujo si hay errores visuales en el cliente
+                    return;
+                }
+
+                // Construcción del Contrato JSON exacto para el endpoint de Laravel
+                const finalPayload = {
+                    answers: payloadAnswers
+                };
+
+                // Enviar datos al Servidor Laravel
+                fetch(`${API_BASE_URL}/surveys/${TEMPLATE_ID}/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(finalPayload)
+                })
+                    .then(async (response) => {
+                        const data = await response.json();
+
+                        if (response.status === 422) {
+                            // Errores de validación devueltos por el FormRequest de Laravel
+                            alert(`Error de validación del servidor: ${data.message}`);
+                            return;
+                        }
+
+                        if (!response.ok) throw new Error(data.message || 'Error en el servidor');
+
+                        alert('Encuesta enviada con éxito. ¡Gracias!');
+                        formEl.reset();
+                    })
+                    .catch(err => {
+                        alert(`Error crítico al enviar: ${err.message}`);
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

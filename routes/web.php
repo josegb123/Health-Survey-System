@@ -20,10 +20,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
     require __DIR__ . '/settings.php';
 });
 
-// Ruta Fallback para redirección inteligente
-Route::fallback(function () {
-    if (Auth::check()) {
-        return redirect()->route('dashboard');
-    }
-    return redirect()->route('login');
-});
