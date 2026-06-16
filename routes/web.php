@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Admin\Dashboard;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Acceso Público / Autenticación
@@ -14,9 +13,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/dashboard', Dashboard::class)->name('dashboard');
 
     // Módulo de Administración
-    require __DIR__ . '/admin.php';
+    require __DIR__.'/admin.php';
 
     // Ajustes del sistema
-    require __DIR__ . '/settings.php';
+    require __DIR__.'/settings.php';
 });
 
+// Ruta Fallback para redirección inteligente
+Route::fallback(function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return redirect()->route('login');
+});
