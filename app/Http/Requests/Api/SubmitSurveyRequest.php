@@ -20,8 +20,13 @@ class SubmitSurveyRequest extends FormRequest
             // Validaciones para la creación/búsqueda del paciente
             'patient' => ['required', 'array'],
             'patient.name' => ['required', 'string', 'max:255'],
-            'patient.dni' => ['required', 'string', 'max:50'],
-            'patient.email' => ['required', 'email', 'max:255'],
+            'patient.dni' => ['required', 'integer'],
+            'patient.document_type' => ['required', 'string', 'max:4'],
+            'patient.email' => ['nullable', 'email', 'max:255'],
+            'patient.nationality' => ['nullable', 'string', 'max:50'],
+            'patient.address' => ['nullable', 'string', 'max:150'],
+            'patient.phone' => ['nullable', 'string', 'max:50'],
+            'patient.insurer_id' => ['nullable', 'string', 'max:50'],
 
             // Validaciones de las respuestas
             'answers' => ['required', 'array'],
@@ -38,7 +43,7 @@ class SubmitSurveyRequest extends FormRequest
             foreach ($requiredQuestionIds as $requiredId) {
                 $answer = collect($value)->firstWhere('question_id', $requiredId);
 
-                if (!$answer || is_null($answer['value']) || $answer['value'] === '') {
+                if (! $answer || is_null($answer['value']) || $answer['value'] === '') {
                     $fail(__('La pregunta con ID :id es requerida obligatoriamente.', ['id' => $requiredId]));
                 }
             }
