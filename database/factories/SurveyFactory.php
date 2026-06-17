@@ -27,12 +27,13 @@ class SurveyFactory extends Factory
             'survey_template_id' => SurveyTemplate::inRandomOrder()->first()?->id ?? SurveyTemplate::factory(),
             'patient_id' => Patient::inRandomOrder()->first()?->id ?? Patient::factory(),
             'signature_path' => $status === 'completed'
-                ? 'signatures/sig_' . $this->faker->md5 . '.png'
+                ? 'signatures/sig_'.$this->faker->md5.'.png'
                 : null,
             'status' => $status,
             'completed_at' => $status === 'completed' ? $createdAt : null,
             'created_at' => $createdAt,
             'updated_at' => $createdAt,
+
         ];
     }
 }

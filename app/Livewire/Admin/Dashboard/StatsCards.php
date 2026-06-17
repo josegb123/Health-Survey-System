@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Dashboard;
 
-use App\Services\DashboardMetricsService;
 use App\Models\SystemSetting;
+use App\Services\DashboardMetricsService;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -11,11 +11,17 @@ use Livewire\Component;
 class StatsCards extends Component
 {
     public int $completedSurveys = 0;
+
     public array $goalStats = [];
+
     public string $period = 'month';
+
     public int $editingGoalValue = 0;
 
+    public float $generalRate = 0.0;
+
     public string $startDate;
+
     public string $endDate;
 
     public function mount(DashboardMetricsService $metricsService, string $startDate, string $endDate): void
@@ -46,6 +52,11 @@ class StatsCards extends Component
             Carbon::parse($this->endDate),
             $this->period
         );
+
+        $this->generalRate = $metricsService->getGeneralRate(
+            Carbon::parse($this->startDate),
+            Carbon::parse($this->endDate),
+        );
     }
 
     public function openGoalModal(DashboardMetricsService $metricsService): void
@@ -60,7 +71,7 @@ class StatsCards extends Component
     public function saveGoal(DashboardMetricsService $metricsService): void
     {
         $this->validate([
-            'editingGoalValue' => 'required|integer|min:1'
+            'editingGoalValue' => 'required|integer|min:1',
         ]);
 
         // Flujo correcto para tu modelo estructurado por columnas:
@@ -69,7 +80,7 @@ class StatsCards extends Component
 
         // 2. Actualizamos la columna específica de forma segura
         $settings->update([
-            'survey_monthly_goal' => $this->editingGoalValue
+            'survey_monthly_goal' => $this->editingGoalValue,
         ]);
 
         // Tu boot del modelo se encarga de Cache::forget('global_system_settings') aquí.

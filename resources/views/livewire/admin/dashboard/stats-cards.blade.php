@@ -65,6 +65,18 @@
         </div>
     </div>
 
+    <div
+        class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl flex items-center gap-4 shadow-sm">
+        <div class="p-3 bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400 rounded-lg">
+            <flux:icon name="check-circle" variant="outline" class="h-6 w-6" />
+        </div>
+        <div>
+            <span
+                class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">{{ __('Calificación General') }}</span>
+            <span
+                class="text-2xl font-bold text-zinc-900 dark:text-white mt-1 block">{{ floatval($generalRate) }}</span>
+        </div>
+    </div>
     {{-- Tarjeta 3: Siguiente métrica... --}}
 
     {{-- MODAL INLINE DE CONFIGURACIÓN DE METAS --}}

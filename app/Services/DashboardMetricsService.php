@@ -25,6 +25,7 @@ class DashboardMetricsService
     {
         // Consumimos tu método optimizado con caché y leemos la propiedad fillable
         $settings = SystemSetting::set();
+
         return $settings->survey_monthly_goal ?? 100; // 100 de respaldo si viene nulo
     }
 
@@ -55,5 +56,20 @@ class DashboardMetricsService
             'completed' => $completedCount,
             'percentage' => $percentage,
         ];
+    }
+
+    /*
+     * Calcula la nota promedio general en un rango de fechas.
+     */
+    public function getGeneralRate(Carbon $startDate, Carbon $endDate): float
+    {
+        $start = clone $startDate->startOfDay();
+        $end = clone $endDate->endOfDay();
+
+        $average = Survey::where('status', 'completed')
+            ->whereBetween('created_at', [$start, $end])
+            ->avg('rating');
+
+        return (float) ($average ?? 0.0);
     }
 }
