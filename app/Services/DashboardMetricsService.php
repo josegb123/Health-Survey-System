@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Survey;
 use App\Models\SystemSetting;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class DashboardMetricsService
 {
@@ -71,5 +72,17 @@ class DashboardMetricsService
             ->avg('rating');
 
         return (float) ($average ?? 0.0);
+    }
+
+    /**
+     * Obtiene las últimas encuestas procesadas con sus relaciones cargadas.
+     */
+    public function getRecentSurveys(int $limit = 5): Collection
+    {
+        return Survey::with(['patient', 'template'])
+            ->where('status', 'completed')
+            ->latest()
+            ->take($limit)
+            ->get();
     }
 }
