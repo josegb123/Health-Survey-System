@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Services\DashboardMetricsService;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -42,8 +43,15 @@ class Dashboard extends Component
 
     }
 
-    public function render()
+    public function render(DashboardMetricsService $metricsService)
     {
-        return view('livewire.admin.dashboard');
+        $recentSurveys = $metricsService->getRecentSurveys(10);
+        return view(
+            'livewire.admin.dashboard',
+            [
+                'recentSurveys' => $recentSurveys,
+
+            ]
+        );
     }
 }

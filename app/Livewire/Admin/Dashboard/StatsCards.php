@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Dashboard;
 use App\Models\SystemSetting;
 use App\Services\DashboardMetricsService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -23,6 +24,7 @@ class StatsCards extends Component
     public string $startDate;
 
     public string $endDate;
+
 
     public function mount(DashboardMetricsService $metricsService, string $startDate, string $endDate): void
     {
@@ -57,6 +59,7 @@ class StatsCards extends Component
             Carbon::parse($this->startDate),
             Carbon::parse($this->endDate),
         );
+
     }
 
     public function openGoalModal(DashboardMetricsService $metricsService): void

@@ -1,4 +1,4 @@
-<div class="space-y-6 p-6">
+<d class="space-y-6 p-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <flux:heading size="xl">{{ __('Panel de Control') }}</flux:heading>
@@ -19,4 +19,4 @@
 
     {{-- Inyección del componente hijo pasando las propiedades iniciales --}}
     <livewire:admin.dashboard.stats-cards :startDate="$startDate" :endDate="$endDate" />
-</div>
+    <livewire:admin.dashboard.recent-surveys-table :recentSurveys="$recentSurveys" />
