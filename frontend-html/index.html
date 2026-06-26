@@ -1,168 +1,398 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Encuesta de Salud</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body>
-    <div
-        class="max-w-2xl mx-auto p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-        <div id="survey-loading" class="text-zinc-500 italic text-sm">Cargando cuestionario...</div>
+<body class="bg-zinc-100 dark:bg-zinc-950 min-h-screen py-4 sm:py-8 px-4">
+        <div class="max-w-3xl mx-auto space-y-4 sm:space-y-6">
 
-        <form id="dynamic-survey-form" class="space-y-6 hidden">
-            <h2 id="survey-title" class="text-xl font-bold text-zinc-900 dark:text-white"></h2>
+        <div id="survey-loading" class="text-center py-12 sm:py-16">
+            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-zinc-500 text-sm">Cargando cuestionario...</p>
+        </div>
 
+        <form id="dynamic-survey-form" class="hidden space-y-4 sm:space-y-6">
 
-            <div id="survey-questions-container" class="space-y-5"></div>
+            <!-- Título de la encuesta -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6">
+                <h2 id="survey-title" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white"></h2>
+                <p class="text-zinc-500 text-xs sm:text-sm mt-1">Complete los datos del paciente y responda todas las preguntas.</p>
+            </div>
 
-            <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-end">
-                <button type="submit"
-                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors shadow-sm">
-                    Enviar Respuestas
+            <!-- Datos del Paciente -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 space-y-4">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Datos del Paciente
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nombre completo <span class="text-red-500">*</span></label>
+                            <input type="text" id="patient-name" required
+                                class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Email</label>
+                            <input type="email" id="patient-email"
+                                class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tipo de documento <span class="text-red-500">*</span></label>
+                            <select id="patient-document-type" required
+                                class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                            <option value="">Seleccione...</option>
+                            <option value="CC">Cédula de Ciudadanía</option>
+                            <option value="CE">Cédula de Extranjería</option>
+                            <option value="PA">Pasaporte</option>
+                            <option value="TI">Tarjeta de Identidad</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">N° de documento <span class="text-red-500">*</span></label>
+                        <input type="text" id="patient-dni" inputmode="numeric" pattern="[0-9]*" required
+                            class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Teléfono</label>
+                        <input type="text" id="patient-phone"
+                            class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Nacionalidad</label>
+                        <input type="text" id="patient-nationality"
+                            class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Dirección</label>
+                        <input type="text" id="patient-address"
+                            class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Aseguradora</label>
+                        <select id="patient-insurer"
+                            class="w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white">
+                            <option value="">Seleccione...</option>
+                        </select>
+                        <p class="text-xs text-zinc-400 mt-1" id="insurer-loading">Cargando aseguradoras...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preguntas -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 space-y-5">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Cuestionario
+                </h3>
+                <div id="survey-questions-container" class="space-y-5"></div>
+            </div>
+
+            <!-- Firma Digital -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 space-y-3">
+                <h3 class="text-lg font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    Firma Digital <span class="text-red-500">*</span>
+                </h3>
+                <p class="text-xs text-zinc-400">Firme en el recuadro usando su mouse o dedo (en dispositivos táctiles).</p>
+                <div class="border border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden bg-white">
+                    <canvas id="signature-pad" class="w-full touch-none cursor-crosshair"></canvas>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" id="clear-signature"
+                        class="text-sm text-zinc-500 hover:text-red-600 transition-colors flex items-center gap-1 px-3 py-2 sm:py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Limpiar firma
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón de envío -->
+            <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6">
+                <button type="submit" id="submit-btn"
+                    class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    Enviar Encuesta
                 </button>
             </div>
         </form>
+
+        <!-- Mensaje de éxito (oculto inicialmente) -->
+        <div id="success-message" class="hidden bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl shadow-sm p-6 sm:p-8 text-center">
+            <svg class="w-16 h-16 text-emerald-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-xl font-bold text-emerald-800 dark:text-emerald-200 mb-2">Encuesta enviada con éxito</h3>
+            <p class="text-emerald-600 dark:text-emerald-400 text-sm mb-4" id="success-rating"></p>
+            <button type="button" onclick="location.reload()"
+                class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors">
+                Nueva encuesta
+            </button>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div id="error-message" class="hidden bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl shadow-sm p-4 sm:p-6 text-center">
+            <p id="error-text" class="text-red-700 dark:text-red-300 text-sm"></p>
+        </div>
+
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Configuración inicial del entorno
-            const TEMPLATE_ID = 1; // ID dinámico de la plantilla
+            const TEMPLATE_ID = 1;
             const API_BASE_URL = 'http://localhost:8000/api';
 
             const loadingEl = document.getElementById('survey-loading');
             const formEl = document.getElementById('dynamic-survey-form');
             const titleEl = document.getElementById('survey-title');
             const containerEl = document.getElementById('survey-questions-container');
+            const successEl = document.getElementById('success-message');
+            const errorEl = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const successRating = document.getElementById('success-rating');
+            const submitBtn = document.getElementById('submit-btn');
+            const insurerSelect = document.getElementById('patient-insurer');
+            const insurerLoading = document.getElementById('insurer-loading');
 
             let localQuestionsCache = [];
 
-            // 1. OBTENER LOS DATOS DEL API (GET)
+            // 1. Cargar aseguradoras
+            fetch(`${API_BASE_URL}/insurers`)
+                .then(r => r.json())
+                .then(data => {
+                    insurerLoading.classList.add('hidden');
+                    if (data.success && data.data) {
+                        data.data.forEach(ins => {
+                            const opt = document.createElement('option');
+                            opt.value = ins.id;
+                            opt.textContent = ins.name;
+                            insurerSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(() => {
+                    insurerLoading.textContent = 'No se pudieron cargar las aseguradoras.';
+                });
+
+            // 2. Obtener plantilla
             fetch(`${API_BASE_URL}/survey-templates/${TEMPLATE_ID}`)
                 .then(response => response.json())
                 .then(res => {
                     if (!res.success) throw new Error(res.message);
-
                     localQuestionsCache = res.data.questions;
                     renderSurvey(res.data);
                 })
                 .catch(err => {
-                    loadingEl.textContent = `Error: ${err.message}`;
-                    loadingEl.classList.add('text-red-500');
+                    loadingEl.innerHTML = `
+                        <p class="text-red-500 text-sm">Error: ${err.message}</p>
+                    `;
                 });
 
-            // 2. RENDERIZADOR DINÁMICO DE CAMPOS
+            // 3. Signature Pad
+            const canvas = document.getElementById('signature-pad');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0, lastY = 0;
+
+            function resizeCanvas() {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = window.innerWidth < 640 ? 150 : 200;
+                ctx.strokeStyle = '#1e1e2e';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+
+            function getPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            function startDrawing(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const pos = getPos(e);
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            function stopDrawing(e) {
+                isDrawing = false;
+            }
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+            canvas.addEventListener('touchstart', startDrawing, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
+
+            document.getElementById('clear-signature').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            function isSignatureEmpty() {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+                for (let i = 3; i < pixels.length; i += 4) {
+                    if (pixels[i] !== 0) return false;
+                }
+                return true;
+            }
+
+            function getSignatureBase64() {
+                return canvas.toDataURL('image/png');
+            }
+
+            // 4. Renderizado
             function renderSurvey(surveyData) {
                 titleEl.textContent = surveyData.title;
-                containerEl.innerHTML = ''; // Limpiar contenedor
+                containerEl.innerHTML = '';
+
+                loadingEl.classList.add('hidden');
+                formEl.classList.remove('hidden');
+
+                // El canvas necesita recalcular su tamaño ahora que el formulario es visible
+                resizeCanvas();
 
                 surveyData.questions.forEach((q) => {
-                    const questionWrapper = document.createElement('div');
-                    questionWrapper.className = 'space-y-2 question-block';
-                    questionWrapper.dataset.questionId = q.id;
-                    questionWrapper.dataset.required = q.is_required;
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'space-y-2 question-block';
+                    wrapper.dataset.questionId = q.id;
+                    wrapper.dataset.required = q.is_required;
 
-                    // Renderizar la etiqueta (Label)
                     const label = document.createElement('label');
                     label.className = 'block text-sm font-medium text-zinc-700 dark:text-zinc-300';
                     label.innerHTML = `${q.question_text} ${q.is_required ? '<span class="text-red-500">*</span>' : ''}`;
-                    questionWrapper.appendChild(label);
+                    wrapper.appendChild(label);
 
-                    // Selector de elemento por tipo de campo (field_type)
-                    let inputElement;
+                    let input;
 
                     switch (q.field_type) {
                         case 'number':
-                            inputElement = document.createElement('input');
-                            inputElement.type = 'number';
-                            inputElement.min = '1';
-                            inputElement.max = '5';
-                            inputElement.className = 'w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
-                            inputElement.placeholder = 'Ej: 5';
-                            inputElement.name = `q-${q.id}`;
-                            questionWrapper.appendChild(inputElement);
+                            input = document.createElement('input');
+                            input.type = 'number';
+                            input.min = '1';
+                            input.max = '5';
+                            input.step = '1';
+                            input.className = 'w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
+                            input.placeholder = 'Valor del 1 al 5';
+                            input.name = `q-${q.id}`;
+                            wrapper.appendChild(input);
                             break;
 
                         case 'text':
-                            inputElement = document.createElement('textarea');
-                            inputElement.rows = 3;
-                            inputElement.className = 'w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
-                            inputElement.placeholder = 'Escriba su respuesta aquí...';
-                            inputElement.name = `q-${q.id}`;
-                            questionWrapper.appendChild(inputElement);
+                            input = document.createElement('textarea');
+                            input.rows = 3;
+                            input.className = 'w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
+                            input.placeholder = 'Escriba su respuesta aquí...';
+                            input.name = `q-${q.id}`;
+                            wrapper.appendChild(input);
                             break;
 
-                        case 'radio':
-                            const radioContainer = document.createElement('div');
-                            radioContainer.className = 'flex flex-col gap-2 mt-1';
-
-                            q.options.forEach((option, idx) => {
+                        case 'radio': {
+                            const radioGroup = document.createElement('div');
+                            radioGroup.className = 'flex flex-wrap gap-3 mt-1';
+                            q.options.forEach((option) => {
                                 const row = document.createElement('label');
-                                row.className = 'flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 cursor-pointer';
-
+                                row.className = 'flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 cursor-pointer px-3 py-2.5 sm:py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50 dark:has-[:checked]:bg-indigo-950/30 transition-colors';
                                 const radio = document.createElement('input');
                                 radio.type = 'radio';
                                 radio.name = `q-${q.id}`;
                                 radio.value = option;
                                 radio.className = 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-zinc-700';
-
                                 row.appendChild(radio);
-                                row.append(option);
-                                radioContainer.appendChild(row);
+                                row.append(' ' + option);
+                                radioGroup.appendChild(row);
                             });
-                            questionWrapper.appendChild(radioContainer);
+                            wrapper.appendChild(radioGroup);
                             break;
+                        }
 
                         case 'select':
-                            inputElement = document.createElement('select');
-                            inputElement.className = 'w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
-                            inputElement.name = `q-${q.id}`;
-
-                            const defaultOpt = document.createElement('option');
-                            defaultOpt.value = '';
-                            defaultOpt.textContent = 'Seleccione una opción...';
-                            inputElement.appendChild(defaultOpt);
-
+                            input = document.createElement('select');
+                            input.className = 'w-full px-3 py-2.5 sm:py-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-zinc-900 dark:text-white';
+                            input.name = `q-${q.id}`;
+                            const def = document.createElement('option');
+                            def.value = '';
+                            def.textContent = 'Seleccione una opción...';
+                            input.appendChild(def);
                             q.options.forEach(option => {
                                 const opt = document.createElement('option');
                                 opt.value = option;
                                 opt.textContent = option;
-                                inputElement.appendChild(opt);
+                                input.appendChild(opt);
                             });
-                            questionWrapper.appendChild(inputElement);
+                            wrapper.appendChild(input);
                             break;
                     }
 
-                    // Contenedor oculto para mensajes de error
-                    const errorSpan = document.createElement('p');
-                    errorSpan.className = 'text-xs text-red-500 font-medium hidden error-message';
-                    questionWrapper.appendChild(errorSpan);
+                    const err = document.createElement('p');
+                    err.className = 'text-xs text-red-500 font-medium hidden error-message';
+                    wrapper.appendChild(err);
 
-                    containerEl.appendChild(questionWrapper);
+                    containerEl.appendChild(wrapper);
                 });
 
-                // Ocultar loader y mostrar formulario
-                loadingEl.classList.add('hidden');
-                formEl.classList.remove('hidden');
             }
 
-            // 3. CAPTURA DEL VALOR POR TIPO DE ELEMENTO
+            // 5. Obtener valor
             function getQuestionValue(block, type) {
                 if (type === 'radio') {
-                    const checkedRadio = block.querySelector('input[type="radio"]:checked');
-                    return checkedRadio ? checkedRadio.value : null;
-                } else {
-                    const input = block.querySelector('input, textarea, select');
-                    return input ? input.value.trim() : null;
+                    const checked = block.querySelector('input[type="radio"]:checked');
+                    return checked ? checked.value : null;
                 }
+                const el = block.querySelector('input, textarea, select');
+                return el ? el.value.trim() : null;
             }
 
-            // 4. VALIDACIÓN Y PROCESAMIENTO DEL ENVÍO (POST)
+            // 6. Envío
             formEl.addEventListener('submit', (e) => {
                 e.preventDefault();
+                errorEl.classList.add('hidden');
+                successEl.classList.add('hidden');
+
+                // Validar firma
+                if (isSignatureEmpty()) {
+                    alert('Debe firmar antes de enviar la encuesta.');
+                    return;
+                }
 
                 let hasErrors = false;
                 const payloadAnswers = [];
@@ -171,76 +401,109 @@
                 blocks.forEach((block) => {
                     const qId = parseInt(block.dataset.questionId);
                     const isRequired = block.dataset.required === 'true';
-
-                    // Buscamos el tipo de campo desde la caché local
-                    const originalQuestion = localQuestionsCache.find(q => q.id === qId);
-                    const type = originalQuestion ? originalQuestion.field_type : 'text';
-
+                    const original = localQuestionsCache.find(q => q.id === qId);
+                    const type = original ? original.field_type : 'text';
                     const value = getQuestionValue(block, type);
-                    const errorSpan = block.querySelector('.error-message');
+                    const errSpan = block.querySelector('.error-message');
 
-                    // Resetear estados visuales de error previos
-                    errorSpan.classList.add('hidden');
-                    errorSpan.textContent = '';
+                    errSpan.classList.add('hidden');
+                    errSpan.textContent = '';
 
-                    // Validar obligatoriedad
                     if (isRequired && (value === null || value === '')) {
-                        errorSpan.textContent = 'Este campo es obligatorio.';
-                        errorSpan.classList.remove('hidden');
+                        errSpan.textContent = 'Este campo es obligatorio.';
+                        errSpan.classList.remove('hidden');
                         hasErrors = true;
-                    }
-                    // Validación numérica opcional cliente (Rango 1 a 5)
-                    else if (type === 'number' && value !== '' && value !== null) {
+                    } else if (type === 'number' && value !== '' && value !== null) {
                         const num = parseInt(value);
                         if (num < 1 || num > 5) {
-                            errorSpan.textContent = 'El valor debe estar entre 1 y 5.';
-                            errorSpan.classList.remove('hidden');
+                            errSpan.textContent = 'El valor debe estar entre 1 y 5.';
+                            errSpan.classList.remove('hidden');
                             hasErrors = true;
                         }
                     }
 
-                    // Insertar al array estructurado si pasa filtros locales
                     payloadAnswers.push({
                         question_id: qId,
                         value: type === 'number' && value !== '' ? parseInt(value) : value
                     });
                 });
 
-                if (hasErrors) {
-                    // Detener flujo si hay errores visuales en el cliente
+                if (hasErrors) return;
+
+                const patientName = document.getElementById('patient-name').value.trim();
+                const patientDni = document.getElementById('patient-dni').value.trim();
+                const patientDocType = document.getElementById('patient-document-type').value;
+
+                if (!patientName || !patientDni || !patientDocType) {
+                    alert('Complete los campos obligatorios del paciente (nombre, tipo y n° de documento).');
                     return;
                 }
 
-                // Construcción del Contrato JSON exacto para el endpoint de Laravel
-                const finalPayload = {
-                    answers: payloadAnswers
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Enviando...
+                `;
+
+                const signatureBase64 = getSignatureBase64();
+
+                const payload = {
+                    patient: {
+                        name: patientName,
+                        dni: patientDni,
+                        document_type: patientDocType,
+                        email: document.getElementById('patient-email').value.trim() || null,
+                        nationality: document.getElementById('patient-nationality').value.trim() || null,
+                        address: document.getElementById('patient-address').value.trim() || null,
+                        phone: document.getElementById('patient-phone').value.trim() || null,
+                        insurer_id: document.getElementById('patient-insurer').value || null,
+                    },
+                    answers: payloadAnswers,
+                    signature: signatureBase64
                 };
 
-                // Enviar datos al Servidor Laravel
                 fetch(`${API_BASE_URL}/surveys/${TEMPLATE_ID}/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify(finalPayload)
+                    body: JSON.stringify(payload)
                 })
                     .then(async (response) => {
                         const data = await response.json();
 
                         if (response.status === 422) {
-                            // Errores de validación devueltos por el FormRequest de Laravel
-                            alert(`Error de validación del servidor: ${data.message}`);
+                            const messages = data.errors
+                                ? Object.values(data.errors).flat().join('\n')
+                                : data.message || 'Error de validación.';
+                            alert(messages);
                             return;
                         }
 
                         if (!response.ok) throw new Error(data.message || 'Error en el servidor');
 
-                        alert('Encuesta enviada con éxito. ¡Gracias!');
-                        formEl.reset();
+                        formEl.classList.add('hidden');
+                        successEl.classList.remove('hidden');
+                        successRating.textContent = data.data
+                            ? `Calificación asignada: ${data.data.rating_assigned}/5.00`
+                            : '';
                     })
                     .catch(err => {
-                        alert(`Error crítico al enviar: ${err.message}`);
+                        errorEl.classList.remove('hidden');
+                        errorText.textContent = `Error: ${err.message}`;
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                            Enviar Encuesta
+                        `;
                     });
             });
         });
