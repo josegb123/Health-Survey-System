@@ -153,10 +153,10 @@ class SurveyTemplateIndex extends Component
             $this->modal('create-template-flyout')->close();
             $this->reset(['title', 'is_active', 'questions']);
 
-            $this->dispatch('toast', type: 'success', text: __('Plantilla y preguntas creadas con éxito.'));
+            $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error al procesar la plantilla: ') . $e->getMessage());
+            $this->dispatch('toast', type: 'error', text: __('Error processing template: ') . $e->getMessage());
         }
     }
 
@@ -177,7 +177,7 @@ class SurveyTemplateIndex extends Component
         ]);
         $this->modal('status-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-        $this->dispatch('toast', type: 'success', text: __('Estado de la plantilla actualizado.'));
+        $this->dispatch('toast', type: 'success', text: __('Template status updated.'));
     }
 
     public function confirmDelete(int $id, string $title): void
@@ -195,13 +195,13 @@ class SurveyTemplateIndex extends Component
         if ($template->surveys()->exists()) {
             $this->modal('delete-modal')->close();
             $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-            $this->dispatch('toast', type: 'error', text: __('No se puede eliminar una plantilla que ya contiene respuestas clínicas.'));
+            $this->dispatch('toast', type: 'error', text: __('Cannot delete a template that already has clinical responses.'));
             return;
         }
         $template->delete();
         $this->modal('delete-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-        $this->dispatch('toast', type: 'success', text: __('Plantilla eliminada correctamente.'));
+        $this->dispatch('toast', type: 'success', text: __('Template deleted successfully.'));
     }
 
     public function render()

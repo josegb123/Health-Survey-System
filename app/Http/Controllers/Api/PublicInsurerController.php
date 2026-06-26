@@ -18,7 +18,7 @@ class PublicInsurerController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('Lista de EPS en el sistema.'),
+            'message' => __('List of insurers in the system.'),
             'data' => $insurers,
         ], 200);
     }

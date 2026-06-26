@@ -1,21 +1,21 @@
 <flux:modal name="status-modal" class="max-w-md">
     <div class="space-y-6">
         <div>
-            <flux:heading size="lg">{{ __('¿Cambiar estado de la plantilla?') }}</flux:heading>
+            <flux:heading size="lg">{{ __('Change template status?') }}</flux:heading>
             <flux:text class="mt-2">
-                {{ __('Vas a modificar la disponibilidad de:') }} <strong
+                {{ __('You are about to modify the availability of:') }} <strong
                     class="text-zinc-800 dark:text-zinc-200">{{ $selectedTemplateTitle }}</strong>.<br>
-                {{ __('Si la desactivas, los pacientes no podrán responderla.') }}
+                {{ __('If deactivated, patients will not be able to answer it.') }}
             </flux:text>
         </div>
 
         <div class="flex gap-2">
             <flux:spacer />
             <flux:modal.close>
-                <flux:button variant="ghost">{{ __('Cancelar') }}</flux:button>
+                <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
             </flux:modal.close>
             <flux:button wire:click="toggleStatus" variant="primary">
-                {{ __('Confirmar') }}
+                {{ __('Confirm') }}
             </flux:button>
         </div>
     </div>
@@ -25,21 +25,21 @@
     <div class="space-y-6">
         <div>
             <flux:heading size="lg" class="text-red-600 dark:text-red-400">
-                {{ __('¿Eliminar plantilla de encuesta?') }}</flux:heading>
+                {{ __('Delete survey template?') }}</flux:heading>
             <flux:text class="mt-2">
-                {{ __('¿Estás seguro de que deseas eliminar:') }} <strong
+                {{ __('Are you sure you want to delete:') }} <strong
                     class="text-zinc-800 dark:text-zinc-200">{{ $selectedTemplateTitle }}</strong>?<br>
-                {{ __('Esta acción no se puede deshacer si la plantilla es removida del sistema.') }}
+                {{ __('This action cannot be undone if the template is removed from the system.') }}
             </flux:text>
         </div>
 
         <div class="flex gap-2">
             <flux:spacer />
             <flux:modal.close>
-                <flux:button variant="ghost">{{ __('Cancelar') }}</flux:button>
+                <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
             </flux:modal.close>
             <flux:button wire:click="deleteTemplate" variant="danger">
-                {{ __('Eliminar Permanentemente') }}
+                {{ __('Permanently Delete') }}
             </flux:button>
         </div>
     </div>

@@ -1,14 +1,13 @@
 <div class="space-y-6 p-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <flux:heading size="xl">{{ __('Plantillas de Encuestas') }}</flux:heading>
-            <flux:text class="mt-1">{{ __('Administra los cuestionarios clínicos dinámicos y sus configuraciones.') }}
+            <flux:heading size="xl">{{ __('Survey Templates') }}</flux:heading>
+            <flux:text class="mt-1">{{ __('Manage dynamic clinical questionnaires and their settings.') }}
             </flux:text>
         </div>
 
-        {{-- Botón con disparo controlado --}}
         <flux:button wire:click="openCreateFlyout" variant="primary" icon="plus">
-            {{ __('Nueva Plantilla') }}
+            {{ __('New Template') }}
         </flux:button>
     </div>
 

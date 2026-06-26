@@ -78,7 +78,7 @@ class SystemSettings extends Component
 
         // Tu observer estático borra la caché 'global_system_settings' en este punto.
 
-        \Flux\Flux::toast(variant: 'success', text: __('Configuración del sistema actualizada correctamente.', ));
+        \Flux\Flux::toast(variant: 'success', text: __('System settings updated successfully.'));
     }
 
     public function render()

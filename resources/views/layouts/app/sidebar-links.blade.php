@@ -3,33 +3,33 @@
         [
             'label' => 'Dashboard',
             'route' => 'dashboard',
-            'active_pattern' => 'dashboard*', // Activo en dashboard y subrutas
+            'active_pattern' => 'dashboard*',
             'icon' => 'home',
             'navigate' => true,
         ],
         [
-            'label' => 'Usuarios',
+            'label' => 'Users',
             'route' => 'users.index',
             'active_pattern' => 'users.*',
             'icon' => 'user',
             'navigate' => true,
         ],
         [
-            'label' => 'Encuestas',
+            'label' => 'Surveys',
             'route' => 'admin.surveys.index',
             'active_pattern' => 'admin.surveys.*',
             'icon' => 'clipboard-document-list',
             'navigate' => true,
         ],
         [
-            'label' => 'Plantillas',
+            'label' => 'Templates',
             'route' => 'admin.survey-templates.index',
             'active_pattern' => 'admin.survey-templates.*',
             'icon' => 'document-text',
             'navigate' => true,
         ],
         [
-            'label' => 'Ajustes del sistema',
+            'label' => 'System Settings',
             'route' => 'admin.settings',
             'active_pattern' => 'admin.settings.*',
             'icon' => 'cog',

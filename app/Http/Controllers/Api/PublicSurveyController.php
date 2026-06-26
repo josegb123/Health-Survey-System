@@ -26,7 +26,7 @@ class PublicSurveyController extends Controller
         if (! $template || ! $template->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => __('La plantilla solicitada no está disponible o no existe.'),
+                'message' => __('The requested template is not available or does not exist.'),
             ], 404);
         }
 
@@ -67,7 +67,7 @@ class PublicSurveyController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Encuesta y registro de paciente procesados con éxito.'),
+                'message' => __('Survey and patient registration processed successfully.'),
                 'data' => [
                     'rating_assigned' => $survey->rating,
                 ],
@@ -76,7 +76,7 @@ class PublicSurveyController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('Ocurrió un error interno al procesar la solicitud.'),
+                'message' => __('An internal error occurred while processing the request.'),
                 'error' => $e->getMessage(),
             ], 500);
         }

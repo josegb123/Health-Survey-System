@@ -90,7 +90,7 @@ class StatsCards extends Component
 
         $this->modal('edit-goal-modal')->close();
         $this->loadMetrics($metricsService);
-        $this->dispatch('toast', type: 'success', text: __('Meta del sistema actualizada en configuración global.'));
+        $this->dispatch('toast', type: 'success', text: __('System goal updated in global settings.'));
     }
 
     public function render()

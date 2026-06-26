@@ -47,7 +47,7 @@ class SubmitSurveyRequest extends FormRequest
                 $answer = collect($value)->firstWhere('question_id', $requiredId);
 
                 if (! $answer || is_null($answer['value']) || $answer['value'] === '') {
-                    $fail(__('La pregunta con ID :id es requerida obligatoriamente.', ['id' => $requiredId]));
+                    $fail(__('Question with ID :id is required.', ['id' => $requiredId]));
                 }
             }
         };

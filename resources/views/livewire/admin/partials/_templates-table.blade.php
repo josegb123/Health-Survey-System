@@ -1,10 +1,10 @@
 <flux:table :paginate="$templates">
     <flux:table.columns>
-        <flux:table.column>{{ __('Título de la Encuesta') }}</flux:table.column>
-        <flux:table.column class="text-center">{{ __('N° Preguntas') }}</flux:table.column>
-        <flux:table.column>{{ __('Estado') }}</flux:table.column>
-        <flux:table.column>{{ __('Fecha de Creación') }}</flux:table.column>
-        <flux:table.column class="text-right">{{ __('Acciones') }}</flux:table.column>
+        <flux:table.column>{{ __('Survey Title') }}</flux:table.column>
+        <flux:table.column class="text-center">{{ __('Questions') }}</flux:table.column>
+        <flux:table.column>{{ __('Status') }}</flux:table.column>
+        <flux:table.column>{{ __('Creation Date') }}</flux:table.column>
+        <flux:table.column class="text-right">{{ __('Actions') }}</flux:table.column>
     </flux:table.columns>
 
     <flux:table.rows>
@@ -22,9 +22,9 @@
 
                 <flux:table.cell>
                     @if ($template->is_active)
-                        <flux:badge size="sm" color="green" inset="top bottom">{{ __('Activo') }}</flux:badge>
+                        <flux:badge size="sm" color="green" inset="top bottom">{{ __('Active') }}</flux:badge>
                     @else
-                        <flux:badge size="sm" color="red" inset="top bottom">{{ __('Inactivo') }}</flux:badge>
+                        <flux:badge size="sm" color="red" inset="top bottom">{{ __('Inactive') }}</flux:badge>
                     @endif
                 </flux:table.cell>
 
@@ -38,14 +38,14 @@
 
                         <flux:menu>
                             <flux:menu.item wire:click="viewTemplate({{ $template->id }})" icon="eye">
-                                {{ __('Ver Detalle') }}
+                                {{ __('View Detail') }}
                             </flux:menu.item>
 
                             <flux:menu.separator />
                             <flux:menu.item
                                 wire:click="confirmToggleStatus({{ $template->id }}, '{{ addslashes($template->title) }}')"
                                 icon="arrow-path">
-                                {{ $template->is_active ? __('Desactivar') : __('Activar') }}
+                                {{ $template->is_active ? __('Deactivate') : __('Activate') }}
                             </flux:menu.item>
 
                             <flux:menu.separator />
@@ -53,7 +53,7 @@
                             <flux:menu.item
                                 wire:click="confirmDelete({{ $template->id }}, '{{ addslashes($template->title) }}')"
                                 icon="trash" variant="danger">
-                                {{ __('Eliminar') }}
+                                {{ __('Delete') }}
                             </flux:menu.item>
                         </flux:menu>
                     </flux:dropdown>
@@ -62,7 +62,7 @@
         @empty
             <flux:table.row>
                 <flux:table.cell colspan="5" class="text-center py-8 text-zinc-400 italic">
-                    {{ __('No hay plantillas de encuestas registradas en el sistema.') }}
+                    {{ __('No survey templates registered in the system.') }}
                 </flux:table.cell>
             </flux:table.row>
         @endforelse

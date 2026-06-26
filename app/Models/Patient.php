@@ -21,10 +21,10 @@ class Patient extends Model
     public static function documentTypes(): array
     {
         return [
-            'CC' => __('Cédula de Ciudadanía'),
-            'CE' => __('Cédula de Extranjería'),
-            'PA' => __('Pasaporte'),
-            'TI' => __('Tarjeta de Identidad'),
+            'CC' => __('Citizenship ID'),
+            'CE' => __('Foreigner ID'),
+            'PA' => __('Passport'),
+            'TI' => __('Identity Card'),
         ];
     }
 
