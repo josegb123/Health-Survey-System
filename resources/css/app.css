@@ -9,7 +9,19 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-50: #eef9ff;
+    --color-brand-100: #dcf3ff;
+    --color-brand-200: #b3e8ff;
+    --color-brand-300: #6ad6ff;
+    --color-brand-400: #1ac0ff;
+    --color-brand-500: #009ed6;
+    --color-brand-600: #007eb5;
+    --color-brand-700: #006493;
+    --color-brand-800: #005479;
+    --color-brand-900: #004666;
+    --color-brand-950: #002d44;
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -23,27 +35,101 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
+    --color-accent: var(--color-brand-600);
+    --color-accent-content: var(--color-brand-700);
     --color-accent-foreground: var(--color-white);
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent: var(--color-brand-400);
+        --color-accent-content: var(--color-brand-300);
+        --color-accent-foreground: var(--color-brand-950);
     }
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        @apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100;
+    }
+
+    ::selection {
+        @apply bg-brand-200/60 text-brand-900 dark:bg-brand-800/60 dark:text-brand-100;
+    }
+}
+
+@layer components {
+    .sidebar-nav-item {
+        @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150
+               text-zinc-600 hover:text-brand-700 hover:bg-brand-50
+               dark:text-zinc-400 dark:hover:text-brand-300 dark:hover:bg-brand-950/50;
+    }
+
+    .sidebar-nav-item-active {
+        @apply flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-150
+               text-brand-700 bg-brand-50
+               dark:text-brand-300 dark:bg-brand-950/50;
+    }
+
+    .stat-card {
+        @apply relative overflow-hidden rounded-xl border border-zinc-200/70 bg-white p-5 shadow-xs
+               transition-all duration-200 hover:shadow-sm hover:border-zinc-300
+               dark:border-zinc-800/70 dark:bg-zinc-900 dark:hover:border-zinc-700;
+    }
+
+    .stat-card-icon {
+        @apply flex size-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600
+               dark:bg-brand-950/50 dark:text-brand-400;
+    }
+
+    .progress-bar-brand {
+        @apply h-2.5 rounded-full bg-brand-200 dark:bg-brand-900;
+    }
+
+    .progress-bar-brand-fill {
+        @apply h-2.5 rounded-full bg-gradient-to-r from-brand-500 to-brand-400 transition-all duration-700 ease-out;
+    }
+}
+
+@layer utilities {
+    .scrollbar-thin {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-zinc-300) transparent;
+    }
+
+    .dark .scrollbar-thin {
+        scrollbar-color: var(--color-zinc-700) transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        @apply bg-zinc-300 rounded-full;
+    }
+
+    .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+        @apply bg-zinc-700;
     }
 }
 
