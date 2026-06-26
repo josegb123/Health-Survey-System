@@ -11,6 +11,19 @@ class SurveyIndex extends Component
 {
     use WithPagination;
 
+    public ?Survey $viewingSurvey = null;
+
+    public function viewSurvey(int $id): void
+    {
+        $this->viewingSurvey = Survey::with([
+            'patient.insurer',
+            'template',
+            'answers.question',
+        ])->findOrFail($id);
+
+        $this->modal('view-survey-flyout')->show();
+    }
+
     public function render(): View
     {
         return view('livewire.admin.survey-index', [
