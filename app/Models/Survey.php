@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
 #[Fillable('survey_template_id', 'patient_id', 'signature_path', 'status', 'rating', 'completed_at', )]
@@ -29,27 +30,14 @@ class Survey extends Model
         ];
     }
 
-    /*
-     * Accessor dinámico para obtener la URL segura y temporal de la firma.
-     * Uso en Blade: {{ $survey->signature_url }}
-     *
-    protected function signatureUrl(): Attribute
+    public function signatureUrl(): ?string
     {
-        return Attribute::make(
-            get: function () {
-                if (!$this->signature_path) {
-                    return null;
-                }
+        if (!$this->signature_path) {
+            return null;
+        }
 
-                // Genera una URL firmada por Laravel que expira en 15 minutos
-                return URL::temporarySignedRoute(
-                    'surveys.signature', // Nombre de la ruta privada que crearemos
-                    now()->addMinutes(15),
-                    ['survey' => $this->id]
-                );
-            }
-        );
-    } */
+        return route('surveys.signature', $this);
+    }
 
     /**
      * Casts automáticos de Eloquent para el manejo de fechas con Carbon.

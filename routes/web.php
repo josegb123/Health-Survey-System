@@ -1,7 +1,9 @@
 <?php
 
 use App\Livewire\Admin\Dashboard;
+use App\Models\Survey;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 // Acceso Público / Autenticación
 Route::view('/', 'livewire.auth.login')->name('home');
@@ -17,6 +19,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Ajustes del sistema
     require __DIR__.'/settings.php';
+
+    // Servir firma digital privada (solo usuarios autenticados)
+    Route::get('/survey/{survey}/signature', function (Survey $survey) {
+        if (!$survey->signature_path || !Storage::disk('local')->exists($survey->signature_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('local')->response($survey->signature_path);
+    })->name('surveys.signature');
 });
 
 // Ruta Fallback para redirección inteligente

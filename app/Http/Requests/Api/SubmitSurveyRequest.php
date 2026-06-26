@@ -28,6 +28,9 @@ class SubmitSurveyRequest extends FormRequest
             'patient.phone' => ['nullable', 'string', 'max:50'],
             'patient.insurer_id' => ['nullable', 'string', 'max:50'],
 
+            // Firma digital en base64
+            'signature' => ['required', 'string'],
+
             // Validaciones de las respuestas
             'answers' => ['required', 'array'],
             'answers.*.question_id' => ['required', 'integer', 'exists:survey_questions,id'],

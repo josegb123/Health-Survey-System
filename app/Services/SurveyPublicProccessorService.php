@@ -7,41 +7,37 @@ use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use DB;
+use Illuminate\Support\Facades\Storage;
 use Str;
 
 class SurveyPublicProccessorService
 {
-    /**
-     * Orquesta la creación del paciente, calcula el rating y persiste las respuestas de forma atómica.
-     */
-    public function processPublicSubmission(int $templateId, array $patientData, array $answers): Survey
+    public function processPublicSubmission(int $templateId, array $patientData, array $answers, ?string $signature = null): Survey
     {
-        // 1. Convertimos las respuestas a formato plano para reutilizar tu método de cálculo de rating
         $answersPayload = collect($answers)->pluck('value', 'question_id')->toArray();
         $calculatedRating = CalculateSurveyRating::execute($templateId, $answersPayload);
 
-        return DB::transaction(function () use ($templateId, $patientData, $answers, $calculatedRating) {
+        return DB::transaction(function () use ($templateId, $patientData, $answers, $calculatedRating, $signature) {
 
-            // 2. Buscamos al paciente por su identificación fiscal/DNI, si no existe lo creamos
-            // (Ajusta los campos según la estructura real de tu tabla de usuarios/pacientes)
             $patient = Patient::firstOrCreate(
                 ['dni' => $patientData['dni']],
                 [
                     'name' => $patientData['name'],
                     'email' => $patientData['email'],
-                    'password' => bcrypt(Str::random(16)), // Contraseña aleatoria por seguridad
+                    'password' => bcrypt(Str::random(16)),
                 ]
             );
 
-            // 3. Creamos la cabecera vinculando el ID del paciente obtenido
+            $signaturePath = $signature ? $this->storeSignatureFile($signature) : null;
+
             $survey = Survey::create([
                 'survey_template_id' => $templateId,
-                'patient_id' => $patient->id, // Foránea resuelta
+                'patient_id' => $patient->id,
                 'status' => 'completed',
                 'rating' => $calculatedRating,
+                'signature_path' => $signaturePath,
             ]);
 
-            // 4. Guardamos las respuestas detalladas controlando Eloquent y SoftDeletes
             foreach ($answers as $answer) {
                 $value = $answer['value'];
 
@@ -54,5 +50,25 @@ class SurveyPublicProccessorService
 
             return $survey;
         });
+    }
+
+    private function storeSignatureFile(string $base64Signature): string
+    {
+        if (str_contains($base64Signature, ';base64,')) {
+            $base64Signature = explode(';base64,', $base64Signature)[1];
+        }
+
+        $decoded = base64_decode($base64Signature, true);
+
+        if ($decoded === false) {
+            throw new \InvalidArgumentException('La firma proporcionada no es un base64 válido.');
+        }
+
+        $filename = Str::uuid() . '.png';
+        $path = 'signatures/' . $filename;
+
+        Storage::disk('local')->put($path, $decoded);
+
+        return $path;
     }
 }

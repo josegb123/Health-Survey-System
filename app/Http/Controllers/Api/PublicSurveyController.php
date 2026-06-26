@@ -61,7 +61,8 @@ class PublicSurveyController extends Controller
             $survey = $processor->processPublicSubmission(
                 $templateId,
                 $request->input('patient'),
-                $request->input('answers')
+                $request->input('answers'),
+                $request->input('signature')
             );
 
             return response()->json([
