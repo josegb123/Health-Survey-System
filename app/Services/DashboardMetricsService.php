@@ -85,4 +85,94 @@ class DashboardMetricsService
             ->take($limit)
             ->get();
     }
+
+    /**
+     * Retorna el conteo de encuestas agrupado por día para un rango.
+     */
+    public function getDailyTrend(Carbon $startDate, Carbon $endDate): array
+    {
+        $rows = Survey::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+
+        $trend = [];
+        $current = clone $startDate->startOfDay();
+        $end = clone $endDate->endOfDay();
+
+        while ($current <= $end) {
+            $key = $current->format('Y-m-d');
+            $trend[] = [
+                'date' => $current->format('d/m'),
+                'count' => (int) ($rows[$key] ?? 0),
+            ];
+            $current->addDay();
+        }
+
+        return $trend;
+    }
+
+    /**
+     * Retorna el ranking de plantillas más respondidas.
+     */
+    public function getTemplateRanking(int $limit = 5): Collection
+    {
+        return Survey::where('status', 'completed')
+            ->selectRaw('survey_template_id, COUNT(*) as total')
+            ->with('template')
+            ->groupBy('survey_template_id')
+            ->orderByDesc('total')
+            ->take($limit)
+            ->get();
+    }
+
+    /**
+     * Retorna el desglose de encuestas por aseguradora.
+     */
+    public function getInsurerBreakdown(Carbon $startDate, Carbon $endDate): array
+    {
+        $rows = Survey::where('status', 'completed')
+            ->whereBetween('surveys.created_at', [$startDate, $endDate])
+            ->join('patients', 'surveys.patient_id', '=', 'patients.id')
+            ->join('insurers', 'patients.insurer_id', '=', 'insurers.id')
+            ->selectRaw('insurers.name, COUNT(*) as total')
+            ->groupBy('insurers.name')
+            ->orderByDesc('total')
+            ->get()
+            ->toArray();
+
+        return $rows;
+    }
+
+    /**
+     * Retorna el promedio de calificación por día para un rango.
+     */
+    public function getRatingTrend(Carbon $startDate, Carbon $endDate): array
+    {
+        $rows = Survey::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('DATE(created_at) as date, AVG(rating) as avg_rating')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('avg_rating', 'date')
+            ->toArray();
+
+        $trend = [];
+        $current = clone $startDate->startOfDay();
+        $end = clone $endDate->endOfDay();
+
+        while ($current <= $end) {
+            $key = $current->format('Y-m-d');
+            $trend[] = [
+                'date' => $current->format('d/m'),
+                'avg_rating' => round((float) ($rows[$key] ?? 0), 2),
+            ];
+            $current->addDay();
+        }
+
+        return $trend;
+    }
 }

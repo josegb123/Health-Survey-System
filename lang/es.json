@@ -250,6 +250,16 @@
 
     "The requested template is not available or does not exist.": "La plantilla solicitada no está disponible o no existe.",
     "Survey and patient registration processed successfully.": "Encuesta y registro de paciente procesados con éxito.",
+    "Daily Survey Trend": "Tendencia Diaria de Encuestas",
+    "Completed surveys per day in the selected period.": "Encuestas completadas por día en el período seleccionado.",
+    "No data available for this period.": "No hay datos disponibles para este período.",
+    "Rating Trend": "Tendencia de Calificación",
+    "Average rating per day.": "Calificación promedio por día.",
+    "Most Answered Templates": "Plantillas Más Respondidas",
+    "Top templates by number of responses.": "Principales plantillas por número de respuestas.",
+    "Surveys by Insurer": "Encuestas por Aseguradora",
+    "Distribution of responses by insurer.": "Distribución de respuestas por aseguradora.",
+
     "An internal error occurred while processing the request.": "Ocurrió un error interno al procesar la solicitud.",
     "List of insurers in the system.": "Lista de EPS en el sistema.",
     "Question with ID :id is required.": "La pregunta con ID :id es requerida obligatoriamente."
