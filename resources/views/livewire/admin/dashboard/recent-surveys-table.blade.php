@@ -6,8 +6,8 @@
             <flux:text size="sm">
                 {{ __('Últimas respuestas completadas por los pacientes en el portal público.') }}</flux:text>
         </div>
-        {{-- Enlace opcional a la vista completa de reportes --}}
-        <flux:button href="#" variant="subtle" size="sm" icon="arrow-right" icon-trailing>
+        {{-- Enlace a la vista completa de encuestas --}}
+        <flux:button href="{{ route('admin.surveys.index') }}" variant="subtle" size="sm" icon="arrow-right" icon-trailing>
             {{ __('Ver todas') }}
         </flux:button>
     </div>

@@ -1,12 +1,16 @@
 <?php
 
+use App\Livewire\Admin\SurveyIndex;
 use App\Livewire\Admin\SystemSettings;
 use App\Livewire\Admin\SurveyTemplateIndex;
 use App\Livewire\User\Index;
 use Illuminate\Support\Facades\Route;
 
-// Sub-módulo de Configuración y Plantillas Administrativas
+// Sub-módulo de Administración
 Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Listado de Encuestas Completadas
+    Route::get('/surveys', SurveyIndex::class)->name('surveys.index');
 
     // Gestión de Plantillas de Encuestas
     Route::get('/survey-templates', SurveyTemplateIndex::class)->name('survey-templates.index');

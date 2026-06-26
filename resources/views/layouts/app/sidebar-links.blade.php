@@ -16,6 +16,13 @@
         ],
         [
             'label' => 'Encuestas',
+            'route' => 'admin.surveys.index',
+            'active_pattern' => 'admin.surveys.*',
+            'icon' => 'clipboard-document-list',
+            'navigate' => true,
+        ],
+        [
+            'label' => 'Plantillas',
             'route' => 'admin.survey-templates.index',
             'active_pattern' => 'admin.survey-templates.*',
             'icon' => 'document-text',
