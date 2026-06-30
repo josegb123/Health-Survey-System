@@ -9,8 +9,7 @@ class CreateSurveyQuestionAction
     /**
      * Registra una pregunta y la vincula a una plantilla.
      *
-     * @param array $data Datos validados de la pregunta.
-     * @return SurveyQuestion
+     * @param  array  $data  Datos validados de la pregunta.
      */
     public function execute(array $data): SurveyQuestion
     {

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyTemplate;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class SurveySeeder extends Seeder
@@ -18,8 +17,9 @@ class SurveySeeder extends Seeder
         $patients = Patient::all();
         $template = SurveyTemplate::where('is_active', true)->first();
 
-        if ($patients->isEmpty() || !$template) {
+        if ($patients->isEmpty() || ! $template) {
             $this->command->warn('Ensure PatientSeeder and SurveyTemplateSeeder are run before SurveySeeder.');
+
             return;
         }
 

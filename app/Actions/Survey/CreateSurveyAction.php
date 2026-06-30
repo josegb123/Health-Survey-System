@@ -9,8 +9,7 @@ class CreateSurveyAction
     /**
      * Registra la cabecera de una encuesta en el sistema.
      *
-     * @param array $data Datos validados de la encuesta.
-     * @return Survey
+     * @param  array  $data  Datos validados de la encuesta.
      */
     public function execute(array $data): Survey
     {

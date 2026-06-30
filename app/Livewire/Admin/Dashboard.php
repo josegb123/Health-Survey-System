@@ -9,7 +9,9 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public string $period = 'month'; // Filtro por defecto
+
     public string $startDate;
+
     public string $endDate;
 
     public function mount(): void
@@ -40,12 +42,12 @@ class Dashboard extends Component
             default => Carbon::now()->subMonth()->startOfDay()->toDateTimeString(),
         };
 
-
     }
 
     public function render(DashboardMetricsService $metricsService)
     {
         $recentSurveys = $metricsService->getRecentSurveys(10);
+
         return view(
             'livewire.admin.dashboard',
             [

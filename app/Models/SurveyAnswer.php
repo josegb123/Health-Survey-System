@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SurveyAnswerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Fillable('survey_id', 'survey_question_id', 'answer_value')]
 class SurveyAnswer extends Model
 {
-    /** @use HasFactory<\Database\Factories\SurveyAnswerFactory> */
+    /** @use HasFactory<SurveyAnswerFactory> */
     use HasFactory, SoftDeletes;
 
     /**

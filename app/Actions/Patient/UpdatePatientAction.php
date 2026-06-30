@@ -9,9 +9,8 @@ class UpdatePatientAction
     /**
      * Actualiza la ficha de información de un paciente existente.
      *
-     * @param int $id Identificador único del paciente.
-     * @param array $data Datos validados con las modificaciones.
-     * @return Patient
+     * @param  int  $id  Identificador único del paciente.
+     * @param  array  $data  Datos validados con las modificaciones.
      */
     public function execute(int $id, array $data): Patient
     {

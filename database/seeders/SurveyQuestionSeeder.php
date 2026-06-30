@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\SurveyTemplate;
 use App\Models\SurveyQuestion;
+use App\Models\SurveyTemplate;
 use Illuminate\Database\Seeder;
 
 class SurveyQuestionSeeder extends Seeder
@@ -16,7 +16,7 @@ class SurveyQuestionSeeder extends Seeder
             // Si no hay plantillas, creamos la de satisfacción por defecto
             $template = SurveyTemplate::create([
                 'title' => 'General Satisfaction Survey',
-                'is_active' => true
+                'is_active' => true,
             ]);
             $templates = collect([$template]);
         }
@@ -29,21 +29,21 @@ class SurveyQuestionSeeder extends Seeder
                     'field_type' => 'number',
                     'options' => null,
                     'is_required' => true,
-                    'order' => 1
+                    'order' => 1,
                 ],
                 [
                     'question_text' => 'Was the staff courteous and professional?',
                     'field_type' => 'radio',
                     'options' => ['Yes', 'No'], // ¡Corregido! Opciones para el componente de la UI
                     'is_required' => true,
-                    'order' => 2
+                    'order' => 2,
                 ],
                 [
                     'question_text' => 'What aspects of our service could be improved?',
                     'field_type' => 'text',
                     'options' => null,
                     'is_required' => false, // Opcional para que el paciente no esté obligado a escribir
-                    'order' => 3
+                    'order' => 3,
                 ],
             ];
 
@@ -52,13 +52,13 @@ class SurveyQuestionSeeder extends Seeder
                 SurveyQuestion::updateOrCreate(
                     [
                         'survey_template_id' => $template->id,
-                        'question_text' => $question['question_text']
+                        'question_text' => $question['question_text'],
                     ],
                     [
                         'field_type' => $question['field_type'],
                         'options' => $question['options'],     // Sincronizado
                         'is_required' => $question['is_required'], // Sincronizado
-                        'order' => $question['order']
+                        'order' => $question['order'],
                     ]
                 );
             }

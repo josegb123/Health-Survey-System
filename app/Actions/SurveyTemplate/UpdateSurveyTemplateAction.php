@@ -9,9 +9,8 @@ class UpdateSurveyTemplateAction
     /**
      * Actualiza una plantilla existente.
      *
-     * @param int $id ID de la plantilla.
-     * @param array $data Datos a modificar.
-     * @return SurveyTemplate
+     * @param  int  $id  ID de la plantilla.
+     * @param  array  $data  Datos a modificar.
      */
     public function execute(int $id, array $data): SurveyTemplate
     {

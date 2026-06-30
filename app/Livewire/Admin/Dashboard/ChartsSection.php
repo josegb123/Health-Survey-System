@@ -9,12 +9,17 @@ use Livewire\Component;
 class ChartsSection extends Component
 {
     public string $startDate;
+
     public string $endDate;
+
     public string $period = 'month';
 
     public array $dailyTrend = [];
+
     public array $ratingTrend = [];
+
     public array $templateRanking = [];
+
     public array $insurerBreakdown = [];
 
     public function mount(DashboardMetricsService $metricsService, string $startDate, string $endDate, string $period): void

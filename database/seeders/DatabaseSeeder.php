@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             SurveyAnswerSeeder::class,
         ]);
 
-
         // Inicializa el registro único de configuraciones globales
         SystemSetting::set();
 
@@ -35,7 +34,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => env('ADMIN_NAME', 'Administrador por Defecto'),
             'email' => env('ADMIN_EMAIL', 'admin@admin.com'),
-            'password' => Hash::make(env('ADMIN_PASSWORD', 'password_por_defecto'))
+            'password' => Hash::make(env('ADMIN_PASSWORD', 'password_por_defecto')),
         ])->assignRole('admin');
     }
 }

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class SurveyAnswerSeeder extends Seeder
@@ -19,6 +18,7 @@ class SurveyAnswerSeeder extends Seeder
 
         if ($surveys->isEmpty()) {
             $this->command->warn('No surveys found to seed answers for. Run SurveySeeder first.');
+
             return;
         }
 

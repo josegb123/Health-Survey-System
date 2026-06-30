@@ -1,8 +1,8 @@
 <?php
 
 use App\Livewire\Admin\SurveyIndex;
-use App\Livewire\Admin\SystemSettings;
 use App\Livewire\Admin\SurveyTemplateIndex;
+use App\Livewire\Admin\SystemSettings;
 use App\Livewire\User\Index;
 use Illuminate\Support\Facades\Route;
 

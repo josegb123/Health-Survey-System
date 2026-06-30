@@ -27,11 +27,11 @@ class InsurerFactory extends Factory
             'Compensar',
             'Coosalud',
             'Mutual Ser',
-            'Famisanar'
+            'Famisanar',
         ];
 
         return [
-            'name' => $this->faker->randomElement($epsNombres) . ' ' . $this->faker->companySuffix(),
+            'name' => $this->faker->randomElement($epsNombres).' '.$this->faker->companySuffix(),
             'type' => $this->faker->randomElement(['contributory', 'subsidized']),
             'is_active' => $this->faker->boolean(90),
         ];
@@ -42,7 +42,7 @@ class InsurerFactory extends Factory
      */
     public function contributivo(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'regimen' => 'contributivo',
         ]);
     }
@@ -52,7 +52,7 @@ class InsurerFactory extends Factory
      */
     public function subsidiado(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'regimen' => 'subsidiado',
         ]);
     }

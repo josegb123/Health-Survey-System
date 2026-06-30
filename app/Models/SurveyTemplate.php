@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SurveyTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,12 +12,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Fillable(['title', 'is_active'])]
 class SurveyTemplate extends Model
 {
-    /** @use HasFactory<\Database\Factories\SurveyTemplateFactory> */
+    /** @use HasFactory<SurveyTemplateFactory> */
     use HasFactory, SoftDeletes;
-
 
     /**
      * (Summary of surveyQuestions)
+     *
      * @return HasMany<SurveyQuestion, SurveyTemplate>
      */
     public function surveyQuestions(): HasMany
@@ -26,6 +27,7 @@ class SurveyTemplate extends Model
 
     /**
      * Summary of surveys
+     *
      * @return HasMany<Survey, SurveyTemplate>
      */
     public function surveys(): HasMany
@@ -35,6 +37,7 @@ class SurveyTemplate extends Model
 
     /**
      * Summary of questions
+     *
      * @return HasMany<SurveyQuestion, SurveyTemplate>
      */
     public function questions(): HasMany

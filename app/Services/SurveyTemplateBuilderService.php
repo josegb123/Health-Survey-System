@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Actions\SurveyTemplate\CreateSurveyTemplateAction;
 use App\Actions\SurveyQuestion\CreateSurveyQuestionAction;
+use App\Actions\SurveyTemplate\CreateSurveyTemplateAction;
 use App\Models\SurveyTemplate;
 use Illuminate\Support\Facades\DB;
 
@@ -12,9 +12,9 @@ class SurveyTemplateBuilderService
     /**
      * Construye una plantilla completa con su juego de preguntas en una sola transacción.
      *
-     * @param array $templateData ['title' => string, 'is_active' => bool]
-     * @param array $questions Array de preguntas [['question_text' => ..., 'field_type' => ..., 'options' => ..., 'is_required' => ...]]
-     * @return SurveyTemplate
+     * @param  array  $templateData  ['title' => string, 'is_active' => bool]
+     * @param  array  $questions  Array de preguntas [['question_text' => ..., 'field_type' => ..., 'options' => ..., 'is_required' => ...]]
+     *
      * @throws \Exception
      */
     public function createWithQuestions(array $templateData, array $questions): SurveyTemplate
@@ -32,7 +32,7 @@ class SurveyTemplateBuilderService
                     'field_type' => $question['field_type'],
                     'options' => $question['options'] ?? null,
                     'is_required' => $question['is_required'] ?? true,
-                    'order' => $index + 1
+                    'order' => $index + 1,
                 ]);
             }
 

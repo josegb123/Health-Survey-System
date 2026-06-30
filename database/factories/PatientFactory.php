@@ -36,7 +36,7 @@ class PatientFactory extends Factory
      */
     public function withInsurer(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'insurer_id' => Insurer::inRandomOrder()->first()?->id ?? Insurer::factory(),
         ]);
     }

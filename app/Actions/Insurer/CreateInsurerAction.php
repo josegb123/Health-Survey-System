@@ -8,8 +8,8 @@ class CreateInsurerAction
 {
     /**
      * Registra una nueva aseguradora en el sistema.
+     *
      * * @param array $data Datos ya validados desde la capa superior.
-     * @return Insurer
      */
     public function execute(array $data): Insurer
     {

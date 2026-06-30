@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SurveyQuestionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable('survey_template_id', 'question_text', 'field_type', 'options', 'order', 'is_required')]
 class SurveyQuestion extends Model
 {
-    /** @use HasFactory<\Database\Factories\SurveyQuestionFactory> */
+    /** @use HasFactory<SurveyQuestionFactory> */
     use HasFactory;
 
     protected $casts = [
@@ -29,6 +30,7 @@ class SurveyQuestion extends Model
 
     /**
      * Summary of answers
+     *
      * @return HasMany<SurveyAnswer, SurveyQuestion>
      */
     public function answers(): HasMany

@@ -2,16 +2,16 @@
 
 namespace App\Livewire\User;
 
-use App\Models\User;
 use App\Actions\User\CreateUserAction;
-use App\Actions\User\UpdateUserAction;
 use App\Actions\User\DeleteUserAction;
+use App\Actions\User\UpdateUserAction;
+use App\Models\User;
+use Exception;
 use Flux\Flux;
+use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Validation\Rule;
-use Illuminate\Contracts\View\View;
-use Exception;
 
 class Index extends Component
 {
@@ -19,14 +19,20 @@ class Index extends Component
 
     // Propiedades del formulario
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = ''; // Requerida para la regla 'confirmed'
+
     public string $role = '';
+
     public bool $is_active = true; // Atributo de estado dedicado
 
     // Estado del modal y control de excepciones
     public ?User $editingUser = null;
+
     public ?string $errorMessage = null;
 
     /**
@@ -42,7 +48,7 @@ class Index extends Component
                 'required',
                 'email',
                 'max:255',
-                $userId ? Rule::unique('users', 'email')->ignore($userId) : 'unique:users,email'
+                $userId ? Rule::unique('users', 'email')->ignore($userId) : 'unique:users,email',
             ],
             // 'confirmed' busca automáticamente la propiedad password_confirmation
             'password' => [$userId ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
@@ -64,7 +70,7 @@ class Index extends Component
             'password_confirmation',
             'role',
             'editingUser',
-            'errorMessage'
+            'errorMessage',
         ]);
 
         $this->is_active = true; // Por defecto activo al crear
@@ -99,8 +105,9 @@ class Index extends Component
     {
         $user = User::find($userId);
 
-        if (!$user) {
+        if (! $user) {
             $this->errorMessage = __('The user no longer exists or has already been deleted.');
+
             return;
         }
 
@@ -163,7 +170,7 @@ class Index extends Component
     public function render(): View
     {
         return view('livewire.users.index', [
-            'users' => User::latest()->paginate(10)
+            'users' => User::latest()->paginate(10),
         ]);
     }
 }

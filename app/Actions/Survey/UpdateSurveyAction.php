@@ -9,9 +9,8 @@ class UpdateSurveyAction
     /**
      * Actualiza los metadatos o estado de una encuesta existente.
      *
-     * @param int $id ID de la encuesta.
-     * @param array $data Datos a modificar.
-     * @return Survey
+     * @param  int  $id  ID de la encuesta.
+     * @param  array  $data  Datos a modificar.
      */
     public function execute(int $id, array $data): Survey
     {

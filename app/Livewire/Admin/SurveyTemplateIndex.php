@@ -13,11 +13,14 @@ class SurveyTemplateIndex extends Component
 
     // Propiedades para hidratar modales de confirmación
     public ?int $selectedTemplateId = null;
+
     public string $selectedTemplateTitle = '';
 
     // Propiedades del Formulario Dinámico (Creación)
     public string $title = '';
+
     public bool $is_active = true;
+
     public array $questions = []; // Colección dinámica de preguntas
 
     public ?SurveyTemplate $viewingTemplate = null;
@@ -38,8 +41,9 @@ class SurveyTemplateIndex extends Component
      */
     public function moveQuestionUp(int $index): void
     {
-        if ($index === 0)
-            return; // Ya es la primera, flujo alternativo bloqueado
+        if ($index === 0) {
+            return;
+        } // Ya es la primera, flujo alternativo bloqueado
 
         $adjacentIndex = $index - 1;
         $backup = $this->questions[$adjacentIndex];
@@ -54,8 +58,9 @@ class SurveyTemplateIndex extends Component
      */
     public function moveQuestionDown(int $index): void
     {
-        if ($index === count($this->questions) - 1)
-            return; // Ya es la última, flujo alternativo bloqueado
+        if ($index === count($this->questions) - 1) {
+            return;
+        } // Ya es la última, flujo alternativo bloqueado
 
         $adjacentIndex = $index + 1;
         $backup = $this->questions[$adjacentIndex];
@@ -73,7 +78,7 @@ class SurveyTemplateIndex extends Component
         $this->viewingTemplate = SurveyTemplate::with([
             'questions' => function ($query) {
                 $query->orderBy('order', 'asc');
-            }
+            },
         ])->findOrFail($id);
 
         $this->modal('view-template-flyout')->show();
@@ -99,7 +104,7 @@ class SurveyTemplateIndex extends Component
             'field_type' => 'text',
             'options' => [],
             'is_required' => true,
-            'new_option_text' => '' // Campo temporal local para agregar opciones
+            'new_option_text' => '', // Campo temporal local para agregar opciones
         ];
     }
 
@@ -156,7 +161,7 @@ class SurveyTemplateIndex extends Component
             $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error processing template: ') . $e->getMessage());
+            $this->dispatch('toast', type: 'error', text: __('Error processing template: ').$e->getMessage());
         }
     }
 
@@ -170,10 +175,11 @@ class SurveyTemplateIndex extends Component
 
     public function toggleStatus(): void
     {
-        if (!$this->selectedTemplateId)
+        if (! $this->selectedTemplateId) {
             return;
+        }
         SurveyTemplate::findOrFail($this->selectedTemplateId)->update([
-            'is_active' => !SurveyTemplate::findOrFail($this->selectedTemplateId)->is_active
+            'is_active' => ! SurveyTemplate::findOrFail($this->selectedTemplateId)->is_active,
         ]);
         $this->modal('status-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
@@ -189,13 +195,15 @@ class SurveyTemplateIndex extends Component
 
     public function deleteTemplate(): void
     {
-        if (!$this->selectedTemplateId)
+        if (! $this->selectedTemplateId) {
             return;
+        }
         $template = SurveyTemplate::findOrFail($this->selectedTemplateId);
         if ($template->surveys()->exists()) {
             $this->modal('delete-modal')->close();
             $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
             $this->dispatch('toast', type: 'error', text: __('Cannot delete a template that already has clinical responses.'));
+
             return;
         }
         $template->delete();
@@ -207,7 +215,7 @@ class SurveyTemplateIndex extends Component
     public function render()
     {
         return view('livewire.admin.survey-template-index', [
-            'templates' => SurveyTemplate::withCount('questions')->latest()->paginate(10)
+            'templates' => SurveyTemplate::withCount('questions')->latest()->paginate(10),
         ]);
     }
 }

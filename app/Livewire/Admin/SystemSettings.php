@@ -3,22 +3,34 @@
 namespace App\Livewire\Admin;
 
 use App\Models\SystemSetting;
+use Flux\Flux;
 use Livewire\Component;
 
 class SystemSettings extends Component
 {
     // Propiedades enlazadas directamente con las columnas del modelo
     public string $theme = 'system';
+
     public string $language = 'es';
+
     public ?string $turnstile_site_key = null;
+
     public ?string $turnstile_secret_key = null;
+
     public int $rate_limit_requests = 60;
+
     public string $company_name = '';
+
     public string $company_dni = '';
+
     public ?string $mail_from_address = null;
+
     public ?string $mail_from_name = null;
+
     public int $session_timeout_minutes = 120;
+
     public bool $is_maintenance_mode = false;
+
     public int $survey_monthly_goal = 100;
 
     /**
@@ -78,7 +90,7 @@ class SystemSettings extends Component
 
         // Tu observer estático borra la caché 'global_system_settings' en este punto.
 
-        \Flux\Flux::toast(variant: 'success', text: __('System settings updated successfully.'));
+        Flux::toast(variant: 'success', text: __('System settings updated successfully.'));
     }
 
     public function render()

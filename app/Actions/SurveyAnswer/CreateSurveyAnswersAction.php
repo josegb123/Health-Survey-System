@@ -10,10 +10,9 @@ class CreateSurveyAnswersAction
     /**
      * Guarda todas las respuestas de una encuesta en una sola consulta SQL.
      *
-     * @param int $surveyId ID de la cabecera de la encuesta (Survey).
-     * @param array $answers Array asociativo donde la llave es el 'survey_question_id' y el valor es la respuesta.
-     * Ejemplo: [ 1 => 'Yes', 2 => 'Good service', 3 => '4' ]
-     * @return bool
+     * @param  int  $surveyId  ID de la cabecera de la encuesta (Survey).
+     * @param  array  $answers  Array asociativo donde la llave es el 'survey_question_id' y el valor es la respuesta.
+     *                          Ejemplo: [ 1 => 'Yes', 2 => 'Good service', 3 => '4' ]
      */
     public function execute(int $surveyId, array $answers): bool
     {

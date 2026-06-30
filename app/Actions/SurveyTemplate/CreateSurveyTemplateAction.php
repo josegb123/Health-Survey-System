@@ -9,8 +9,7 @@ class CreateSurveyTemplateAction
     /**
      * Crea una nueva plantilla de encuesta.
      *
-     * @param array $data Datos validados (title, is_active).
-     * @return SurveyTemplate
+     * @param  array  $data  Datos validados (title, is_active).
      */
     public function execute(array $data): SurveyTemplate
     {

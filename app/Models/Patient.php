@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\PatientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Fillable('name', 'document_type', 'dni', 'email', 'nationality', 'address', 'phone', 'insurer_id')]
 class Patient extends Model
 {
-    /** @use HasFactory<\Database\Factories\PatientFactory> */
+    /** @use HasFactory<PatientFactory> */
     use HasFactory, SoftDeletes;
 
     /**
@@ -38,6 +39,7 @@ class Patient extends Model
 
     /**
      * Summary of surveys
+     *
      * @return HasMany<Survey, Patient>
      */
     public function surveys(): HasMany

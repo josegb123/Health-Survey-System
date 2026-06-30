@@ -22,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Servir firma digital privada (solo usuarios autenticados)
     Route::get('/survey/{survey}/signature', function (Survey $survey) {
-        if (!$survey->signature_path || !Storage::disk('local')->exists($survey->signature_path)) {
+        if (! $survey->signature_path || ! Storage::disk('local')->exists($survey->signature_path)) {
             abort(404);
         }
 

@@ -23,7 +23,7 @@ class SurveyQuestionFactory extends Factory
             'Was the waiting time acceptable to you?',
             'Would you recommend our services to family and friends?',
             'How clear was the information provided by our staff?',
-            'Please leave any additional comments or suggestions to improve.'
+            'Please leave any additional comments or suggestions to improve.',
         ];
 
         // Definimos el tipo de campo primero para condicionar las opciones
@@ -36,11 +36,11 @@ class SurveyQuestionFactory extends Factory
 
         return [
             'survey_template_id' => SurveyTemplate::factory(),
-            'question_text'      => $this->faker->randomElement($satisfactionQuestions),
-            'field_type'         => $fieldType,
-            'options'            => $options, // Sincronizado con la migración
-            'is_required'        => $this->faker->boolean(80), // 80% de probabilidad de ser obligatoria
-            'order'              => $this->faker->numberBetween(1, 10),
+            'question_text' => $this->faker->randomElement($satisfactionQuestions),
+            'field_type' => $fieldType,
+            'options' => $options, // Sincronizado con la migración
+            'is_required' => $this->faker->boolean(80), // 80% de probabilidad de ser obligatoria
+            'order' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

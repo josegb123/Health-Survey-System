@@ -9,9 +9,8 @@ class UpdateSurveyQuestionAction
     /**
      * Modifica los parámetros o el orden de una pregunta existente.
      *
-     * @param int $id ID de la pregunta.
-     * @param array $data Datos a modificar.
-     * @return SurveyQuestion
+     * @param  int  $id  ID de la pregunta.
+     * @param  array  $data  Datos a modificar.
      */
     public function execute(int $id, array $data): SurveyQuestion
     {

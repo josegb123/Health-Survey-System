@@ -3,16 +3,14 @@
 namespace App\Actions\User;
 
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class DeleteUserAction
 {
     /**
      * Ejecuta la eliminación de un usuario de forma segura.
      *
-     * @param User $user
-     * @return bool
      * @throws Exception
      */
     public function __invoke(User $user): bool
