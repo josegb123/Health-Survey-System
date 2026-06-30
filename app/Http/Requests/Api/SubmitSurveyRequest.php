@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Api;
 
 use App\Models\SurveyQuestion;
+use App\Models\SystemSetting;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Http;
 
 class SubmitSurveyRequest extends FormRequest
 {
@@ -35,6 +37,9 @@ class SubmitSurveyRequest extends FormRequest
             'answers' => ['required', 'array'],
             'answers.*.question_id' => ['required', 'integer', 'exists:survey_questions,id'],
             'answers.*.value' => ['nullable'],
+
+            // Token de Cloudflare Turnstile
+            'cf_turnstile_token' => ['required', 'string'],
         ];
 
         $requiredQuestionIds = SurveyQuestion::where('survey_template_id', $templateId)
@@ -53,5 +58,29 @@ class SubmitSurveyRequest extends FormRequest
         };
 
         return $rules;
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $token = $this->input('cf_turnstile_token');
+            $settings = SystemSetting::set();
+
+            if (! $settings->turnstile_secret_key) {
+                return;
+            }
+
+            $response = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                'secret' => $settings->turnstile_secret_key,
+                'response' => $token,
+                'remoteip' => $this->ip(),
+            ]);
+
+            $result = $response->json();
+
+            if (! $result['success'] ?? false) {
+                $validator->errors()->add('cf_turnstile_token', __('Human verification failed. Please try again.'));
+            }
+        });
     }
 }

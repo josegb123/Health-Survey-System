@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encuesta de Salud</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
 <body class="bg-zinc-100 dark:bg-zinc-950 min-h-screen py-4 sm:py-8 px-4">
@@ -119,6 +120,11 @@
                 </div>
             </div>
 
+            <!-- Verificación humana -->
+            <div id="turnstile-container" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 hidden">
+                <div id="turnstile-widget"></div>
+            </div>
+
             <!-- Botón de envío -->
             <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6">
                 <button type="submit" id="submit-btn"
@@ -169,6 +175,35 @@
             const insurerLoading = document.getElementById('insurer-loading');
 
             let localQuestionsCache = [];
+            let turnstileSiteKey = null;
+
+            // 0. Obtener configuración pública (Turnstile, mantenimiento)
+            fetch(`${API_BASE_URL}/config`)
+                .then(r => r.json())
+                .then(res => {
+                    if (!res.success) return;
+                    const cfg = res.data;
+
+                    if (cfg.is_maintenance_mode) {
+                        loadingEl.innerHTML = `
+                            <div class="text-center py-12">
+                                <p class="text-red-500 text-sm font-medium">El sistema se encuentra en mantenimiento. Intente más tarde.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    turnstileSiteKey = cfg.turnstile_site_key;
+                    if (turnstileSiteKey) {
+                        document.getElementById('turnstile-container').classList.remove('hidden');
+                        if (window.turnstile) {
+                            window.turnstile.render('#turnstile-widget', {
+                                sitekey: turnstileSiteKey,
+                            });
+                        }
+                    }
+                })
+                .catch(() => {});
 
             // 1. Cargar aseguradoras
             fetch(`${API_BASE_URL}/insurers`)
@@ -450,6 +485,22 @@
 
                 const signatureBase64 = getSignatureBase64();
 
+                let cfToken = '';
+                if (turnstileSiteKey && window.turnstile) {
+                    cfToken = window.turnstile.getResponse();
+                    if (!cfToken) {
+                        alert('Debe completar la verificación humana.');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                            Enviar Encuesta
+                        `;
+                        return;
+                    }
+                }
+
                 const payload = {
                     patient: {
                         name: patientName,
@@ -462,7 +513,8 @@
                         insurer_id: document.getElementById('patient-insurer').value || null,
                     },
                     answers: payloadAnswers,
-                    signature: signatureBase64
+                    signature: signatureBase64,
+                    cf_turnstile_token: cfToken,
                 };
 
                 fetch(`${API_BASE_URL}/surveys/${TEMPLATE_ID}/submit`, {
