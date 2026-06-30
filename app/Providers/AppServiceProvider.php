@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureRateLimiting();
         $this->configureSession();
+        $this->configureMail();
     }
 
     /**
@@ -84,6 +85,26 @@ class AppServiceProvider extends ServiceProvider
 
             if (! empty($settings->session_timeout_minutes)) {
                 config(['session.lifetime' => (int) $settings->session_timeout_minutes]);
+            }
+        } catch (\Exception) {
+            // Fallback if database is not available
+        }
+    }
+
+    /**
+     * Configure mail defaults from system settings.
+     */
+    protected function configureMail(): void
+    {
+        try {
+            $settings = SystemSetting::set();
+
+            if (! empty($settings->mail_from_address)) {
+                config(['mail.from.address' => $settings->mail_from_address]);
+            }
+
+            if (! empty($settings->mail_from_name)) {
+                config(['mail.from.name' => $settings->mail_from_name]);
             }
         } catch (\Exception) {
             // Fallback if database is not available
