@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckMaintenanceMode;
+use App\Http\Middleware\SetAppLocale;
 use Illuminate\Http\Request;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
@@ -26,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             CheckMaintenanceMode::class,
             'throttle:api',
+        ]);
+
+        $middleware->web(prepend: [
+            SetAppLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
