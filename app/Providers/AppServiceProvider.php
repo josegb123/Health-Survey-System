@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureRateLimiting();
+        $this->configureSession();
     }
 
     /**
@@ -71,5 +72,21 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute($maxAttempts)
                 ->by($request->user()?->id ?: $request->ip());
         });
+    }
+
+    /**
+     * Configure session timeout from system settings.
+     */
+    protected function configureSession(): void
+    {
+        try {
+            $settings = SystemSetting::set();
+
+            if (! empty($settings->session_timeout_minutes)) {
+                config(['session.lifetime' => (int) $settings->session_timeout_minutes]);
+            }
+        } catch (\Exception) {
+            // Fallback if database is not available
+        }
     }
 }
