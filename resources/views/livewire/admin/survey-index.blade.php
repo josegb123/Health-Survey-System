@@ -4,6 +4,10 @@
             <flux:heading size="xl">{{ __('Completed Surveys') }}</flux:heading>
             <flux:text class="mt-1">{{ __('All surveys answered by patients.') }}</flux:text>
         </div>
+
+        <flux:button icon="chart-bar" variant="primary" wire:click="openReportModal">
+            {{ __('Reports') }}
+        </flux:button>
     </div>
 
     <flux:table :paginate="$surveys">
@@ -72,6 +76,9 @@
             @endforelse
         </flux:table.rows>
     </flux:table>
+
+    {{-- Report modal --}}
+    @include('livewire.admin.partials._report-modal')
 
     {{-- Detail flyout --}}
     <flux:modal name="view-survey-flyout" flyout variant="floating" class="w-full max-w-2xl">
