@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\SystemSetting;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureRateLimiting();
     }
 
     /**
@@ -46,5 +51,25 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    /**
+     * Configure API rate limiting from system settings.
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            $maxAttempts = 60;
+
+            try {
+                $settings = SystemSetting::set();
+                $maxAttempts = (int) ($settings->rate_limit_requests ?? 60);
+            } catch (\Exception) {
+                // Fallback if database is not available
+            }
+
+            return Limit::perMinute($maxAttempts)
+                ->by($request->user()?->id ?: $request->ip());
+        });
     }
 }
