@@ -15,6 +15,10 @@ class SetAppLocale
             $settings = SystemSetting::set();
             $locale = $settings->language ?? 'es';
 
+            if (empty($locale)) {
+                $locale = 'es';
+            }
+
             if (in_array($locale, ['es', 'en'])) {
                 app()->setLocale($locale);
             }

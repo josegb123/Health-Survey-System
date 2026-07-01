@@ -11,6 +11,10 @@ class CheckMaintenanceMode
 {
     public function handle(Request $request, Closure $next): Response
     {
+        if ($request->is('api/config')) {
+            return $next($request);
+        }
+
         try {
             $settings = SystemSetting::set();
 
