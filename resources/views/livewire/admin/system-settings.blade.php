@@ -48,9 +48,9 @@
             <flux:heading size="md">{{ __('Outgoing Mail Service') }}</flux:heading>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <flux:input wire:model="mail_from_address" type="email" label="{{ __('From Address') }}"
-                    placeholder="no-reply@clinic.com" />
+                    :placeholder="__('no-reply@clinic.com')" />
                 <flux:input wire:model="mail_from_name" label="{{ __('From Name') }}"
-                    placeholder="Clinic System" />
+                    :placeholder="__('Clinic System')" />
             </div>
         </div>
 

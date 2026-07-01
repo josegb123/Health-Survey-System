@@ -262,5 +262,52 @@
 
     "An internal error occurred while processing the request.": "Ocurrió un error interno al procesar la solicitud.",
     "List of insurers in the system.": "Lista de EPS en el sistema.",
-    "Question with ID :id is required.": "La pregunta con ID :id es requerida obligatoriamente."
+    "Question with ID :id is required.": "La pregunta con ID :id es requerida obligatoriamente.",
+
+    "Reports": "Reportes",
+    "Pagination Navigation": "Navegación de Paginación",
+    "email@example.com": "email@example.com",
+    "no-reply@clinic.com": "no-reply@clinic.com",
+    "Clinic System": "Sistema Clínica",
+    "Laravel Starter Kit": "Laravel Starter Kit",
+
+    "Generated": "Generado",
+    "Generated on": "Generado el",
+    "Generating...": "Generando...",
+
+    "Survey Reports": "Reportes de Encuestas",
+    "Select the period and generate reports.": "Seleccione el período y genere reportes.",
+    "Period": "Período",
+    "Monthly": "Mensual",
+    "Quarterly": "Trimestral",
+    "Yearly": "Anual",
+    "Start Date": "Fecha de Inicio",
+    "End Date": "Fecha de Fin",
+    "Available Reports": "Reportes Disponibles",
+    "Export Surveys": "Exportar Encuestas",
+    "List of surveys with patient data and ratings.": "Listado de encuestas con datos del paciente y calificaciones.",
+    "PDF": "PDF",
+    "Export Statistics": "Exportar Estadísticas",
+    "Analytical report with metrics and breakdowns.": "Reporte analítico con métricas y desgloses.",
+    "Export Ministry of Health": "Exportar Ministerio de Salud",
+    "Formatted TXT file for the Ministry of Health.": "Archivo TXT formateado para el Ministerio de Salud.",
+    "TXT": "TXT",
+
+    "Surveys Report": "Reporte de Encuestas",
+    "Document": "Documento",
+    "No surveys found for the selected period.": "No se encontraron encuestas en el período seleccionado.",
+
+    "Statistics Report": "Reporte de Estadísticas",
+    "Total Surveys": "Total de Encuestas",
+    "Average Rating": "Calificación Promedio",
+    "By Template": "Por Plantilla",
+    "Count": "Cantidad",
+    "Percentage": "Porcentaje",
+    "By Insurer": "Por Aseguradora",
+    "Daily Trend": "Tendencia Diaria",
+
+    "From": "Desde",
+    "To": "Hasta",
+
+    "Human verification failed. Please try again.": "La verificación humana falló. Por favor intente nuevamente."
 }
