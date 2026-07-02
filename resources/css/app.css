@@ -150,3 +150,8 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+[data-flux-modal] > dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(4px);
+}
