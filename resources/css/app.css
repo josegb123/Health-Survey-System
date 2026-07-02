@@ -156,41 +156,70 @@ select:focus[data-flux-control] {
     backdrop-filter: blur(4px);
 }
 
-/* Sidebar brand colors */
-[data-flux-sidebar] {
-    --sidebar-bg: var(--color-brand-50);
-    --sidebar-border: var(--color-brand-100);
-}
-
+/* Sidebar brand colors - light mode dark blue, dark mode gray */
 [data-flux-sidebar-item] {
-    @apply text-zinc-500 dark:text-zinc-400;
+    @apply text-white/75;
 }
 
 [data-flux-sidebar-item]:hover {
-    @apply text-brand-700 bg-brand-100/60 dark:text-white dark:bg-white/[7%];
+    @apply text-white bg-white/10;
 }
 
 [data-flux-sidebar-item][data-current] {
-    @apply text-brand-700 bg-white border-brand-200 shadow-xs dark:text-white dark:bg-white/[7%] dark:border-transparent;
+    @apply text-brand-700 bg-white border-white/20 shadow-sm;
 }
 
 [data-flux-sidebar-group] > div > div:first-child {
-    @apply text-brand-600 dark:text-zinc-500;
+    @apply text-brand-300;
+}
+
+[data-flux-sidebar-brand] > div:last-child {
+    @apply text-white/90;
 }
 
 [data-flux-sidebar-profile] {
-    @apply text-zinc-500 dark:text-zinc-400;
+    @apply text-white/75;
 }
 
 [data-flux-sidebar-profile]:hover {
-    @apply bg-brand-100/60 dark:bg-white/[7%];
+    @apply bg-white/10;
 }
 
 [data-flux-sidebar-profile]:hover > span,
 [data-flux-sidebar-profile]:hover [data-flux-icon] {
-    @apply text-brand-700 dark:text-white;
+    @apply text-white;
 }
 
-[data-flux-sidebar] .in-data-flux-sidebar-collapsed-desktop\:hidden {
-    color: inherit;
+/* Dark mode overrides - neutral gray sidebar */
+.dark [data-flux-sidebar-item] {
+    @apply text-zinc-400;
+}
+
+.dark [data-flux-sidebar-item]:hover {
+    @apply text-white bg-white/[7%];
+}
+
+.dark [data-flux-sidebar-item][data-current] {
+    @apply text-white bg-white/[7%] border-transparent;
+}
+
+.dark [data-flux-sidebar-group] > div > div:first-child {
+    @apply text-zinc-500;
+}
+
+.dark [data-flux-sidebar-brand] > div:last-child {
+    @apply text-zinc-100;
+}
+
+.dark [data-flux-sidebar-profile] {
+    @apply text-zinc-400;
+}
+
+.dark [data-flux-sidebar-profile]:hover {
+    @apply bg-white/[7%];
+}
+
+.dark [data-flux-sidebar-profile]:hover > span,
+.dark [data-flux-sidebar-profile]:hover [data-flux-icon] {
+    @apply text-white;
 }
