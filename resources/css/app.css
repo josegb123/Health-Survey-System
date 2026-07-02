@@ -181,6 +181,11 @@ select:focus[data-flux-control] {
     @apply text-white/75;
 }
 
+[data-flux-sidebar-profile] > span,
+[data-flux-sidebar-profile] [data-flux-icon] {
+    @apply text-white/75;
+}
+
 [data-flux-sidebar-profile]:hover {
     @apply bg-white/10;
 }
@@ -212,6 +217,11 @@ select:focus[data-flux-control] {
 }
 
 .dark [data-flux-sidebar-profile] {
+    @apply text-zinc-400;
+}
+
+.dark [data-flux-sidebar-profile] > span,
+.dark [data-flux-sidebar-profile] [data-flux-icon] {
     @apply text-zinc-400;
 }
 
