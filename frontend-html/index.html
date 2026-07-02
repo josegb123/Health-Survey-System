@@ -161,6 +161,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const TEMPLATE_ID = 1;
             const API_BASE_URL = 'http://localhost:8000/api';
+            const CLOUDFLARE_TURNSTILE_SITE_KEY = ''; // Coloca aquí tu Site Key de Cloudflare Turnstile
 
             const loadingEl = document.getElementById('survey-loading');
             const formEl = document.getElementById('dynamic-survey-form');
@@ -178,6 +179,17 @@
             let turnstileSiteKey = null;
 
             // 0. Obtener configuración pública (Turnstile, mantenimiento)
+            // Si la constante está definida, se usa directamente; si no, se obtiene del API
+            if (CLOUDFLARE_TURNSTILE_SITE_KEY) {
+                turnstileSiteKey = CLOUDFLARE_TURNSTILE_SITE_KEY;
+                document.getElementById('turnstile-container').classList.remove('hidden');
+                if (window.turnstile) {
+                    window.turnstile.render('#turnstile-widget', {
+                        sitekey: turnstileSiteKey,
+                    });
+                }
+            }
+
             fetch(`${API_BASE_URL}/config`)
                 .then(r => r.json())
                 .then(res => {
@@ -193,8 +205,8 @@
                         return;
                     }
 
-                    turnstileSiteKey = cfg.turnstile_site_key;
-                    if (turnstileSiteKey) {
+                    if (!turnstileSiteKey && cfg.turnstile_site_key) {
+                        turnstileSiteKey = cfg.turnstile_site_key;
                         document.getElementById('turnstile-container').classList.remove('hidden');
                         if (window.turnstile) {
                             window.turnstile.render('#turnstile-widget', {
