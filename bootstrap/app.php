@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -37,4 +39,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->user() && $request->acceptsHtml()) {
+                return redirect()->route('dashboard');
+            }
+        });
+
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($request->user() && $e->getStatusCode() === 403 && $request->acceptsHtml()) {
+                return redirect()->route('dashboard');
+            }
+        });
     })->create();
