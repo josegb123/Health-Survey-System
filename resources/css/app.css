@@ -175,7 +175,7 @@ select:focus[data-flux-control] {
 }
 
 [data-flux-sidebar-group] > div > div:first-child {
-    @apply text-brand-400 dark:text-zinc-500;
+    @apply text-brand-600 dark:text-zinc-500;
 }
 
 [data-flux-sidebar-profile] {

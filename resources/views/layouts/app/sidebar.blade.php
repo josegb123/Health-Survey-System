@@ -7,7 +7,7 @@
 
 <body class="min-h-screen bg-gradient-to-br from-brand-50/40 to-white dark:from-zinc-900 dark:to-zinc-800">
     <flux:sidebar sticky collapsible="mobile"
-        class="border-e border-brand-100 bg-brand-50 dark:border-zinc-700 dark:bg-zinc-900">
+        class="border-e border-brand-200/50 bg-brand-200 dark:border-zinc-700 dark:bg-zinc-900">
         <flux:sidebar.header>
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
             <flux:sidebar.collapse class="lg:hidden" />
