@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ \App\Models\SystemSetting::set()->theme === 'light' ? '' : 'dark' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ \App\Models\SystemSetting::set()->theme === 'dark' ? 'dark' : '' }}">
 
 <head>
     @include('partials.head')
