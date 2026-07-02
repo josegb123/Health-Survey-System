@@ -5,10 +5,8 @@ namespace App\Livewire\Settings;
 use App\Concerns\ProfileValidationRules;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Profile settings')]
 class Profile extends Component
 {
     use ProfileValidationRules;
@@ -20,6 +18,11 @@ class Profile extends Component
     /**
      * Mount the component.
      */
+    public function title(): string
+    {
+        return __('Profile settings');
+    }
+
     public function mount(): void
     {
         $this->name = Auth::user()->name;

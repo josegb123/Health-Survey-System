@@ -38,6 +38,6 @@ class CheckMaintenanceModeTest extends TestCase
         });
 
         $this->assertEquals(503, $response->getStatusCode());
-        $this->assertStringContainsString('maintenance', $response->getContent());
+        $this->assertStringContainsString('mantenimiento', $response->getContent());
     }
 }

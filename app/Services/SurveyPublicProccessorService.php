@@ -61,7 +61,7 @@ class SurveyPublicProccessorService
         $decoded = base64_decode($base64Signature, true);
 
         if ($decoded === false) {
-            throw new \InvalidArgumentException('La firma proporcionada no es un base64 válido.');
+            throw new \InvalidArgumentException('The provided signature is not a valid base64 string.');
         }
 
         $filename = Str::uuid().'.png';

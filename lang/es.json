@@ -309,5 +309,27 @@
     "From": "Desde",
     "To": "Hasta",
 
-    "Human verification failed. Please try again.": "La verificación humana falló. Por favor intente nuevamente."
+    "Human verification failed. Please try again.": "La verificación humana falló. Por favor intente nuevamente.",
+
+    "Accept": "Aceptar",
+    "Entity ID Type": "Tipo de Identificación de la Entidad",
+    "Registry Type": "Tipo de Registro",
+    "Incomplete Configuration": "Configuración Incompleta",
+    "Month": "Mes",
+    "Quarter": "Trimestre",
+    "Year": "Año",
+    "Q": "T",
+    "NI": "NI",
+    "e.g. NI for NIT, CC for ID, etc.": "Ej: NI para NIT, CC para cédula, etc.",
+    "Record type identifier for the ministry file.": "Identificador del tipo de registro para el archivo del ministerio.",
+    "Tax ID / DNI (NIT)": "Identificación Fiscal / DNI (NIT)",
+    "The system is currently under maintenance. Please try again later.": "El sistema está actualmente en mantenimiento. Por favor intente más tarde.",
+
+    "No surveys were found in the selected period.": "No se encontraron encuestas en el período seleccionado.",
+    "Recommended by the Ministry": "Recomendada por el ministerio",
+    "Cannot change the role of the only system administrator.": "No se puede cambiar el rol del único administrador del sistema.",
+    "You cannot delete your own user account while logged in.": "No puedes eliminar tu propia cuenta de usuario en sesión.",
+    "Operation cancelled. There must be at least one administrator in the system.": "Operación cancelada. Debe existir al menos un administrador en el sistema.",
+    "Error processing the survey answers block.": "Error al procesar el bloque de respuestas de la encuesta.",
+    "The provided signature is not a valid base64 string.": "La firma proporcionada no es un base64 válido."
 }

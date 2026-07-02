@@ -19,14 +19,14 @@ class DeleteUserAction
 
             // Condición de error: No permitir que el usuario se elimine a sí mismo
             if ($user->id === auth()->id()) {
-                throw new Exception('No puedes eliminar tu propia cuenta de usuario en sesión.');
+                throw new Exception('You cannot delete your own user account while logged in.');
             }
 
             // Condición de error: No permitir eliminar al único administrador
             if ($user->role === 'admin') {
                 $adminCount = User::where('role', 'admin')->count();
                 if ($adminCount <= 1) {
-                    throw new Exception('Operación cancelada. Debe existir al menos un administrador en el sistema.');
+                    throw new Exception('Operation cancelled. There must be at least one administrator in the system.');
                 }
             }
 

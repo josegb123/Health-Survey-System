@@ -33,7 +33,7 @@ class UpdateUserAction
             if ($user->role === 'admin' && $updateData['role'] !== 'admin') {
                 $adminCount = User::where('role', 'admin')->count();
                 if ($adminCount <= 1) {
-                    throw new Exception('No se puede cambiar el rol del único administrador del sistema.');
+                    throw new Exception('Cannot change the role of the only system administrator.');
                 }
             }
 

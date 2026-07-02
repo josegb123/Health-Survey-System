@@ -7,10 +7,8 @@ use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Title('Security settings')]
 class Security extends Component
 {
     use PasswordValidationRules;
@@ -24,6 +22,11 @@ class Security extends Component
     /**
      * Mount the component.
      */
+    public function title(): string
+    {
+        return __('Security settings');
+    }
+
     public function mount(DisableTwoFactorAuthentication $disableTwoFactorAuthentication): void {}
 
     /**

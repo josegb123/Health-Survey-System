@@ -53,7 +53,7 @@ class SurveyProcessorService
             $answersSaved = app(CreateSurveyAnswersAction::class)->execute($survey->id, $answers);
 
             if (! $answersSaved && ! empty($answers)) {
-                throw new \Exception('Error al procesar el bloque de respuestas de la encuesta.');
+                throw new \Exception('Error processing the survey answers block.');
             }
 
             Log::info('Encuesta procesada con éxito', [
