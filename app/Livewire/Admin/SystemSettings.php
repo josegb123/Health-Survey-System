@@ -23,6 +23,10 @@ class SystemSettings extends Component
 
     public string $company_dni = '';
 
+    public string $entity_type = 'NI';
+
+    public int $registry_type = 3;
+
     public ?string $mail_from_address = null;
 
     public ?string $mail_from_name = null;
@@ -44,6 +48,8 @@ class SystemSettings extends Component
         'rate_limit_requests' => 'nullable|integer|min:1',
         'company_name' => 'nullable|string|max:255',
         'company_dni' => 'nullable|string|max:255',
+        'entity_type' => 'nullable|string|max:10',
+        'registry_type' => 'nullable|integer|min:1',
         'mail_from_address' => 'nullable|email|max:255',
         'mail_from_name' => 'nullable|string|max:255',
         'session_timeout_minutes' => 'nullable|integer|min:1',
@@ -81,6 +87,8 @@ class SystemSettings extends Component
             'rate_limit_requests' => $this->rate_limit_requests,
             'company_name' => $this->company_name,
             'company_dni' => $this->company_dni,
+            'entity_type' => $this->entity_type,
+            'registry_type' => $this->registry_type,
             'mail_from_address' => $this->mail_from_address,
             'mail_from_name' => $this->mail_from_name,
             'session_timeout_minutes' => $this->session_timeout_minutes,

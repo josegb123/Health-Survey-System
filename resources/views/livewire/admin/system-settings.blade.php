@@ -17,6 +17,12 @@
                 <flux:input wire:model="company_name" label="{{ __('Company / Clinic Name') }}" />
                 <flux:input wire:model="company_dni" label="{{ __('Tax ID / DNI') }}" />
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <flux:input wire:model="entity_type" label="{{ __('Entity ID Type') }}" :placeholder="__('NI')"
+                    hint="{{ __('e.g. NI for NIT, CC for ID, etc.') }}" />
+                <flux:input type="number" wire:model="registry_type" label="{{ __('Registry Type') }}" min="1"
+                    hint="{{ __('Record type identifier for the ministry file.') }}" />
+            </div>
         </div>
 
         {{-- SECTION 2: Preferences & Metrics --}}
