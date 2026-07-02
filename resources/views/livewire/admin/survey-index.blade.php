@@ -10,6 +10,26 @@
         </flux:button>
     </div>
 
+    {{-- Filters --}}
+    <div class="flex flex-wrap items-center gap-3">
+        <flux:select wire:model.live="filterMonth" class="w-44" :placeholder="__('All months')">
+            @foreach (range(1, 12) as $m)
+                <flux:select.option :value="$m">{{ Carbon\Carbon::create()->month($m)->translatedFormat('F') }}</flux:select.option>
+            @endforeach
+        </flux:select>
+        <flux:select wire:model.live="filterQuarter" class="w-44" :placeholder="__('All quarters')">
+            <flux:select.option value="1">{{ __('Q1') }} (Ene-Mar)</flux:select.option>
+            <flux:select.option value="2">{{ __('Q2') }} (Abr-Jun)</flux:select.option>
+            <flux:select.option value="3">{{ __('Q3') }} (Jul-Sep)</flux:select.option>
+            <flux:select.option value="4">{{ __('Q4') }} (Oct-Dic)</flux:select.option>
+        </flux:select>
+        @if ($filterMonth || $filterQuarter)
+            <flux:button size="sm" variant="subtle" wire:click="clearFilters">
+                {{ __('Clear') }}
+            </flux:button>
+        @endif
+    </div>
+
     <flux:table :paginate="$surveys">
         <flux:table.columns>
             <flux:table.column>{{ __('Patient') }}</flux:table.column>

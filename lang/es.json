@@ -334,5 +334,13 @@
     "The provided signature is not a valid base64 string.": "La firma proporcionada no es un base64 válido.",
 
     "Welcome back": "Bienvenido de nuevo",
-    "Enter your credentials to access the system": "Ingrese sus credenciales para acceder al sistema"
+    "Enter your credentials to access the system": "Ingrese sus credenciales para acceder al sistema",
+
+    "All months": "Todos los meses",
+    "All quarters": "Todos los trimestres",
+    "Clear": "Limpiar",
+    "Q1": "T1",
+    "Q2": "T2",
+    "Q3": "T3",
+    "Q4": "T4"
 }

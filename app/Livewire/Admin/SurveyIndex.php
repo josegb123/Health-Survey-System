@@ -17,6 +17,10 @@ class SurveyIndex extends Component
 
     public ?Survey $viewingSurvey = null;
 
+    public ?int $filterMonth = null;
+
+    public ?int $filterQuarter = null;
+
     public string $reportPeriod = 'monthly';
 
     public string $reportStartDate = '';
@@ -30,6 +34,25 @@ class SurveyIndex extends Component
     public ?int $reportQuarter = null;
 
     public ?string $ministryConfigError = null;
+
+    public function clearFilters(): void
+    {
+        $this->filterMonth = null;
+        $this->filterQuarter = null;
+        $this->resetPage();
+    }
+
+    public function updatedFilterMonth(): void
+    {
+        $this->filterQuarter = null;
+        $this->resetPage();
+    }
+
+    public function updatedFilterQuarter(): void
+    {
+        $this->filterMonth = null;
+        $this->resetPage();
+    }
 
     public function mount(): void
     {
@@ -174,11 +197,21 @@ class SurveyIndex extends Component
 
     public function render(): View
     {
+        $query = Survey::with(['patient', 'template'])
+            ->where('status', 'completed');
+
+        if ($this->filterMonth) {
+            $query->whereMonth('completed_at', $this->filterMonth)
+                ->whereYear('completed_at', now()->year);
+        } elseif ($this->filterQuarter) {
+            $startMonth = ($this->filterQuarter - 1) * 3 + 1;
+            $query->whereMonth('completed_at', '>=', $startMonth)
+                ->whereMonth('completed_at', '<=', $startMonth + 2)
+                ->whereYear('completed_at', now()->year);
+        }
+
         return view('livewire.admin.survey-index', [
-            'surveys' => Survey::with(['patient', 'template'])
-                ->where('status', 'completed')
-                ->latest()
-                ->paginate(10),
+            'surveys' => $query->latest()->paginate(10),
         ]);
     }
 }

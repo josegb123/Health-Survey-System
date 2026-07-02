@@ -20,11 +20,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             InsurerSeeder::class,
-            PatientSeeder::class,
             SurveyTemplateSeeder::class,
             SurveyQuestionSeeder::class,
-            SurveySeeder::class,
-            SurveyAnswerSeeder::class,
         ]);
 
         // Inicializa el registro único de configuraciones globales
