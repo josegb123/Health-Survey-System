@@ -103,7 +103,9 @@ class SystemSettings extends Component
 
     public function render()
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        if (! auth()->user()->isAdmin()) {
+            $this->redirect(route('dashboard'));
+        }
 
         return view('livewire.admin.system-settings');
     }

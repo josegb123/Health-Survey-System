@@ -169,7 +169,9 @@ class Index extends Component
      */
     public function render(): View
     {
-        abort_unless(auth()->user()->isAdmin(), 403);
+        if (! auth()->user()->isAdmin()) {
+            $this->redirect(route('dashboard'));
+        }
 
         return view('livewire.users.index', [
             'users' => User::latest()->paginate(10),
