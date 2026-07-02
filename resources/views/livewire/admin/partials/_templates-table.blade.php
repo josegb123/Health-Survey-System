@@ -41,20 +41,22 @@
                                 {{ __('View Detail') }}
                             </flux:menu.item>
 
-                            <flux:menu.separator />
-                            <flux:menu.item
-                                wire:click="confirmToggleStatus({{ $template->id }}, '{{ addslashes($template->title) }}')"
-                                icon="arrow-path">
-                                {{ $template->is_active ? __('Deactivate') : __('Activate') }}
-                            </flux:menu.item>
+                            @if (auth()->user()->isAdmin())
+                                <flux:menu.separator />
+                                <flux:menu.item
+                                    wire:click="confirmToggleStatus({{ $template->id }}, '{{ addslashes($template->title) }}')"
+                                    icon="arrow-path">
+                                    {{ $template->is_active ? __('Deactivate') : __('Activate') }}
+                                </flux:menu.item>
 
-                            <flux:menu.separator />
+                                <flux:menu.separator />
 
-                            <flux:menu.item
-                                wire:click="confirmDelete({{ $template->id }}, '{{ addslashes($template->title) }}')"
-                                icon="trash" variant="danger">
-                                {{ __('Delete') }}
-                            </flux:menu.item>
+                                <flux:menu.item
+                                    wire:click="confirmDelete({{ $template->id }}, '{{ addslashes($template->title) }}')"
+                                    icon="trash" variant="danger">
+                                    {{ __('Delete') }}
+                                </flux:menu.item>
+                            @endif
                         </flux:menu>
                     </flux:dropdown>
                 </flux:table.cell>

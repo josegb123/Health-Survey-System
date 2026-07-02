@@ -8,13 +8,6 @@
             'navigate' => true,
         ],
         [
-            'label' => 'Users',
-            'route' => 'users.index',
-            'active_pattern' => 'users.*',
-            'icon' => 'user',
-            'navigate' => true,
-        ],
-        [
             'label' => 'Surveys',
             'route' => 'admin.surveys.index',
             'active_pattern' => 'admin.surveys.*',
@@ -28,14 +21,25 @@
             'icon' => 'document-text',
             'navigate' => true,
         ],
-        [
+    ];
+
+    if (auth()->user()->isAdmin()) {
+        $platformMenu[] = [
+            'label' => 'Users',
+            'route' => 'users.index',
+            'active_pattern' => 'users.*',
+            'icon' => 'user',
+            'navigate' => true,
+        ];
+
+        $platformMenu[] = [
             'label' => 'System Settings',
             'route' => 'admin.settings',
             'active_pattern' => 'admin.settings.*',
             'icon' => 'cog',
             'navigate' => true,
-        ],
-    ];
+        ];
+    }
 @endphp
 
 <x-sidebar-group heading="Platform" :items="$platformMenu" />

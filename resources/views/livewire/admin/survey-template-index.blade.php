@@ -6,9 +6,11 @@
             </flux:text>
         </div>
 
-        <flux:button wire:click="openCreateFlyout" variant="primary" icon="plus">
-            {{ __('New Template') }}
-        </flux:button>
+        @if (auth()->user()->isAdmin())
+            <flux:button wire:click="openCreateFlyout" variant="primary" icon="plus">
+                {{ __('New Template') }}
+            </flux:button>
+        @endif
     </div>
 
     <flux:separator />

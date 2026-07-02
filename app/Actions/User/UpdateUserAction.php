@@ -26,24 +26,28 @@ class UpdateUserAction
             $updateData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'role' => $data['role'] ?? $user->role, // Mantiene el rol actual si no se envía
             ];
 
             // 2. Condición de error / Flujo alternativo: Evitar degradar al único administrador
-            if ($user->role === 'admin' && $updateData['role'] !== 'admin') {
+            if ($user->hasRole('admin') && isset($data['role']) && $data['role'] !== 'admin') {
                 $adminCount = User::where('role', 'admin')->count();
                 if ($adminCount <= 1) {
                     throw new Exception('Cannot change the role of the only system administrator.');
                 }
             }
 
-            // 3. Flujo alternativo para la contraseña
+            // 3. Sincronizar el rol usando Spatie
+            if (isset($data['role'])) {
+                $user->syncRoles([$data['role']]);
+            }
+
+            // 4. Flujo alternativo para la contraseña
             // Si viene vacía (porque en el modal es opcional al editar), no se modifica.
             if (! empty($data['password'])) {
                 $updateData['password'] = Hash::make($data['password']);
             }
 
-            // 4. Actualizar el modelo
+            // 5. Actualizar el modelo
             $user->update($updateData);
 
             return $user;

@@ -103,6 +103,8 @@ class SystemSettings extends Component
 
     public function render()
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         return view('livewire.admin.system-settings');
     }
 }

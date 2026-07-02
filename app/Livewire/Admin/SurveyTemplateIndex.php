@@ -89,6 +89,8 @@ class SurveyTemplateIndex extends Component
      */
     public function openCreateFlyout(): void
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         $this->reset(['title', 'is_active', 'questions']);
         $this->addQuestion(); // Inicia con un bloque de pregunta listo
         $this->modal('create-template-flyout')->show();
@@ -144,6 +146,8 @@ class SurveyTemplateIndex extends Component
      */
     public function saveTemplate(SurveyTemplateBuilderService $builderService): void
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         $this->validate();
 
         try {
@@ -175,6 +179,8 @@ class SurveyTemplateIndex extends Component
 
     public function toggleStatus(): void
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         if (! $this->selectedTemplateId) {
             return;
         }
@@ -195,6 +201,8 @@ class SurveyTemplateIndex extends Component
 
     public function deleteTemplate(): void
     {
+        abort_unless(auth()->user()->isAdmin(), 403);
+
         if (! $this->selectedTemplateId) {
             return;
         }

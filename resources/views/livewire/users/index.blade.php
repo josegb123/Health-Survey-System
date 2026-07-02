@@ -55,9 +55,13 @@
                                 {{ __('Edit') }}
                             </flux:button>
 
-                            <flux:button size="sm" variant="danger" wire:click="deleteUser({{ $user->id }})"
-                                wire:confirm="{{ __('Are you absolutely sure you want to delete :name? This action cannot be undone.', ['name' => $user->name]) }}"
-                                icon="trash">
+                            @php
+                                $cannotDelete = $user->id === auth()->id() || $user->isAdmin();
+                            @endphp
+                            <flux:button size="sm" variant="danger"
+                                wire:click="deleteUser({{ $user->id }})"
+                                wire:confirm="{{ $cannotDelete ? '' : __('Are you absolutely sure you want to delete :name? This action cannot be undone.', ['name' => $user->name]) }}"
+                                icon="trash" :disabled="$cannotDelete">
                                 {{ __('Delete') }}
                             </flux:button>
                         </div>

@@ -23,7 +23,7 @@ class DeleteUserAction
             }
 
             // Condición de error: No permitir eliminar al único administrador
-            if ($user->role === 'admin') {
+            if ($user->hasRole('admin')) {
                 $adminCount = User::where('role', 'admin')->count();
                 if ($adminCount <= 1) {
                     throw new Exception('Operation cancelled. There must be at least one administrator in the system.');
