@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class SurveyReportService
 {
+    const MINISTRY_TEMPLATE_TITLE = 'Recommended by the Ministry';
+
     public function getSettings(): SystemSetting
     {
         return SystemSetting::set();
@@ -102,59 +104,148 @@ class SurveyReportService
 
     public function generateMinistryReport(string $startDate, string $endDate, string $period): string
     {
-        $surveys = $this->getSurveysInRange($startDate, $endDate);
         $settings = $this->getSettings();
-        $generatedAt = now()->format('d/m/Y H:i:s');
 
-        $lines = [];
-        $lines[] = '===========================================';
-        $lines[] = '  REPORTE PARA EL MINISTERIO DE SALUD';
-        $lines[] = '===========================================';
-        $lines[] = '';
-        $lines[] = 'Empresa: '.($settings->company_name ?? config('app.name'));
-        $lines[] = 'NIT: '.($settings->company_dni ?? 'N/A');
-        $lines[] = 'Periodo: '.$period;
-        $lines[] = 'Fecha inicio: '.Carbon::parse($startDate)->format('d/m/Y');
-        $lines[] = 'Fecha fin: '.Carbon::parse($endDate)->format('d/m/Y');
-        $lines[] = 'Generado: '.$generatedAt;
-        $lines[] = 'Total encuestas: '.$surveys->count();
-        $lines[] = '';
-        $lines[] = '-------------------------------------------';
-        $lines[] = '';
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->endOfDay();
+
+        $surveys = Survey::with(['answers.question', 'template.questions'])
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$start, $end])
+            ->get();
 
         if ($surveys->isEmpty()) {
-            $lines[] = 'No se encontraron encuestas en el periodo seleccionado.';
-            $lines[] = '';
-        } else {
-            foreach ($surveys as $index => $survey) {
-                $lines[] = 'ENCUESTA #'.($index + 1);
-                $lines[] = '  ID Interno: '.$survey->id;
-                $lines[] = '  Fecha: '.$survey->created_at->format('d/m/Y H:i');
-                $lines[] = '  Plantilla: '.($survey->template?->title ?? 'Eliminada');
-                $lines[] = '  Calificacion: '.($survey->rating ? number_format($survey->rating, 2).' / 5.00' : 'N/A');
-                $lines[] = '';
-                $lines[] = '  DATOS DEL PACIENTE:';
-                $lines[] = '    Nombre: '.($survey->patient?->name ?? 'Anonimo');
-                $lines[] = '    Documento: '.($survey->patient?->dni ?? 'N/A');
-                $lines[] = '    Email: '.($survey->patient?->email ?? 'N/A');
-                $lines[] = '    Telefono: '.($survey->patient?->phone ?? 'N/A');
-                $lines[] = '    Aseguradora: '.($survey->patient?->insurer?->name ?? 'N/A');
-                $lines[] = '';
-                $lines[] = '  RESPUESTAS:';
+            return __('No surveys were found in the selected period.');
+        }
 
-                foreach ($survey->answers as $answer) {
-                    $question = $answer->question?->question_text ?? 'Pregunta eliminada';
-                    $lines[] = '    - '.$question.': '.$answer->answer_value;
+        $expMap = [
+            'MUY BUENA' => 0,
+            'BUENA' => 0,
+            'REGULAR' => 0,
+            'MALA' => 0,
+            'MUY MALA' => 0,
+        ];
+        $expNoAnswer = 0;
+
+        $recMap = [
+            'DEFINITIVAMENTE SÍ' => 0,
+            'PROBABLEMENTE SÍ' => 0,
+            'DEFINITIVAMENTE NO' => 0,
+            'PROBABLEMENTE NO' => 0,
+        ];
+        $recNoAnswer = 0;
+
+        foreach ($surveys as $survey) {
+            $answeredExp = false;
+            $answeredRec = false;
+
+            foreach ($survey->answers as $answer) {
+                $question = $answer->question ?? $survey->template?->questions
+                    ->firstWhere('id', $answer->survey_question_id);
+
+                if (! $question) {
+                    continue;
                 }
 
-                $lines[] = '';
-                $lines[] = '-------------------------------------------';
-                $lines[] = '';
+                if ($question->field_type === 'radio' && ! empty($question->options)) {
+                    $key = mb_strtoupper(trim($answer->answer_value));
+
+                    // Try direct match against ministry experience options
+                    if (isset($expMap[$key])) {
+                        $expMap[$key]++;
+                        $answeredExp = true;
+
+                        continue;
+                    }
+
+                    // Try direct match against ministry recommendation options
+                    if (isset($recMap[$key])) {
+                        $recMap[$key]++;
+                        $answeredRec = true;
+
+                        continue;
+                    }
+
+                    // Map Yes/No to recommendation
+                    $normalized = mb_strtoupper(trim($key));
+                    if (in_array($normalized, ['YES', 'SI', 'SÍ', 'Y'])) {
+                        $recMap['DEFINITIVAMENTE SÍ']++;
+                        $answeredRec = true;
+
+                        continue;
+                    }
+                    if (in_array($normalized, ['NO', 'N'])) {
+                        $recMap['DEFINITIVAMENTE NO']++;
+                        $answeredRec = true;
+
+                        continue;
+                    }
+                }
+
+                // Map number-type answers (1-5 scale) to experience
+                if ($question->field_type === 'number' && is_numeric($answer->answer_value)) {
+                    $val = (float) $answer->answer_value;
+                    $bucket = match (true) {
+                        $val >= 4.5 => 'MUY BUENA',
+                        $val >= 3.5 => 'BUENA',
+                        $val >= 2.5 => 'REGULAR',
+                        $val >= 1.5 => 'MALA',
+                        default => 'MUY MALA',
+                    };
+                    $expMap[$bucket]++;
+                    $answeredExp = true;
+                }
+            }
+
+            // Fallback: use survey rating for experience if not already answered
+            if (! $answeredExp && $survey->rating !== null) {
+                $bucket = match (true) {
+                    $survey->rating >= 4.5 => 'MUY BUENA',
+                    $survey->rating >= 3.5 => 'BUENA',
+                    $survey->rating >= 2.5 => 'REGULAR',
+                    $survey->rating >= 1.5 => 'MALA',
+                    default => 'MUY MALA',
+                };
+                $expMap[$bucket]++;
+                $answeredExp = true;
+            }
+
+            // Fallback: derive recommendation from rating
+            if (! $answeredRec && $survey->rating !== null) {
+                if ($survey->rating >= 3.5) {
+                    $recMap['DEFINITIVAMENTE SÍ']++;
+                } else {
+                    $recMap['DEFINITIVAMENTE NO']++;
+                }
+                $answeredRec = true;
+            }
+
+            if (! $answeredExp) {
+                $expNoAnswer++;
+            }
+            if (! $answeredRec) {
+                $recNoAnswer++;
             }
         }
 
-        $lines[] = '--- FIN DEL REPORTE ---';
+        $consecutive = 1;
 
-        return implode("\n", $lines);
+        return implode('|', [
+            $settings->registry_type ?? 3,
+            $consecutive,
+            $settings->entity_type ?? 'NI',
+            $settings->company_dni ?? '',
+            $expMap['MUY BUENA'],
+            $expMap['BUENA'],
+            $expMap['REGULAR'],
+            $expMap['MALA'],
+            $expMap['MUY MALA'],
+            $expNoAnswer,
+            $recMap['DEFINITIVAMENTE SÍ'],
+            $recMap['PROBABLEMENTE SÍ'],
+            $recMap['DEFINITIVAMENTE NO'],
+            $recMap['PROBABLEMENTE NO'],
+            $recNoAnswer,
+        ]);
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
+use App\Services\SurveyReportService;
 use Illuminate\Database\Seeder;
 
 class SurveyQuestionSeeder extends Seeder
@@ -13,7 +14,6 @@ class SurveyQuestionSeeder extends Seeder
         $templates = SurveyTemplate::all();
 
         if ($templates->isEmpty()) {
-            // Si no hay plantillas, creamos la de satisfacción por defecto
             $template = SurveyTemplate::create([
                 'title' => 'General Satisfaction Survey',
                 'is_active' => true,
@@ -22,46 +22,88 @@ class SurveyQuestionSeeder extends Seeder
         }
 
         foreach ($templates as $template) {
-            // Set de preguntas fijas de satisfacción estructuradas correctamente
-            $questions = [
-                [
-                    'question_text' => 'Rate your overall satisfaction with the service (1 to 5)',
-                    'field_type' => 'number',
-                    'options' => null,
-                    'is_required' => true,
-                    'order' => 1,
-                ],
-                [
-                    'question_text' => 'Was the staff courteous and professional?',
-                    'field_type' => 'radio',
-                    'options' => ['Yes', 'No'], // ¡Corregido! Opciones para el componente de la UI
-                    'is_required' => true,
-                    'order' => 2,
-                ],
-                [
-                    'question_text' => 'What aspects of our service could be improved?',
-                    'field_type' => 'text',
-                    'options' => null,
-                    'is_required' => false, // Opcional para que el paciente no esté obligado a escribir
-                    'order' => 3,
-                ],
-            ];
-
-            foreach ($questions as $question) {
-                // Al usar updateOrCreate evitamos duplicados si se corre el seeder más de una vez
-                SurveyQuestion::updateOrCreate(
-                    [
-                        'survey_template_id' => $template->id,
-                        'question_text' => $question['question_text'],
-                    ],
-                    [
-                        'field_type' => $question['field_type'],
-                        'options' => $question['options'],     // Sincronizado
-                        'is_required' => $question['is_required'], // Sincronizado
-                        'order' => $question['order'],
-                    ]
-                );
+            if ($template->title === SurveyReportService::MINISTRY_TEMPLATE_TITLE) {
+                $this->createMinistryQuestions($template);
+            } else {
+                $this->createStandardQuestions($template);
             }
+        }
+    }
+
+    private function createMinistryQuestions(SurveyTemplate $template): void
+    {
+        $questions = [
+            [
+                'question_text' => '¿Cómo califica su experiencia global con la IPS?',
+                'field_type' => 'radio',
+                'options' => ['MUY BUENA', 'BUENA', 'REGULAR', 'MALA', 'MUY MALA'],
+                'is_required' => true,
+                'order' => 1,
+            ],
+            [
+                'question_text' => '¿Recomendaría esta IPS a otras personas?',
+                'field_type' => 'radio',
+                'options' => ['DEFINITIVAMENTE SÍ', 'PROBABLEMENTE SÍ', 'DEFINITIVAMENTE NO', 'PROBABLEMENTE NO'],
+                'is_required' => true,
+                'order' => 2,
+            ],
+        ];
+
+        foreach ($questions as $question) {
+            SurveyQuestion::updateOrCreate(
+                [
+                    'survey_template_id' => $template->id,
+                    'question_text' => $question['question_text'],
+                ],
+                [
+                    'field_type' => $question['field_type'],
+                    'options' => $question['options'],
+                    'is_required' => $question['is_required'],
+                    'order' => $question['order'],
+                ]
+            );
+        }
+    }
+
+    private function createStandardQuestions(SurveyTemplate $template): void
+    {
+        $questions = [
+            [
+                'question_text' => 'Rate your overall satisfaction with the service (1 to 5)',
+                'field_type' => 'number',
+                'options' => null,
+                'is_required' => true,
+                'order' => 1,
+            ],
+            [
+                'question_text' => 'Was the staff courteous and professional?',
+                'field_type' => 'radio',
+                'options' => ['Yes', 'No'],
+                'is_required' => true,
+                'order' => 2,
+            ],
+            [
+                'question_text' => 'What aspects of our service could be improved?',
+                'field_type' => 'text',
+                'options' => null,
+                'is_required' => false,
+                'order' => 3,
+            ],
+        ];
+
+        foreach ($questions as $question) {
+            SurveyQuestion::updateOrCreate(
+                [
+                    'survey_template_id' => $template->id,
+                    'question_text' => $question['question_text'],
+                ],
+                [
+                    'field_type' => $question['field_type'],
+                    'options' => $question['options'],
+                    'is_required' => $question['is_required'],
+                    'order' => $question['order'],
+                ]
+            );
         }
     }
 }

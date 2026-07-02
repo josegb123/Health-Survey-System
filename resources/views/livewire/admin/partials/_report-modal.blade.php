@@ -14,8 +14,29 @@
                 <option value="yearly">{{ __('Yearly') }}</option>
             </flux:select>
 
-            <flux:input type="date" wire:model="reportStartDate" label="{{ __('Start Date') }}" />
+            @if ($reportPeriod === 'monthly')
+                <flux:select wire:model.live="reportMonth" label="{{ __('Month') }}">
+                    @foreach (range(1, 12) as $m)
+                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}</option>
+                    @endforeach
+                </flux:select>
+            @elseif ($reportPeriod === 'quarterly')
+                <flux:select wire:model.live="reportQuarter" label="{{ __('Quarter') }}">
+                    @foreach (range(1, 4) as $q)
+                        <option value="{{ $q }}">{{ __('Q') }}{{ $q }}</option>
+                    @endforeach
+                </flux:select>
+            @endif
 
+            <flux:select wire:model.live="reportYear" label="{{ __('Year') }}">
+                @foreach (range(now()->year - 2, now()->year + 1) as $y)
+                    <option value="{{ $y }}">{{ $y }}</option>
+                @endforeach
+            </flux:select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <flux:input type="date" wire:model="reportStartDate" label="{{ __('Start Date') }}" />
             <flux:input type="date" wire:model="reportEndDate" label="{{ __('End Date') }}" />
         </div>
 

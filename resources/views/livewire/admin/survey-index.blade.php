@@ -80,6 +80,31 @@
     {{-- Report modal --}}
     @include('livewire.admin.partials._report-modal')
 
+    {{-- Ministry config error modal --}}
+    <flux:modal name="ministry-config-error-modal" class="max-w-md">
+        <div class="space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-full">
+                    <flux:icon name="exclamation-triangle" variant="outline" class="h-6 w-6" />
+                </div>
+                <flux:heading size="lg">{{ __('Incomplete Configuration') }}</flux:heading>
+            </div>
+
+            <flux:separator />
+
+            <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                {{ $ministryConfigError }}
+            </p>
+
+            <div class="flex gap-2 pt-2">
+                <flux:spacer />
+                <flux:modal.close>
+                    <flux:button variant="primary">{{ __('Accept') }}</flux:button>
+                </flux:modal.close>
+            </div>
+        </div>
+    </flux:modal>
+
     {{-- Detail flyout --}}
     <flux:modal name="view-survey-flyout" flyout variant="floating" class="w-full max-w-2xl">
         <div class="space-y-6 h-full flex flex-col justify-between">

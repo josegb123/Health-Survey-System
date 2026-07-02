@@ -23,7 +23,11 @@ class ReportsTest extends TestCase
     {
         parent::setUp();
 
-        SystemSetting::set();
+        SystemSetting::set()->update([
+            'company_dni' => '4545454545',
+            'entity_type' => 'NI',
+            'registry_type' => 3,
+        ]);
         $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create();

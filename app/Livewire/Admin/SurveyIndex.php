@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Survey;
+use App\Models\SystemSetting;
 use App\Services\SurveyReportService;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -20,6 +22,21 @@ class SurveyIndex extends Component
     public string $reportStartDate = '';
 
     public string $reportEndDate = '';
+
+    public int $reportYear;
+
+    public ?int $reportMonth = null;
+
+    public ?int $reportQuarter = null;
+
+    public ?string $ministryConfigError = null;
+
+    public function mount(): void
+    {
+        $this->reportYear = now()->year;
+        $this->reportMonth = now()->month;
+        $this->reportQuarter = now()->quarter;
+    }
 
     public function viewSurvey(int $id): void
     {
@@ -43,21 +60,44 @@ class SurveyIndex extends Component
         $this->setReportDateRange();
     }
 
+    public function updatedReportMonth(): void
+    {
+        $this->setReportDateRange();
+    }
+
+    public function updatedReportQuarter(): void
+    {
+        $this->setReportDateRange();
+    }
+
+    public function updatedReportYear(): void
+    {
+        $this->setReportDateRange();
+    }
+
     private function setReportDateRange(): void
     {
-        $now = now();
+        $year = $this->reportYear ?? now()->year;
 
-        $this->reportStartDate = match ($this->reportPeriod) {
-            'quarterly' => $now->copy()->startOfQuarter()->format('Y-m-d'),
-            'yearly' => $now->copy()->startOfYear()->format('Y-m-d'),
-            default => $now->copy()->startOfMonth()->format('Y-m-d'),
-        };
+        switch ($this->reportPeriod) {
+            case 'quarterly':
+                $quarter = $this->reportQuarter ?? now()->quarter;
+                $month = ($quarter - 1) * 3 + 1;
+                $this->reportStartDate = Carbon::create($year, $month, 1)->startOfQuarter()->format('Y-m-d');
+                $this->reportEndDate = Carbon::create($year, $month, 1)->endOfQuarter()->format('Y-m-d');
+                break;
 
-        $this->reportEndDate = match ($this->reportPeriod) {
-            'quarterly' => $now->copy()->endOfQuarter()->format('Y-m-d'),
-            'yearly' => $now->copy()->endOfYear()->format('Y-m-d'),
-            default => $now->copy()->endOfMonth()->format('Y-m-d'),
-        };
+            case 'yearly':
+                $this->reportStartDate = Carbon::create($year, 1, 1)->startOfYear()->format('Y-m-d');
+                $this->reportEndDate = Carbon::create($year, 12, 31)->endOfYear()->format('Y-m-d');
+                break;
+
+            default: // monthly
+                $month = $this->reportMonth ?? now()->month;
+                $this->reportStartDate = Carbon::create($year, $month, 1)->startOfMonth()->format('Y-m-d');
+                $this->reportEndDate = Carbon::create($year, $month, 1)->endOfMonth()->format('Y-m-d');
+                break;
+        }
     }
 
     public function downloadSurveysReport(): StreamedResponse
@@ -88,9 +128,31 @@ class SurveyIndex extends Component
         }, $filename);
     }
 
-    public function downloadMinistryReport(): StreamedResponse
+    public function downloadMinistryReport(): StreamedResponse|null
     {
         $this->validateReportDates();
+
+        $settings = SystemSetting::set();
+        $missing = [];
+
+        if (empty($settings->company_dni)) {
+            $missing[] = __('Tax ID / DNI (NIT)');
+        }
+        if (empty($settings->entity_type)) {
+            $missing[] = __('Entity ID Type');
+        }
+        if (empty($settings->registry_type)) {
+            $missing[] = __('Registry Type');
+        }
+
+        if (! empty($missing)) {
+            $this->ministryConfigError = __('The following fields must be configured in Settings before exporting: :fields', [
+                'fields' => implode(', ', $missing),
+            ]);
+            $this->modal('ministry-config-error-modal')->show();
+
+            return null;
+        }
 
         $service = app(SurveyReportService::class);
         $content = $service->generateMinistryReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod);
