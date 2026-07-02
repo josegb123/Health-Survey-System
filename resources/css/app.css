@@ -167,15 +167,15 @@ select:focus[data-flux-control] {
 }
 
 [data-flux-sidebar-item]:hover {
-    @apply text-brand-700 bg-brand-100/60 dark:text-brand-300 dark:bg-brand-800/20;
+    @apply text-brand-700 bg-brand-100/60 dark:text-white dark:bg-white/[7%];
 }
 
 [data-flux-sidebar-item][data-current] {
-    @apply text-brand-700 bg-white border-brand-200 shadow-xs dark:text-brand-300 dark:bg-brand-800/30 dark:border-brand-700;
+    @apply text-brand-700 bg-white border-brand-200 shadow-xs dark:text-white dark:bg-white/[7%] dark:border-transparent;
 }
 
 [data-flux-sidebar-group] > div > div:first-child {
-    @apply text-brand-400 dark:text-brand-500;
+    @apply text-brand-400 dark:text-zinc-500;
 }
 
 [data-flux-sidebar-profile] {
@@ -183,12 +183,12 @@ select:focus[data-flux-control] {
 }
 
 [data-flux-sidebar-profile]:hover {
-    @apply bg-brand-100/60 dark:bg-brand-800/20;
+    @apply bg-brand-100/60 dark:bg-white/[7%];
 }
 
 [data-flux-sidebar-profile]:hover > span,
 [data-flux-sidebar-profile]:hover [data-flux-icon] {
-    @apply text-brand-700 dark:text-brand-300;
+    @apply text-brand-700 dark:text-white;
 }
 
 [data-flux-sidebar] .in-data-flux-sidebar-collapsed-desktop\:hidden {
