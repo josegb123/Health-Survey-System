@@ -331,5 +331,8 @@
     "You cannot delete your own user account while logged in.": "No puedes eliminar tu propia cuenta de usuario en sesión.",
     "Operation cancelled. There must be at least one administrator in the system.": "Operación cancelada. Debe existir al menos un administrador en el sistema.",
     "Error processing the survey answers block.": "Error al procesar el bloque de respuestas de la encuesta.",
-    "The provided signature is not a valid base64 string.": "La firma proporcionada no es un base64 válido."
+    "The provided signature is not a valid base64 string.": "La firma proporcionada no es un base64 válido.",
+
+    "Welcome back": "Bienvenido de nuevo",
+    "Enter your credentials to access the system": "Ingrese sus credenciales para acceder al sistema"
 }
