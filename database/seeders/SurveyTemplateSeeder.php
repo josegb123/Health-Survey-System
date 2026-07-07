@@ -15,6 +15,6 @@ class SurveyTemplateSeeder extends Seeder
             ['is_active' => true],
         );
 
-        SurveyTemplate::factory()->count(12)->create();
+        // /SurveyTemplate::factory()->count(12)->create();
     }
 }
