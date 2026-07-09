@@ -25,8 +25,8 @@ class SurveyAnswerFactory extends Factory
         // Generamos datos basados en el tipo de campo de la pregunta
         $mockAnswer = match ($question->field_type) {
             'number' => (string) $this->faker->numberBetween(1, 5),
-            'radio' => $this->faker->randomElement(['Yes', 'No']),
-            'select' => $this->faker->randomElement(['Excellent', 'Good', 'Regular', 'Bad']),
+            'radio' => $this->faker->randomElement([__('Yes'), __('No')]),
+            'select' => $this->faker->randomElement([__('Excellent'), __('Good'), __('Regular'), __('Bad')]),
             default => $this->faker->sentence(6), // Para tipo 'text'
         };
 

@@ -19,11 +19,11 @@ class SurveyQuestionFactory extends Factory
     public function definition(): array
     {
         $satisfactionQuestions = [
-            'How would you rate the quality of the service received?',
-            'Was the waiting time acceptable to you?',
-            'Would you recommend our services to family and friends?',
-            'How clear was the information provided by our staff?',
-            'Please leave any additional comments or suggestions to improve.',
+            __('How would you rate the quality of the service received?'),
+            __('Was the waiting time acceptable to you?'),
+            __('Would you recommend our services to family and friends?'),
+            __('How clear was the information provided by our staff?'),
+            __('Please leave any additional comments or suggestions to improve.'),
         ];
 
         // Definimos el tipo de campo primero para condicionar las opciones
@@ -31,7 +31,7 @@ class SurveyQuestionFactory extends Factory
 
         // Flujo alternativo: Si es radio o select, generamos un array de opciones válidas
         $options = in_array($fieldType, ['radio', 'select'])
-            ? ['Excellent', 'Good', 'Regular', 'Bad']
+            ? [__('Excellent'), __('Good'), __('Regular'), __('Bad')]
             : null;
 
         return [

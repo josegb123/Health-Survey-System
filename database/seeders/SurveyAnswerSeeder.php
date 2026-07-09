@@ -17,7 +17,7 @@ class SurveyAnswerSeeder extends Seeder
         $surveys = Survey::with('template.questions')->get();
 
         if ($surveys->isEmpty()) {
-            $this->command->warn('No surveys found to seed answers for. Run SurveySeeder first.');
+            $this->command->warn(__('No surveys found to seed answers for. Run SurveySeeder first.'));
 
             return;
         }
@@ -30,7 +30,7 @@ class SurveyAnswerSeeder extends Seeder
                 $answerValue = match ($question->field_type) {
                     'number' => (string) rand(4, 5), // Sesgado a buena calificación en satisfacción
                     'radio' => rand(0, 1) ? 'Yes' : 'No',
-                    default => 'Everything was excellent during the medical appointment.',
+                    default => __('Everything was excellent during the medical appointment.'),
                 };
 
                 SurveyAnswer::updateOrCreate(
