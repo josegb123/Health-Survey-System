@@ -6,9 +6,9 @@ use App\Helpers\CalculateSurveyRating;
 use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Str;
+use Illuminate\Support\Str;
 
 class SurveyPublicProccessorService
 {
@@ -23,7 +23,12 @@ class SurveyPublicProccessorService
                 ['dni' => $patientData['dni']],
                 [
                     'name' => $patientData['name'],
-                    'email' => $patientData['email'],
+                    'email' => $patientData['email'] ?? null,
+                    'document_type' => $patientData['document_type'] ?? null,
+                    'nationality' => $patientData['nationality'] ?? null,
+                    'address' => $patientData['address'] ?? null,
+                    'phone' => $patientData['phone'] ?? null,
+                    'insurer_id' => $patientData['insurer_id'] ?? null,
                     'password' => bcrypt(Str::random(16)),
                 ]
             );
@@ -64,8 +69,8 @@ class SurveyPublicProccessorService
             throw new \InvalidArgumentException('The provided signature is not a valid base64 string.');
         }
 
-        $filename = Str::uuid().'.png';
-        $path = 'signatures/'.$filename;
+        $filename = Str::uuid() . '.png';
+        $path = 'signatures/' . $filename;
 
         Storage::disk('local')->put($path, $decoded);
 
