@@ -7,9 +7,9 @@
         </div>
 
         @if (auth()->user()->isAdmin())
-            <flux:button wire:click="openCreateFlyout" variant="primary" icon="plus">
-                {{ __('New Template') }}
-            </flux:button>
+            <a href="{{ route('admin.survey-templates.create') }}">
+                <flux:button variant="primary" icon="plus">{{ __('New Template') }}</flux:button>
+            </a>
         @endif
     </div>
 
@@ -17,6 +17,5 @@
 
     @include('livewire.admin.partials._templates-table')
     @include('livewire.admin.partials._templates-modals')
-    @include('livewire.admin.partials._templates-flyout')
     @include('livewire.admin.partials._templates-view-flyout')
 </div>
