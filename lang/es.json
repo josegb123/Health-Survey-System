@@ -234,7 +234,6 @@
     "Surveys": "Encuestas",
     "Templates": "Plantillas",
 
-
     "Template and questions created successfully.": "Plantilla y preguntas creadas con éxito.",
     "Error processing template: ": "Error al procesar la plantilla: ",
     "Template status updated.": "Estado de la plantilla actualizado.",
@@ -342,5 +341,26 @@
     "Q1": "T1",
     "Q2": "T2",
     "Q3": "T3",
-    "Q4": "T4"
+    "Q4": "T4",
+    "Create Survey Template": "Crear Plantilla de Encuesta",
+    "Define the template and its dynamic questions.": "Define la plantilla y sus preguntas dinámicas.",
+    "Back": "Volver",
+    "Do you want to save this template?": "¿Desea guardar esta plantilla?",
+    "Confirm save template?": "¿Confirmar guardar plantilla?",
+    "Confirm and Save": "Confirmar y Guardar",
+    "Very Good": "Muy Buena",
+    "Good": "Buena",
+    "Fair": "Regular",
+    "Bad": "Mala",
+    "Very Bad": "Muy Mala",
+    "Yes": "Sí",
+    "No": "No",
+    "Excellent": "Excelente",
+    "Everything was excellent during the medical appointment.": "Todo fue excelente durante la cita médica.",
+    "How would you rate the quality of the service received?": "¿Cómo calificaría la calidad del servicio recibido?",
+    "Was the waiting time acceptable to you?": "¿El tiempo de espera fue aceptable para usted?",
+    "Would you recommend our services to family and friends?": "¿Recomendaría nuestros servicios a familiares y amigos?",
+    "How clear was the information provided by our staff?": "¿Qué tan clara fue la información proporcionada por nuestro personal?",
+    "Please leave any additional comments or suggestions to improve.": "Por favor deje comentarios o sugerencias adicionales para mejorar.",
+    "No surveys found to seed answers for. Run SurveySeeder first.": "No se encontraron encuestas para sembrar respuestas. Ejecute primero SurveySeeder."
 }
