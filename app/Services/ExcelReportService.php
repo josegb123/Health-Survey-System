@@ -156,7 +156,7 @@ class ExcelReportService
 
                 $matchedAnswer = null;
                 foreach ($survey->answers as $answer) {
-                    if ($answer->survey_question_id === $question->id) {
+                    if ((int) $answer->survey_question_id === $question->id) {
                         $matchedAnswer = $answer;
                         break;
                     }
