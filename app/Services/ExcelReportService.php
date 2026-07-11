@@ -136,7 +136,7 @@ class ExcelReportService
 
                 $colLetter = 'C';
                 foreach ($options as $optIndex => $opt) {
-                    if ($answerValue !== null && mb_strtoupper($answerValue) === mb_strtoupper(trim($opt))) {
+                    if ($answerValue !== null && $this->normalize($answerValue) === $this->normalize(trim($opt))) {
                         $ws->setCellValue($colLetter . $row, 'X');
                         $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     }
@@ -179,5 +179,12 @@ class ExcelReportService
             $colIndex = intdiv($colIndex, 26);
         }
         return $letter;
+    }
+
+    private function normalize(string $value): string
+    {
+        $value = mb_strtolower(trim($value));
+        $value = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'u', 'n'], $value);
+        return preg_replace('/\s+/', ' ', $value);
     }
 }

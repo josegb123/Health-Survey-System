@@ -40,8 +40,15 @@ class MinistryReportGeneratorService
                     }
 
                     $answerValue = trim($answer->answer_value);
-                    $index = array_search($answerValue, $options);
-                    if ($index !== false) {
+                    $normalizedAnswer = $this->normalize($answerValue);
+                    $index = null;
+                    foreach ($options as $i => $opt) {
+                        if ($this->normalize($opt) === $normalizedAnswer) {
+                            $index = $i;
+                            break;
+                        }
+                    }
+                    if ($index !== null) {
                         $optionCounts[$index]++;
                     }
                 }
@@ -60,5 +67,12 @@ class MinistryReportGeneratorService
             $settings->company_dni ?? '',
             ...$counters,
         ]);
+    }
+
+    private function normalize(string $value): string
+    {
+        $value = mb_strtolower(trim($value));
+        $value = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'u', 'n'], $value);
+        return preg_replace('/\s+/', ' ', $value);
     }
 }
