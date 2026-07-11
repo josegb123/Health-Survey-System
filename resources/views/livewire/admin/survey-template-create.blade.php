@@ -1,8 +1,9 @@
-<div class="space-y-6 p-6">
+<div class="space-y-6 p-6 max-w-4xl">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <flux:heading size="xl">{{ __('Create Survey Template') }}</flux:heading>
-            <flux:text class="mt-1">{{ __('Define the template and its dynamic questions.') }}</flux:text>
+            <flux:text class="mt-1">
+                {{ __('Build your questionnaire by adding questions, options, and reordering them.') }}</flux:text>
         </div>
 
         <div class="flex items-center gap-2">
@@ -15,123 +16,219 @@
     <flux:separator />
 
     <form wire:submit.prevent="confirmSave" class="space-y-6">
-        <div class="grid grid-cols-1 gap-4">
-            <flux:input wire:model="title" label="{{ __('Survey Title') }}"
-                placeholder="{{ __('E.g.: Post-Appointment Satisfaction Survey') }}" />
+        <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
+            <flux:heading size="md">{{ __('Template Information') }}</flux:heading>
+            <div class="grid grid-cols-1 gap-4">
+                <flux:input wire:model="title" label="{{ __('Survey Title') }}"
+                    placeholder="{{ __('E.g.: Post-Appointment Satisfaction Survey') }}" />
 
-            <div class="flex items-center gap-2 mt-2">
-                <flux:checkbox wire:model="is_active" label="{{ __('Publish immediately (Active)') }}" />
+                <div class="flex items-center gap-2 mt-2">
+                    <flux:checkbox wire:model="is_active" label="{{ __('Publish immediately (Active)') }}" />
+                </div>
             </div>
         </div>
 
-        <flux:separator />
-
-        <div class="space-y-4">
+        <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
             <div class="flex justify-between items-center">
-                <flux:heading size="sm">{{ __('Questionnaire Questions') }}</flux:heading>
-                <flux:button type="button" size="sm" variant="subtle" icon="plus" wire:click="addQuestion">
-                    {{ __('Add Question') }}
-                </flux:button>
+                <div>
+                    <flux:heading size="md">{{ __('Questions') }}</flux:heading>
+                    <flux:text size="sm" class="text-zinc-500 mt-1">
+                        {{ __('Add the questions that patients will answer.') }}
+                    </flux:text>
+                </div>
+
             </div>
+
+            <flux:separator />
 
             @error('questions')
-                <p class="text-xs text-red-500 font-medium">{{ $message }}</p>
+                <p class="text-sm text-red-500 font-medium">{{ $message }}</p>
             @enderror
 
-            <div class="space-y-3">
-                @foreach ($questions as $index => $question)
-                    <div class="p-4 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-4 transition-all duration-200"
-                        :key="'q-'.$index">
+            @if (empty($questions))
+                <div class="text-center py-12 text-zinc-400">
+                    <flux:icon name="clipboard-document-list" variant="outline"
+                        class="h-12 w-12 mx-auto mb-3 text-zinc-300" />
+                    <p class="text-sm">
+                        {{ __('No questions yet. Click "Add Question" to start building your survey.') }}</p>
+                </div>
+            @else
+                <div class="space-y-3">
+                    @foreach ($questions as $index => $question)
+                        <div class="group relative border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-all duration-200 hover:border-zinc-300 dark:hover:border-zinc-700"
+                            :key="'q-'.$index" x-data="{ collapsed: false }">
 
-                        <div
-                            class="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-2">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                                {{ __('Position Controls') }}
-                            </span>
-
-                            <div class="flex items-center gap-1">
-                                <flux:button type="button" variant="ghost" size="sm" icon="chevron-up"
-                                    wire:click="moveQuestionUp({{ $index }})" :disabled="$index === 0"
-                                    class="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200" />
-
-                                <flux:button type="button" variant="ghost" size="sm" icon="chevron-down"
-                                    wire:click="moveQuestionDown({{ $index }})"
-                                    :disabled="$index === count($questions) - 1"
-                                    class="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200" />
-
-                                <flux:separator vertical class="mx-1 h-4" />
-
-                                <flux:button type="button" variant="ghost" size="sm" icon="trash" color="danger"
-                                    wire:click="removeQuestion({{ $index }})"
-                                    class="hover:bg-red-50 dark:hover:bg-red-950/30" />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="md:col-span-2">
-                                <flux:input wire:model="questions.{{ $index }}.question_text"
-                                    label="{{ __('Question :number', ['number' => $index + 1]) }}"
-                                    placeholder="{{ __('How would you rate...?') }}" />
-                            </div>
-                            <div>
-                                <flux:select wire:model.live="questions.{{ $index }}.field_type"
-                                    wire:change="handleFieldTypeChange({{ $index }}, $event.target.value)"
-                                    label="{{ __('Field Type') }}">
-                                    <option value="text">{{ __('Free Text') }}</option>
-                                    <option value="number">{{ __('Numeric') }}</option>
-                                    <option value="radio">{{ __('Single Choice (Radio)') }}</option>
-                                    <option value="select">{{ __('Dropdown (Select)') }}</option>
-                                </flux:select>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <flux:checkbox wire:model="questions.{{ $index }}.is_required"
-                                label="{{ __('Required Field') }}" />
-                        </div>
-
-                        @if (in_array($question['field_type'], ['radio', 'select']))
+                            {{-- Header with question number and reorder controls --}}
                             <div
-                                class="p-3 bg-white dark:bg-zinc-950 border border-zinc-150 rounded border-dashed space-y-3">
-                                <flux:label>{{ __('Answer Options') }}</flux:label>
+                                class="flex items-center justify-between px-4 py-3 bg-zinc-50 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-800">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="flex items-center justify-center w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                                        {{ $index + 1 }}
+                                    </span>
+                                    <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                        {{ $question['question_text'] ?: __('(Untitled question)') }}
+                                    </span>
+                                    @if ($question['is_required'])
+                                        <span class="text-red-400 text-xs font-bold">*</span>
+                                    @endif
+                                    <flux:badge size="sm" color="zinc" variant="subtle" class="ml-1">
+                                        @switch($question['field_type'])
+                                            @case('text')
+                                                {{ __('Text') }}
+                                            @break
 
-                                @if (!empty($question['options']))
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach ($question['options'] as $optIndex => $option)
-                                            <flux:badge size="sm" color="zinc"
-                                                class="flex items-center gap-1.5 px-2 py-0.5">
-                                                {{ $option }}
-                                                <button type="button"
-                                                    class="text-zinc-400 hover:text-red-500 ml-1 focus:outline-none transition-colors"
-                                                    wire:click="removeOption({{ $index }}, {{ $optIndex }})">&times;</button>
-                                            </flux:badge>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <p class="text-xs text-zinc-400 italic">
-                                        {{ __('You have not added any options yet.') }}
-                                    </p>
-                                @endif
+                                            @case('number')
+                                                {{ __('Number') }}
+                                            @break
 
-                                <div class="flex gap-2">
-                                    <flux:input wire:model="questions.{{ $index }}.new_option_text"
-                                        placeholder="{{ __('E.g.: Excellent') }}" size="sm" class="flex-1" />
-                                    <flux:button type="button" size="sm" variant="subtle"
-                                        wire:click="addOption({{ $index }})">{{ __('Add') }}
-                                    </flux:button>
+                                            @case('radio')
+                                                {{ __('Radio') }}
+                                            @break
+
+                                            @case('select')
+                                                {{ __('Select') }}
+                                            @break
+                                        @endswitch
+                                    </flux:badge>
+                                </div>
+
+                                <div class="flex items-center gap-1">
+                                    <flux:button type="button" variant="ghost" size="xs" icon="chevron-up"
+                                        wire:click="moveQuestionUp({{ $index }})" :disabled="$index === 0"
+                                        class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-30" />
+
+                                    <flux:button type="button" variant="ghost" size="xs" icon="chevron-down"
+                                        wire:click="moveQuestionDown({{ $index }})"
+                                        :disabled="$index === count($questions) - 1"
+                                        class="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-30" />
+
+                                    <flux:separator vertical class="mx-1 h-4" />
+
+                                    <flux:button type="button" variant="ghost" size="xs" icon="trash"
+                                        color="danger" wire:click="removeQuestion({{ $index }})"
+                                        class="text-zinc-400 hover:text-red-600 dark:hover:text-red-400" />
                                 </div>
                             </div>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
+
+                            {{-- Question body --}}
+                            <div class="p-4 space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="md:col-span-2">
+                                        <flux:input wire:model="questions.{{ $index }}.question_text"
+                                            label="{{ __('Question') }}"
+                                            placeholder="{{ __('How would you rate...?') }}" />
+                                    </div>
+                                    <div>
+                                        <flux:select wire:model.live="questions.{{ $index }}.field_type"
+                                            wire:change="handleFieldTypeChange({{ $index }}, $event.target.value)"
+                                            label="{{ __('Answer Type') }}">
+                                            <option value="text">{{ __('Free Text') }}</option>
+                                            <option value="number">{{ __('Numeric') }}</option>
+                                            <option value="radio">{{ __('Single Choice (Radio)') }}</option>
+                                            <option value="select">{{ __('Dropdown (Select)') }}</option>
+                                        </flux:select>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <flux:checkbox wire:model="questions.{{ $index }}.is_required"
+                                        label="{{ __('Required') }}" />
+                                </div>
+
+                                @if (in_array($question['field_type'], ['radio', 'select']))
+                                    <div
+                                        class="p-4 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200 dark:border-zinc-700 rounded-lg space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <flux:label class="text-sm font-medium">{{ __('Answer Options') }}
+                                            </flux:label>
+                                            <span class="text-xs text-zinc-400">{{ count($question['options']) }}
+                                                {{ __('option(s)') }}</span>
+                                        </div>
+
+                                        @if (!empty($question['options']))
+                                            <div class="flex flex-wrap gap-2">
+                                                @foreach ($question['options'] as $optIndex => $option)
+                                                    <span
+                                                        class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm text-zinc-700 dark:text-zinc-300">
+                                                        {{ $option }}
+                                                        <button type="button"
+                                                            class="text-zinc-300 hover:text-red-500 transition-colors"
+                                                            wire:click="removeOption({{ $index }}, {{ $optIndex }})">&times;</button>
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <p class="text-xs text-zinc-400 italic">{{ __('No options added yet.') }}
+                                            </p>
+                                        @endif
+
+                                        <div class="flex gap-2">
+                                            <flux:input wire:model="questions.{{ $index }}.new_option_text"
+                                                placeholder="{{ __('E.g.: Excellent, Good, Fair...') }}" size="sm"
+                                                class="flex-1" />
+                                            <flux:button type="button" size="sm" variant="subtle"
+                                                wire:click="addOption({{ $index }})">{{ __('Add') }}
+                                            </flux:button>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                {{-- Live preview of the question --}}
+                                @if ($question['question_text'])
+                                    <div
+                                        class="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-lg">
+                                        <span
+                                            class="text-xs font-semibold text-blue-500 uppercase tracking-wider">{{ __('Preview') }}</span>
+                                        <p class="text-sm text-zinc-800 dark:text-zinc-200 mt-1">
+                                            {{ $question['question_text'] }}
+                                            @if ($question['is_required'])
+                                                <span class="text-red-400">*</span>
+                                            @endif
+                                        </p>
+                                        @if (in_array($question['field_type'], ['radio', 'select']) && !empty($question['options']))
+                                            <div class="mt-2 space-y-1">
+                                                @foreach ($question['options'] as $opt)
+                                                    <div class="flex items-center gap-2 text-sm text-zinc-500">
+                                                        @if ($question['field_type'] === 'radio')
+                                                            <span
+                                                                class="w-3.5 h-3.5 rounded-full border-2 border-zinc-300 block"></span>
+                                                        @else
+                                                            <span class="text-zinc-300">-</span>
+                                                        @endif
+                                                        {{ $opt }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @elseif ($question['field_type'] === 'text')
+                                            <div
+                                                class="mt-1 h-6 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded">
+                                            </div>
+                                        @elseif ($question['field_type'] === 'number')
+                                            <div
+                                                class="mt-1 h-6 w-24 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded">
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+            <flux:button type="button" variant="primary" color="green" icon="plus" wire:click="addQuestion">
+                {{ __('Add Question') }}
+            </flux:button>
         </div>
 
-        <div class="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+
+        <div class="flex items-center justify-end gap-2 pt-4">
             <a href="{{ route('admin.survey-templates.index') }}">
                 <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
             </a>
-            <flux:button type="submit" variant="primary">{{ __('Save Template') }}</flux:button>
+            <flux:button type="submit" variant="primary" icon="check" :disabled="empty($questions)">
+                {{ __('Save Template') }}
+            </flux:button>
         </div>
     </form>
 
@@ -140,7 +237,11 @@
             <div>
                 <flux:heading size="lg">{{ __('Confirm save template?') }}</flux:heading>
                 <flux:text class="mt-2">{{ __('You are about to create the template:') }} <strong
-                        class="text-zinc-800 dark:text-zinc-200">{{ $title }}</strong></flux:text>
+                        class="text-zinc-800 dark:text-zinc-200">{{ $title }}</strong>
+                </flux:text>
+                <flux:text size="sm" class="mt-2 text-zinc-500">
+                    {{ __('The template will contain :count questions.', ['count' => count($questions)]) }}
+                </flux:text>
             </div>
 
             <div class="flex gap-2">
@@ -152,6 +253,4 @@
             </div>
         </div>
     </flux:modal>
-
-    {{-- Confirmation handled by integrated modal; avoid browser alerts/confirm --}}
 </div>
