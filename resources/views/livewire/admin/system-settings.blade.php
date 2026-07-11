@@ -98,4 +98,107 @@
             </flux:button>
         </div>
     </form>
+
+    {{-- SECTION 6: Data Cleanup --}}
+    <div class="p-6 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/50 rounded-xl space-y-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-full">
+                <flux:icon name="trash" variant="outline" class="h-5 w-5" />
+            </div>
+            <div>
+                <flux:heading size="md">{{ __('Old Surveys Cleanup') }}</flux:heading>
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Permanently delete all completed surveys, their answers, digital signatures, and orphan patients that are older than 6 months.') }}
+                </flux:text>
+            </div>
+        </div>
+
+        <flux:separator />
+
+        @if ($purgeStep === 0)
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4 text-sm text-zinc-500">
+                    <flux:icon name="clock" variant="outline" class="h-4 w-4 text-zinc-400" />
+                    @if ($surveys_purge_last_run)
+                        {{ __('Last cleanup:') }} {{ \Carbon\Carbon::parse($surveys_purge_last_run)->format('d/m/Y H:i') }}
+                    @else
+                        {{ __('No previous cleanup recorded.') }}
+                    @endif
+                </div>
+                <flux:button variant="danger" wire:click="startPurge">
+                    {{ __('Clean Old Data') }}
+                </flux:button>
+            </div>
+        @elseif ($purgeStep === 1)
+            <div class="space-y-4">
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="exclamation-triangle" variant="outline" class="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-red-700 dark:text-red-300">
+                            <p class="font-semibold mb-1">{{ __('Warning: This action is irreversible') }}</p>
+                            <p>{{ __('This will permanently delete all surveys, answers, digital signatures, and orphan patients that have been in the system for more than 6 months. This data cannot be recovered.') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <flux:button variant="ghost" wire:click="cancelPurge">
+                        {{ __('Cancel') }}
+                    </flux:button>
+                    <flux:button variant="danger" wire:click="nextPurgeStep">
+                        {{ __('Continue') }}
+                    </flux:button>
+                </div>
+            </div>
+        @elseif ($purgeStep === 2)
+            <div class="space-y-4">
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="shield-exclamation" variant="outline" class="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-red-700 dark:text-red-300 space-y-3">
+                            <p class="font-semibold">{{ __('Final Confirmation') }}</p>
+                            <p>{{ __('To proceed, type the following text exactly:') }}</p>
+                            <p class="font-mono font-bold text-base bg-red-100 dark:bg-red-900/40 px-3 py-1.5 rounded inline-block">
+                                {{ __('DELETE ALL') }}
+                            </p>
+                            <div>
+                                <flux:input
+                                    wire:model="confirmText"
+                                    placeholder="{{ __('Type the confirmation text here') }}"
+                                    :error="$errors->first('confirmText')"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <flux:button variant="ghost" wire:click="cancelPurge">
+                        {{ __('Cancel') }}
+                    </flux:button>
+                    <flux:button variant="danger" wire:click="executePurge">
+                        {{ __('Permanently Delete') }}
+                    </flux:button>
+                </div>
+            </div>
+        @elseif ($purgeStep === 3)
+            <div class="space-y-4">
+                <div class="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="check-circle" variant="outline" class="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-green-700 dark:text-green-300">
+                            <p class="font-semibold">{{ __('Cleanup Result') }}</p>
+                            <p>{{ $purgeResult }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <flux:button variant="primary" wire:click="cancelPurge">
+                        {{ __('Done') }}
+                    </flux:button>
+                </div>
+            </div>
+        @endif
+    </div>
 </div>
