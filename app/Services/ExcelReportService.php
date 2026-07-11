@@ -12,13 +12,15 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class ExcelReportService
 {
-    public function generate(string $startDate, string $endDate): Spreadsheet
+    public function generate(string $startDate, string $endDate, ?int $templateId = null): Spreadsheet
     {
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
 
-        $settings = SystemSetting::set();
-        $templateId = $settings->default_survey_template_id;
+        if (! $templateId) {
+            $settings = SystemSetting::set();
+            $templateId = $settings->default_survey_template_id;
+        }
 
         if (! $templateId) {
             $spreadsheet = new Spreadsheet;

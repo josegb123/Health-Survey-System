@@ -77,12 +77,15 @@ class SurveyReportService
         };
     }
 
-    public function generateStatisticsReport(string $startDate, string $endDate, string $period)
+    public function generateStatisticsReport(string $startDate, string $endDate, string $period, ?int $templateId = null)
     {
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
-        $settings = $this->getSettings();
-        $templateId = $settings->default_survey_template_id;
+
+        if (! $templateId) {
+            $settings = $this->getSettings();
+            $templateId = $settings->default_survey_template_id;
+        }
 
         $surveysQuery = Survey::where('status', 'completed')
             ->whereBetween('surveys.created_at', [$start, $end]);

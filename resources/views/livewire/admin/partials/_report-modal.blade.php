@@ -40,6 +40,16 @@
             <flux:input type="date" wire:model="reportEndDate" label="{{ __('End Date') }}" />
         </div>
 
+        <div>
+            <flux:select wire:model.live="reportTemplateId" label="{{ __('Survey Template') }}">
+                @forelse ($templates as $tpl)
+                    <flux:select.option :value="$tpl['id']">{{ $tpl['title'] }} ({{ $tpl['questions_count'] }} {{ __('questions') }})</flux:select.option>
+                @empty
+                    <flux:select.option :value="null" disabled>{{ __('No templates available') }}</flux:select.option>
+                @endforelse
+            </flux:select>
+        </div>
+
         <flux:separator />
 
         <div class="space-y-3">

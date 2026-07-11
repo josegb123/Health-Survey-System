@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\MinistryReportConfig;
 use App\Models\Survey;
+use App\Models\SurveyTemplate;
 use App\Models\SystemSetting;
 use App\Services\ExcelReportService;
 use App\Services\MinistryReportGeneratorService;
@@ -39,7 +40,11 @@ class SurveyIndex extends Component
 
     public ?int $reportConsecutive = null;
 
+    public ?int $reportTemplateId = null;
+
     public ?string $ministryConfigError = null;
+
+    public array $templates = [];
 
     public function clearFilters(): void
     {
@@ -65,6 +70,15 @@ class SurveyIndex extends Component
         $this->reportYear = now()->year;
         $this->reportMonth = now()->month;
         $this->reportQuarter = now()->quarter;
+
+        $this->templates = SurveyTemplate::withCount('questions')
+            ->where('is_active', true)
+            ->latest()
+            ->get()
+            ->toArray();
+
+        $settings = SystemSetting::set();
+        $this->reportTemplateId = $settings->default_survey_template_id;
     }
 
     public function viewSurvey(int $id): void
@@ -82,6 +96,8 @@ class SurveyIndex extends Component
     {
         $this->setReportDateRange();
         $this->reportConsecutive = null;
+        $settings = SystemSetting::set();
+        $this->reportTemplateId = $settings->default_survey_template_id;
         $this->modal('report-modal')->show();
     }
 
@@ -135,7 +151,7 @@ class SurveyIndex extends Component
         $this->validateReportDates();
 
         $service = app(ExcelReportService::class);
-        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate);
+        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate, $this->reportTemplateId);
 
         $filename = 'reporte-encuestas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.xlsx';
 
@@ -151,7 +167,7 @@ class SurveyIndex extends Component
         $this->validateReportDates();
 
         $service = app(SurveyReportService::class);
-        $pdf = $service->generateStatisticsReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod);
+        $pdf = $service->generateStatisticsReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod, $this->reportTemplateId);
 
         $filename = 'reporte-estadisticas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.pdf';
 
