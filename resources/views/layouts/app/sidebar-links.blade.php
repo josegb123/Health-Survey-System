@@ -35,8 +35,16 @@
         $platformMenu[] = [
             'label' => 'System Settings',
             'route' => 'admin.settings',
-            'active_pattern' => 'admin.settings.*',
+            'active_pattern' => 'admin.settings*',
             'icon' => 'cog',
+            'navigate' => true,
+        ];
+
+        $platformMenu[] = [
+            'label' => 'Ministry Report',
+            'route' => 'admin.ministry-settings',
+            'active_pattern' => 'admin.ministry-settings*',
+            'icon' => 'building-office',
             'navigate' => true,
         ];
     }

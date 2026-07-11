@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\MinistrySettings;
 use App\Livewire\Admin\SurveyIndex;
 use App\Livewire\Admin\SurveyTemplateIndex;
 use App\Livewire\Admin\SurveyTemplateCreate;
@@ -19,6 +20,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Configuración Global de la fila única del sistema
     Route::get('/settings', SystemSettings::class)->name('settings');
+
+    // Configuración del reporte de Ministerio
+    Route::get('/ministry-settings', MinistrySettings::class)->name('ministry-settings');
 
 });
 
