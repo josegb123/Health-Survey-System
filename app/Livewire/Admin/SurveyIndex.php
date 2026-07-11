@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\MinistryReportConfig;
 use App\Models\Survey;
 use App\Models\SystemSetting;
+use App\Services\ExcelReportService;
 use App\Services\MinistryReportGeneratorService;
 use App\Services\SurveyReportService;
 use Carbon\Carbon;
@@ -132,13 +133,15 @@ class SurveyIndex extends Component
     {
         $this->validateReportDates();
 
-        $service = app(SurveyReportService::class);
-        $pdf = $service->generateSurveysReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod);
+        $service = app(ExcelReportService::class);
+        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate);
 
-        $filename = 'reporte-encuestas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.pdf';
+        $filename = 'reporte-encuestas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.xlsx';
 
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->output();
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->setPreCalculateFormulas(false);
+            $writer->save('php://output');
         }, $filename);
     }
 

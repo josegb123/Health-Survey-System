@@ -54,11 +54,11 @@
                         </div>
                         <div>
                             <span class="font-medium text-sm text-zinc-900 dark:text-white">{{ __('Export Surveys') }}</span>
-                            <p class="text-xs text-zinc-400">{{ __('List of surveys with patient data and ratings.') }}</p>
+                            <p class="text-xs text-zinc-400">{{ __('List of surveys with patient data and ratings, one sheet per question.') }}</p>
                         </div>
                     </div>
                     <flux:button size="sm" variant="primary" wire:click="downloadSurveysReport" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="downloadSurveysReport">{{ __('PDF') }}</span>
+                        <span wire:loading.remove wire:target="downloadSurveysReport">{{ __('Excel') }}</span>
                         <span wire:loading wire:target="downloadSurveysReport">{{ __('Generating...') }}</span>
                     </flux:button>
                 </div>
