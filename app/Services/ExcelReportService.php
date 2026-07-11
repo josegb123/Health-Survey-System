@@ -53,23 +53,33 @@ class ExcelReportService
             $ws = $spreadsheet->createSheet($qIndex);
             $ws->setTitle($sheetName);
 
-            $ws->getColumnDimension('A')->setWidth(3);
-            $ws->getColumnDimension('B')->setWidth(46);
-
             $options = $question->options ?? [];
-            $colLetter = 'C';
-            foreach ($options as $opt) {
-                $label = $opt['label'] ?? $opt;
-                $ws->getColumnDimension($colLetter)->setWidth(max(16, mb_strlen($label) + 4));
-                $colLetter++;
-            }
-            $ws->getColumnDimension($colLetter)->setWidth(14);
-            $colLetter++;
-            $ws->getColumnDimension($colLetter)->setWidth(14);
-            $colLetter++;
-            $ws->getColumnDimension($colLetter)->setWidth(28);
+            $hasOptions = in_array($question->field_type, ['radio', 'select']) && !empty($options);
 
-            $lastCol = $this->lastColLetter(2 + count($options) + 3);
+            $ws->getColumnDimension('A')->setWidth(3);
+            $ws->getColumnDimension('B')->setWidth(12);
+            $ws->getColumnDimension('C')->setWidth(46);
+
+            if ($hasOptions) {
+                $colLetter = 'D';
+                foreach ($options as $opt) {
+                    $ws->getColumnDimension($colLetter)->setWidth(max(16, mb_strlen($opt['label'] ?? $opt) + 4));
+                    $colLetter++;
+                }
+            }
+            $respuestaCol = $hasOptions
+                ? $this->lastColLetter(4 + count($options) - 1)
+                : 'D';
+            $ws->getColumnDimension($respuestaCol)->setWidth(16);
+            $valorCol = $this->lastColLetter($this->colIndex($respuestaCol) + 1);
+            $ws->getColumnDimension($valorCol)->setWidth(10);
+            $fechaCol = $this->lastColLetter($this->colIndex($valorCol) + 1);
+            $ws->getColumnDimension($fechaCol)->setWidth(14);
+            $obsCol = $this->lastColLetter($this->colIndex($fechaCol) + 1);
+            $ws->getColumnDimension($obsCol)->setWidth(28);
+
+            $totalCols = $this->colIndex($obsCol);
+            $lastCol = $this->lastColLetter($totalCols);
 
             $ws->mergeCells('B2:' . $lastCol . '2');
             $ws->setCellValue('B2', 'TABULACION ENCUESTA DE SATISFACCION');
@@ -90,19 +100,33 @@ class ExcelReportService
 
             $headerRow = 5;
             $ws->mergeCells('B' . $headerRow . ':B' . ($headerRow + 1));
-            $ws->setCellValue('B' . $headerRow, 'NOMBRE DE PACIENTE');
+            $ws->setCellValue('B' . $headerRow, 'ID');
             $ws->getStyle('B' . $headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
             $ws->getStyle('B' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            $colLetter = 'C';
-            foreach ($options as $opt) {
-                $label = $opt['label'] ?? $opt;
-                $ws->mergeCells($colLetter . $headerRow . ':' . $colLetter . ($headerRow + 1));
-                $ws->setCellValue($colLetter . $headerRow, $label);
-                $ws->getStyle($colLetter . $headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-                $ws->getStyle($colLetter . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
-                $colLetter++;
+            $ws->mergeCells('C' . $headerRow . ':C' . ($headerRow + 1));
+            $ws->setCellValue('C' . $headerRow, 'PACIENTE');
+            $ws->getStyle('C' . $headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
+            $ws->getStyle('C' . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            $colLetter = 'D';
+            if ($hasOptions) {
+                foreach ($options as $opt) {
+                    $label = $opt['label'] ?? $opt;
+                    $ws->mergeCells($colLetter . $headerRow . ':' . $colLetter . ($headerRow + 1));
+                    $ws->setCellValue($colLetter . $headerRow, $label);
+                    $ws->getStyle($colLetter . $headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
+                    $ws->getStyle($colLetter . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
+                    $colLetter++;
+                }
             }
+
+            $ws->mergeCells($colLetter . $headerRow . ':' . $colLetter . ($headerRow + 1));
+            $respuestaHeader = $hasOptions ? 'RESPUESTA' : 'VALOR';
+            $ws->setCellValue($colLetter . $headerRow, $respuestaHeader);
+            $ws->getStyle($colLetter . $headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
+            $ws->getStyle($colLetter . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $colLetter++;
 
             $ws->mergeCells($colLetter . $headerRow . ':' . $colLetter . ($headerRow + 1));
             $ws->setCellValue($colLetter . $headerRow, 'PONDERADO');
@@ -124,10 +148,14 @@ class ExcelReportService
             $row = 7;
             foreach ($surveys as $survey) {
                 $patient = $survey->patient;
-                $patientName = ($patient->dni ?? '') . ' ' . ($patient->name ?? '');
-                $ws->setCellValue('B' . $row, $patientName);
+                $ws->setCellValue('B' . $row, $patient->id);
                 $ws->getStyle('B' . $row)->getFont()->setSize(11)->setName('Aptos Narrow');
-                $ws->getStyle('B' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $ws->getStyle('B' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                $patientName = ($patient->dni ?? '') . ' ' . ($patient->name ?? '');
+                $ws->setCellValue('C' . $row, $patientName);
+                $ws->getStyle('C' . $row)->getFont()->setSize(11)->setName('Aptos Narrow');
+                $ws->getStyle('C' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
                 $matchedAnswer = null;
                 foreach ($survey->answers as $answer) {
@@ -137,20 +165,37 @@ class ExcelReportService
                     }
                 }
 
-                $colLetter = 'C';
-                foreach ($options as $optIndex => $opt) {
-                    $label = $opt['label'] ?? $opt;
-                    if ($matchedAnswer !== null && CalculateSurveyRating::normalize($matchedAnswer->answer_value) === CalculateSurveyRating::normalize($label)) {
-                        $ws->setCellValue($colLetter . $row, 'X');
-                        $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $colLetter = 'D';
+                if ($hasOptions && $matchedAnswer) {
+                    foreach ($options as $opt) {
+                        $label = $opt['label'] ?? $opt;
+                        if (CalculateSurveyRating::normalize($matchedAnswer->answer_value) === CalculateSurveyRating::normalize($label)) {
+                            $ws->setCellValue($colLetter . $row, 'X');
+                            $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                        }
+                        $colLetter++;
                     }
+
+                    $ws->setCellValue($colLetter . $row, $matchedAnswer->answer_value);
+                    $ws->getStyle($colLetter . $row)->getFont()->setSize(11)->setName('Aptos Narrow');
+                    $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $colLetter++;
+                } elseif ($hasOptions) {
+                    $colLetter = $this->lastColLetter(4 + count($options) - 1 + 2);
                 }
 
                 if ($matchedAnswer !== null && $matchedAnswer->weighted_value !== null) {
                     $ws->setCellValue($colLetter . $row, $matchedAnswer->weighted_value);
                     $ws->getStyle($colLetter . $row)->getNumberFormat()->setFormatCode('0.00');
                     $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                } elseif ($question->field_type === 'number' && $matchedAnswer && is_numeric($matchedAnswer->answer_value)) {
+                    $ws->setCellValue($colLetter . $row, (float) $matchedAnswer->answer_value);
+                    $ws->getStyle($colLetter . $row)->getNumberFormat()->setFormatCode('0.00');
+                    $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                } elseif ($question->field_type === 'text' && $matchedAnswer) {
+                    $ws->setCellValue($colLetter . $row, $matchedAnswer->answer_value);
+                    $ws->getStyle($colLetter . $row)->getFont()->setSize(11)->setName('Aptos Narrow');
+                    $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                 }
                 $colLetter++;
 
@@ -183,5 +228,15 @@ class ExcelReportService
             $colIndex = intdiv($colIndex, 26);
         }
         return $letter;
+    }
+
+    private function colIndex(string $colLetter): int
+    {
+        $index = 0;
+        $len = strlen($colLetter);
+        for ($i = 0; $i < $len; $i++) {
+            $index = $index * 26 + (ord($colLetter[$i]) - 64);
+        }
+        return $index;
     }
 }

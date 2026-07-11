@@ -36,14 +36,25 @@ class SurveyQuestionSeeder extends Seeder
             [
                 'question_text' => '¿Cómo califica su experiencia global con la IPS?',
                 'field_type' => 'radio',
-                'options' => ['MUY BUENA', 'BUENA', 'REGULAR', 'MALA', 'MUY MALA'],
+                'options' => [
+                    ['label' => 'MUY BUENA', 'weight' => 5],
+                    ['label' => 'BUENA', 'weight' => 4],
+                    ['label' => 'REGULAR', 'weight' => 3],
+                    ['label' => 'MALA', 'weight' => 2],
+                    ['label' => 'MUY MALA', 'weight' => 1],
+                ],
                 'is_required' => true,
                 'order' => 1,
             ],
             [
                 'question_text' => '¿Recomendaría esta IPS a otras personas?',
                 'field_type' => 'radio',
-                'options' => ['DEFINITIVAMENTE SÍ', 'PROBABLEMENTE SÍ', 'DEFINITIVAMENTE NO', 'PROBABLEMENTE NO'],
+                'options' => [
+                    ['label' => 'DEFINITIVAMENTE SÍ', 'weight' => 5],
+                    ['label' => 'PROBABLEMENTE SÍ', 'weight' => 4],
+                    ['label' => 'DEFINITIVAMENTE NO', 'weight' => 2],
+                    ['label' => 'PROBABLEMENTE NO', 'weight' => 1],
+                ],
                 'is_required' => true,
                 'order' => 2,
             ],
@@ -78,7 +89,10 @@ class SurveyQuestionSeeder extends Seeder
             [
                 'question_text' => 'Was the staff courteous and professional?',
                 'field_type' => 'radio',
-                'options' => ['Yes', 'No'],
+                'options' => [
+                    ['label' => 'Yes', 'weight' => 5],
+                    ['label' => 'No', 'weight' => 1],
+                ],
                 'is_required' => true,
                 'order' => 2,
             ],
