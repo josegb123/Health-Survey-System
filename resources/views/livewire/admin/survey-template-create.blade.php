@@ -146,29 +146,40 @@
                                                 {{ __('option(s)') }}</span>
                                         </div>
 
-                                        @if (!empty($question['options']))
-                                            <div class="flex flex-wrap gap-2">
-                                                @foreach ($question['options'] as $optIndex => $option)
-                                                    @php
-                                                        $label = $option['label'] ?? $option;
-                                                        $weight = $option['weight'] ?? null;
-                                                    @endphp
+                                    @if (!empty($question['options']))
+                                        <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                                            {{ __('Assign a weight (0 to 5) to each option. A higher weight means a more positive answer.') }}
+                                        </p>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            @foreach ($question['options'] as $optIndex => $option)
+                                                @php
+                                                    $label = $option['label'] ?? $option;
+                                                    $weight = $option['weight'] ?? null;
+                                                @endphp
+                                                <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2">
                                                     <span
-                                                        class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm text-zinc-700 dark:text-zinc-300">
-                                                        {{ $label }}
-                                                        @if ($weight !== null)
-                                                            <span class="text-xs text-zinc-400">({{ $weight }})</span>
-                                                        @endif
-                                                        <button type="button"
-                                                            class="text-zinc-300 hover:text-red-500 transition-colors"
-                                                            wire:click="removeOption({{ $index }}, {{ $optIndex }})">&times;</button>
-                                                    </span>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <p class="text-xs text-zinc-400 italic">{{ __('No options added yet.') }}
-                                            </p>
-                                        @endif
+                                                        class="flex-1 truncate text-sm text-zinc-700 dark:text-zinc-300"
+                                                        title="{{ $label }}">{{ $label }}</span>
+                                                    <flux:input
+                                                        type="number"
+                                                        wire:model.live="questions.{{ $index }}.options.{{ $optIndex }}.weight"
+                                                        wire:change="updateOptionWeight({{ $index }}, {{ $optIndex }}, $event.target.value)"
+                                                        label=""
+                                                        size="sm"
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.01"
+                                                        class="w-16" />
+                                                    <button type="button"
+                                                        class="text-zinc-300 hover:text-red-500 transition-colors shrink-0"
+                                                        wire:click="removeOption({{ $index }}, {{ $optIndex }})">&times;</button>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <p class="text-xs text-zinc-400 italic">{{ __('No options added yet.') }}
+                                        </p>
+                                    @endif
 
                                         <div class="flex gap-2">
                                             <flux:input wire:model="questions.{{ $index }}.new_option_text"

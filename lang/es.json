@@ -377,6 +377,7 @@
     "Required": "Obligatorio",
     "option(s)": "opción(es)",
     "No options added yet.": "Aún no se han agregado opciones.",
+    "Assign a weight (0 to 5) to each option. A higher weight means a more positive answer.": "Asigne un peso (0 a 5) a cada opción. Un mayor peso significa una respuesta más positiva.",
     "E.g.: Excellent, Good, Fair...": "Ej: Excelente, Bueno, Regular...",
     "Preview": "Vista Previa",
     "New question": "Nueva pregunta",
