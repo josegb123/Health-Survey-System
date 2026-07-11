@@ -124,13 +124,6 @@ class ExcelReportService
             }
 
             $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
-            $respuestaHeader = $hasOptions ? 'RESPUESTA' : 'VALOR';
-            $ws->setCellValue($colLetter.$headerRow, $respuestaHeader);
-            $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle($colLetter.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $colLetter++;
-
-            $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
             $ws->setCellValue($colLetter.$headerRow, 'PONDERADO');
             $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
             $ws->getStyle($colLetter.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
