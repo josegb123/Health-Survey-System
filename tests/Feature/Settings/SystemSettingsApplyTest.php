@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Settings;
 
+use App\Models\MinistryReportConfig;
+use App\Models\SurveyTemplate;
 use App\Models\SystemSetting;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -124,5 +126,40 @@ class SystemSettingsApplyTest extends TestCase
 
         $response->assertOk();
         $this->assertEquals('en', app()->getLocale());
+    }
+
+    public function test_saving_default_template_syncs_to_ministry_config(): void
+    {
+        $template = SurveyTemplate::factory()->create(['title' => 'Default', 'is_active' => true]);
+
+        Livewire::actingAs($this->user)
+            ->test(\App\Livewire\Admin\SystemSettings::class)
+            ->set('default_survey_template_id', $template->id)
+            ->call('saveSettings')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('system_settings', [
+            'default_survey_template_id' => $template->id,
+        ]);
+
+        $this->assertDatabaseHas('ministry_report_configs', [
+            'survey_template_id' => $template->id,
+        ]);
+    }
+
+    public function test_clearing_default_template_does_not_sync_to_ministry(): void
+    {
+        $template = SurveyTemplate::factory()->create(['title' => 'Template', 'is_active' => true]);
+        MinistryReportConfig::set()->update(['survey_template_id' => $template->id]);
+
+        Livewire::actingAs($this->user)
+            ->test(\App\Livewire\Admin\SystemSettings::class)
+            ->set('default_survey_template_id', null)
+            ->call('saveSettings')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('ministry_report_configs', [
+            'survey_template_id' => $template->id,
+        ]);
     }
 }

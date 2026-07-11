@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\MinistryReportConfig;
 use App\Models\Patient;
 use App\Models\Survey;
+use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
 use App\Models\SystemSetting;
 use App\Models\User;
@@ -42,9 +44,19 @@ class ReportsTest extends TestCase
         $response->assertOk();
     }
 
-    public function test_download_surveys_report_returns_pdf(): void
+    public function test_download_surveys_report_returns_excel(): void
     {
         $template = SurveyTemplate::factory()->create(['is_active' => true]);
+
+        SurveyQuestion::factory()->create([
+            'survey_template_id' => $template->id,
+            'field_type' => 'radio',
+            'options' => ['MUY BUENA', 'BUENA', 'REGULAR', 'MALA', 'MUY MALA'],
+            'order' => 1,
+        ]);
+
+        SystemSetting::set()->update(['default_survey_template_id' => $template->id]);
+
         $patient = Patient::factory()->create();
 
         Survey::factory()->count(2)->create([
@@ -63,7 +75,7 @@ class ReportsTest extends TestCase
         $response = $component->downloadSurveysReport();
 
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
-        $this->assertStringContainsString('.pdf', $response->headers->get('Content-Disposition') ?? '');
+        $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition') ?? '');
     }
 
     public function test_download_statistics_report_returns_pdf(): void
@@ -96,6 +108,8 @@ class ReportsTest extends TestCase
         $template = SurveyTemplate::factory()->create(['title' => 'Ministry', 'is_active' => true]);
         $patient = Patient::factory()->create();
 
+        MinistryReportConfig::set()->update(['survey_template_id' => $template->id]);
+
         Survey::factory()->create([
             'survey_template_id' => $template->id,
             'patient_id' => $patient->id,
@@ -109,11 +123,25 @@ class ReportsTest extends TestCase
         $component = app(\App\Livewire\Admin\SurveyIndex::class);
         $component->reportStartDate = Carbon::now()->startOfMonth()->format('Y-m-d');
         $component->reportEndDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+        $component->reportConsecutive = 102;
 
         $response = $component->downloadMinistryReport();
 
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
         $this->assertStringContainsString('.txt', $response->headers->get('Content-Disposition') ?? '');
+    }
+
+    public function test_download_ministry_report_fails_without_config(): void
+    {
+        $this->actingAs($this->user);
+
+        $component = \Livewire\Livewire::test(\App\Livewire\Admin\SurveyIndex::class);
+        $component->set('reportStartDate', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $component->set('reportEndDate', Carbon::now()->endOfMonth()->format('Y-m-d'));
+        $component->set('reportConsecutive', 102);
+        $component->call('downloadMinistryReport');
+
+        $this->assertNotNull($component->get('ministryConfigError'));
     }
 
     public function test_report_date_validation_fails_with_invalid_dates(): void
