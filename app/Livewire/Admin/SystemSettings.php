@@ -37,9 +37,16 @@ class SystemSettings extends Component
 
     public int $survey_monthly_goal = 100;
 
-    /**
-     * Reglas de validación para el formulario de configuración global.
-     */
+    public ?string $surveys_purge_last_run = null;
+
+    public int $purgeStep = 0;
+
+    public string $purgeResult = '';
+
+    public string $confirmText = '';
+
+    public string $expectedConfirmText = '';
+
     protected array $rules = [
         'theme' => 'nullable|string|in:light,dark,system',
         'language' => 'nullable|string|in:es,en',
@@ -99,6 +106,38 @@ class SystemSettings extends Component
         // Tu observer estático borra la caché 'global_system_settings' en este punto.
 
         Flux::toast(variant: 'success', text: __('System settings updated successfully.'));
+    }
+
+    public function startPurge(): void
+    {
+        $this->purgeStep = 1;
+        $this->purgeResult = '';
+        $this->confirmText = '';
+        $this->expectedConfirmText = __('DELETE ALL');
+    }
+
+    public function nextPurgeStep(): void
+    {
+        $this->purgeStep = 2;
+    }
+
+    public function cancelPurge(): void
+    {
+        $this->purgeStep = 0;
+        $this->purgeResult = '';
+        $this->confirmText = '';
+        $this->expectedConfirmText = '';
+    }
+
+    public function executePurge(): void
+    {
+        if ($this->confirmText !== $this->expectedConfirmText) {
+            $this->addError('confirmText', __('The confirmation text does not match.'));
+            return;
+        }
+
+        $this->purgeResult = SystemSetting::purgeOldSurveys();
+        $this->purgeStep = 3;
     }
 
     public function render()
