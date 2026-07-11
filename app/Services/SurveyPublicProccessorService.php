@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\CalculateSurveyRating;
+use App\Models\Insurer;
 use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
@@ -25,6 +26,12 @@ class SurveyPublicProccessorService
 
         return DB::transaction(function () use ($templateId, $patientData, $answers, $calculatedRating, $signature, $questions) {
 
+            $insurerId = $patientData['insurer_id'] ?? null;
+
+            if (! $insurerId && ! empty($patientData['insurer_name'])) {
+                $insurerId = $this->resolveOrCreateInsurer($patientData['insurer_name']);
+            }
+
             $patient = Patient::firstOrCreate(
                 ['dni' => $patientData['dni']],
                 [
@@ -34,7 +41,7 @@ class SurveyPublicProccessorService
                     'nationality' => $patientData['nationality'] ?? null,
                     'address' => $patientData['address'] ?? null,
                     'phone' => $patientData['phone'] ?? null,
-                    'insurer_id' => $patientData['insurer_id'] ?? null,
+                    'insurer_id' => $insurerId,
                     'password' => bcrypt(Str::random(16)),
                 ]
             );
@@ -69,6 +76,25 @@ class SurveyPublicProccessorService
 
             return $survey;
         });
+    }
+
+    private function resolveOrCreateInsurer(string $name): int
+    {
+        $normalizedName = trim($name);
+
+        $existing = Insurer::whereRaw('LOWER(name) = ?', [mb_strtolower($normalizedName)])->first();
+
+        if ($existing) {
+            return $existing->id;
+        }
+
+        $insurer = Insurer::create([
+            'name' => $normalizedName,
+            'type' => 'contributory',
+            'is_active' => true,
+        ]);
+
+        return $insurer->id;
     }
 
     private function storeSignatureFile(string $base64Signature): string
