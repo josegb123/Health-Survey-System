@@ -2,18 +2,20 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\SurveyQuestion;
+use App\Models\SurveyTemplate;
 use App\Services\SurveyTemplateBuilderService;
 use Livewire\Component;
 
 class SurveyTemplateCreate extends Component
 {
+    public ?int $templateId = null;
+
     public string $title = '';
 
     public bool $is_active = true;
 
     public array $questions = [];
-
-    // Modal helper (kept to control UI if needed)
 
     protected array $rules = [
         'title' => 'required|string|max:255',
@@ -25,9 +27,25 @@ class SurveyTemplateCreate extends Component
         'questions.*.is_required' => 'boolean',
     ];
 
-    public function mount(): void
+    public function mount(?int $templateId = null): void
     {
-        $this->addQuestion();
+        if ($templateId) {
+            $template = SurveyTemplate::with(['questions' => fn ($q) => $q->orderBy('order')])
+                ->findOrFail($templateId);
+
+            $this->templateId = $template->id;
+            $this->title = $template->title;
+            $this->is_active = $template->is_active;
+            $this->questions = $template->questions->map(fn (SurveyQuestion $q) => [
+                'question_text' => $q->question_text,
+                'field_type' => $q->field_type,
+                'options' => $q->options ?? [],
+                'is_required' => $q->is_required,
+                'new_option_text' => '',
+            ])->toArray();
+        } else {
+            $this->addQuestion();
+        }
     }
 
     public function addQuestion(): void
@@ -131,24 +149,53 @@ class SurveyTemplateCreate extends Component
         $this->validate();
 
         try {
-            $templateData = [
-                'title' => $this->title,
-                'is_active' => $this->is_active,
-            ];
-
-            $builderService = app(SurveyTemplateBuilderService::class);
-            $builderService->createWithQuestions($templateData, $this->questions);
-
-            $this->reset(['title', 'is_active', 'questions']);
-            $this->addQuestion();
-            $this->showConfirmSave = false;
-
-            $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
-            $this->redirect(route('admin.survey-templates.index'));
+            if ($this->templateId) {
+                $this->updateExistingTemplate();
+            } else {
+                $this->createNewTemplate();
+            }
 
         } catch (\Exception $e) {
             $this->dispatch('toast', type: 'error', text: __('Error processing template: ').$e->getMessage());
         }
+    }
+
+    private function createNewTemplate(): void
+    {
+        $builderService = app(SurveyTemplateBuilderService::class);
+        $builderService->createWithQuestions([
+            'title' => $this->title,
+            'is_active' => $this->is_active,
+        ], $this->questions);
+
+        $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
+        $this->redirect(route('admin.survey-templates.index'));
+    }
+
+    private function updateExistingTemplate(): void
+    {
+        $template = SurveyTemplate::findOrFail($this->templateId);
+
+        $template->update([
+            'title' => $this->title,
+            'is_active' => $this->is_active,
+        ]);
+
+        $template->questions()->delete();
+
+        foreach ($this->questions as $index => $question) {
+            SurveyQuestion::create([
+                'survey_template_id' => $template->id,
+                'question_text' => $question['question_text'],
+                'field_type' => $question['field_type'],
+                'options' => $question['options'] ?? null,
+                'is_required' => $question['is_required'] ?? true,
+                'order' => $index + 1,
+            ]);
+        }
+
+        $this->dispatch('toast', type: 'success', text: __('Template updated successfully.'));
+        $this->redirect(route('admin.survey-templates.index'));
     }
 
     public function render()

@@ -1,9 +1,9 @@
 <div class="space-y-6 p-6 max-w-4xl">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-            <flux:heading size="xl">{{ __('Create Survey Template') }}</flux:heading>
+            <flux:heading size="xl">{{ $templateId ? __('Edit Survey Template') : __('Create Survey Template') }}</flux:heading>
             <flux:text class="mt-1">
-                {{ __('Build your questionnaire by adding questions, options, and reordering them.') }}</flux:text>
+                {{ $templateId ? __('Modify the template title, questions, and their settings.') : __('Build your questionnaire by adding questions, options, and reordering them.') }}</flux:text>
         </div>
 
         <div class="flex items-center gap-2">
@@ -248,7 +248,7 @@
                 <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
             </a>
             <flux:button type="submit" variant="primary" icon="check" :disabled="empty($questions)">
-                {{ __('Save Template') }}
+                {{ $templateId ? __('Update Template') : __('Save Template') }}
             </flux:button>
         </div>
     </form>
@@ -256,8 +256,8 @@
     <flux:modal name="confirm-save-modal" class="max-w-md">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">{{ __('Confirm save template?') }}</flux:heading>
-                <flux:text class="mt-2">{{ __('You are about to create the template:') }} <strong
+                <flux:heading size="lg">{{ $templateId ? __('Confirm update template?') : __('Confirm save template?') }}</flux:heading>
+                <flux:text class="mt-2">{{ $templateId ? __('You are about to update the template:') : __('You are about to create the template:') }} <strong
                         class="text-zinc-800 dark:text-zinc-200">{{ $title }}</strong>
                 </flux:text>
                 <flux:text size="sm" class="mt-2 text-zinc-500">
