@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable('survey_id', 'survey_question_id', 'answer_value', 'weighted_value')]
+class SurveyAnswer extends Model
+{
+    /** @use HasFactory<SurveyAnswerFactory> */
+    use HasFactory, SoftDeletes;
 
     protected function casts(): array
     {
@@ -17,22 +21,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
             'weighted_value' => 'decimal:2',
         ];
     }
-class SurveyAnswer extends Model
-{
-    /** @use HasFactory<SurveyAnswerFactory> */
-    use HasFactory, SoftDeletes;
 
-    /**
-     * Una respuesta pertenece a un intento de encuesta específico.
-     */
     public function survey(): BelongsTo
     {
         return $this->belongsTo(Survey::class);
     }
 
-    /**
-     * Una respuesta mapea a una pregunta específica.
-     */
     public function question(): BelongsTo
     {
         return $this->belongsTo(SurveyQuestion::class, 'survey_question_id');

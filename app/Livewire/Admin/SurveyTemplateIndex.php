@@ -130,7 +130,10 @@ class SurveyTemplateIndex extends Component
         $optionText = trim($this->questions[$questionIndex]['new_option_text'] ?? '');
 
         if ($optionText !== '') {
-            $this->questions[$questionIndex]['options'][] = $optionText;
+            $this->questions[$questionIndex]['options'][] = [
+                'label' => $optionText,
+                'weight' => 5,
+            ];
             $this->questions[$questionIndex]['new_option_text'] = '';
         }
     }

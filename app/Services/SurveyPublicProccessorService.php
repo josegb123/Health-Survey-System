@@ -6,6 +6,7 @@ use App\Helpers\CalculateSurveyRating;
 use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
+use App\Models\SurveyQuestion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -17,7 +18,12 @@ class SurveyPublicProccessorService
         $answersPayload = collect($answers)->pluck('value', 'question_id')->toArray();
         $calculatedRating = CalculateSurveyRating::execute($templateId, $answersPayload);
 
-        return DB::transaction(function () use ($templateId, $patientData, $answers, $calculatedRating, $signature) {
+        $questions = SurveyQuestion::where('survey_template_id', $templateId)
+            ->whereIn('field_type', ['radio', 'select'])
+            ->get()
+            ->keyBy('id');
+
+        return DB::transaction(function () use ($templateId, $patientData, $answers, $calculatedRating, $signature, $questions) {
 
             $patient = Patient::firstOrCreate(
                 ['dni' => $patientData['dni']],
@@ -45,11 +51,19 @@ class SurveyPublicProccessorService
 
             foreach ($answers as $answer) {
                 $value = $answer['value'];
+                $questionId = $answer['question_id'];
+                $answerValue = is_array($value) ? json_encode($value) : (string) $value;
+                $weightedValue = null;
+
+                if (isset($questions[$questionId])) {
+                    $weightedValue = CalculateSurveyRating::resolveWeight($questions[$questionId], $answerValue);
+                }
 
                 SurveyAnswer::create([
                     'survey_id' => $survey->id,
-                    'survey_question_id' => $answer['question_id'],
-                    'answer_value' => is_array($value) ? json_encode($value) : (string) $value,
+                    'survey_question_id' => $questionId,
+                    'answer_value' => $answerValue,
+                    'weighted_value' => $weightedValue,
                 ]);
             }
 

@@ -149,9 +149,16 @@
                                         @if (!empty($question['options']))
                                             <div class="flex flex-wrap gap-2">
                                                 @foreach ($question['options'] as $optIndex => $option)
+                                                    @php
+                                                        $label = $option['label'] ?? $option;
+                                                        $weight = $option['weight'] ?? null;
+                                                    @endphp
                                                     <span
                                                         class="inline-flex items-center gap-1.5 px-3 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm text-zinc-700 dark:text-zinc-300">
-                                                        {{ $option }}
+                                                        {{ $label }}
+                                                        @if ($weight !== null)
+                                                            <span class="text-xs text-zinc-400">({{ $weight }})</span>
+                                                        @endif
                                                         <button type="button"
                                                             class="text-zinc-300 hover:text-red-500 transition-colors"
                                                             wire:click="removeOption({{ $index }}, {{ $optIndex }})">&times;</button>
@@ -196,7 +203,10 @@
                                                         @else
                                                             <span class="text-zinc-300">-</span>
                                                         @endif
-                                                        {{ $opt }}
+                                                        {{ $opt['label'] ?? $opt }}
+                                                        @if (isset($opt['weight']))
+                                                            <span class="text-xs text-zinc-400">({{ $opt['weight'] }})</span>
+                                                        @endif
                                                     </div>
                                                 @endforeach
                                             </div>

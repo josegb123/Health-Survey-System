@@ -69,9 +69,15 @@
                                         class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">{{ __('Configured options:') }}</span>
                                     <div class="flex flex-wrap gap-1.5">
                                         @foreach ($question->options as $option)
+                                            @php
+                                                $label = $option['label'] ?? $option;
+                                                $weight = $option['weight'] ?? null;
+                                            @endphp
                                             <flux:badge size="sm" variant="filled" color="zinc"
                                                 class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
-                                                {{ $option }}
+                                                {{ $label }} @if ($weight !== null)
+                                                    ({{ $weight }})
+                                                @endif
                                             </flux:badge>
                                         @endforeach
                                     </div>

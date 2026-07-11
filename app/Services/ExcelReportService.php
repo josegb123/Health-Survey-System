@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CalculateSurveyRating;
 use App\Models\Survey;
 use App\Models\SystemSetting;
 use Carbon\Carbon;
@@ -58,7 +59,8 @@ class ExcelReportService
             $options = $question->options ?? [];
             $colLetter = 'C';
             foreach ($options as $opt) {
-                $ws->getColumnDimension($colLetter)->setWidth(max(16, strlen($opt) + 4));
+                $label = $opt['label'] ?? $opt;
+                $ws->getColumnDimension($colLetter)->setWidth(max(16, mb_strlen($label) + 4));
                 $colLetter++;
             }
             $ws->getColumnDimension($colLetter)->setWidth(14);
@@ -94,8 +96,9 @@ class ExcelReportService
 
             $colLetter = 'C';
             foreach ($options as $opt) {
+                $label = $opt['label'] ?? $opt;
                 $ws->mergeCells($colLetter . $headerRow . ':' . $colLetter . ($headerRow + 1));
-                $ws->setCellValue($colLetter . $headerRow, $opt);
+                $ws->setCellValue($colLetter . $headerRow, $label);
                 $ws->getStyle($colLetter . $headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
                 $ws->getStyle($colLetter . $headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
                 $colLetter++;
@@ -126,25 +129,26 @@ class ExcelReportService
                 $ws->getStyle('B' . $row)->getFont()->setSize(11)->setName('Aptos Narrow');
                 $ws->getStyle('B' . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
-                $answerValue = null;
+                $matchedAnswer = null;
                 foreach ($survey->answers as $answer) {
                     if ($answer->survey_question_id === $question->id) {
-                        $answerValue = trim($answer->answer_value);
+                        $matchedAnswer = $answer;
                         break;
                     }
                 }
 
                 $colLetter = 'C';
                 foreach ($options as $optIndex => $opt) {
-                    if ($answerValue !== null && $this->normalize($answerValue) === $this->normalize(trim($opt))) {
+                    $label = $opt['label'] ?? $opt;
+                    if ($matchedAnswer !== null && CalculateSurveyRating::normalize($matchedAnswer->answer_value) === CalculateSurveyRating::normalize($label)) {
                         $ws->setCellValue($colLetter . $row, 'X');
                         $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     }
                     $colLetter++;
                 }
 
-                if ($survey->rating !== null) {
-                    $ws->setCellValue($colLetter . $row, $survey->rating);
+                if ($matchedAnswer !== null && $matchedAnswer->weighted_value !== null) {
+                    $ws->setCellValue($colLetter . $row, $matchedAnswer->weighted_value);
                     $ws->getStyle($colLetter . $row)->getNumberFormat()->setFormatCode('0.00');
                     $ws->getStyle($colLetter . $row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 }
@@ -179,12 +183,5 @@ class ExcelReportService
             $colIndex = intdiv($colIndex, 26);
         }
         return $letter;
-    }
-
-    private function normalize(string $value): string
-    {
-        $value = mb_strtolower(trim($value));
-        $value = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'u', 'n'], $value);
-        return preg_replace('/\s+/', ' ', $value);
     }
 }

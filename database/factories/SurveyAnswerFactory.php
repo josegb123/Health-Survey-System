@@ -19,15 +19,14 @@ class SurveyAnswerFactory extends Factory
      */
     public function definition(): array
     {
-        // Tomamos una pregunta aleatoria o creamos una por defecto
         $question = SurveyQuestion::inRandomOrder()->first() ?? SurveyQuestion::factory();
 
-        // Generamos datos basados en el tipo de campo de la pregunta
         $mockAnswer = match ($question->field_type) {
             'number' => (string) $this->faker->numberBetween(1, 5),
-            'radio' => $this->faker->randomElement([__('Yes'), __('No')]),
-            'select' => $this->faker->randomElement([__('Excellent'), __('Good'), __('Regular'), __('Bad')]),
-            default => $this->faker->sentence(6), // Para tipo 'text'
+            'radio', 'select' => $this->faker->randomElement(
+                array_map(fn($opt) => $opt['label'] ?? $opt, $question->options ?? [])
+            ),
+            default => $this->faker->sentence(6),
         };
 
         return [

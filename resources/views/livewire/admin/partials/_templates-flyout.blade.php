@@ -107,8 +107,15 @@
                                             @if (!empty($question['options']))
                                                 <div class="flex flex-wrap gap-1.5">
                                                     @foreach ($question['options'] as $optIndex => $option)
+                                                        @php
+                                                            $label = $option['label'] ?? $option;
+                                                            $weight = $option['weight'] ?? null;
+                                                        @endphp
                                                         <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs text-zinc-700 dark:text-zinc-300">
-                                                            {{ $option }}
+                                                            {{ $label }}
+                                                            @if ($weight !== null)
+                                                                <span class="text-zinc-400">({{ $weight }})</span>
+                                                            @endif
                                                             <button type="button"
                                                                 class="text-zinc-300 hover:text-red-500 transition-colors"
                                                                 wire:click="removeOption({{ $index }}, {{ $optIndex }})">&times;</button>

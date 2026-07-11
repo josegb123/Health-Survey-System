@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\CalculateSurveyRating;
 use App\Models\Survey;
 use App\Models\SurveyQuestion;
 use App\Models\SystemSetting;
@@ -39,17 +40,12 @@ class MinistryReportGeneratorService
                         continue;
                     }
 
-                    $answerValue = trim($answer->answer_value);
-                    $normalizedAnswer = $this->normalize($answerValue);
-                    $index = null;
                     foreach ($options as $i => $opt) {
-                        if ($this->normalize($opt) === $normalizedAnswer) {
-                            $index = $i;
+                        $label = $opt['label'] ?? $opt;
+                        if (CalculateSurveyRating::normalize($answer->answer_value) === CalculateSurveyRating::normalize($label)) {
+                            $optionCounts[$i]++;
                             break;
                         }
-                    }
-                    if ($index !== null) {
-                        $optionCounts[$index]++;
                     }
                 }
             }
@@ -67,12 +63,5 @@ class MinistryReportGeneratorService
             $settings->company_dni ?? '',
             ...$counters,
         ]);
-    }
-
-    private function normalize(string $value): string
-    {
-        $value = mb_strtolower(trim($value));
-        $value = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'u', 'n'], $value);
-        return preg_replace('/\s+/', ' ', $value);
     }
 }

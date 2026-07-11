@@ -44,8 +44,8 @@ class PublicSurveyController extends Controller
                         'is_required' => (bool) $question->is_required,
                         // Decodificamos las opciones si es un campo de selección (radio/select)
                         'options' => is_array($question->options)
-                            ? $question->options
-                            : json_decode($question->options, true) ?? [],
+                            ? array_map(fn($opt) => $opt['label'] ?? $opt, $question->options)
+                            : [],
                     ];
                 }),
             ],

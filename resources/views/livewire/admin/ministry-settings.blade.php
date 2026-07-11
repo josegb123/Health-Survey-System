@@ -50,9 +50,12 @@
 
                             <div class="flex flex-wrap gap-1.5">
                                 @foreach ($q['options'] as $optIndex => $option)
+                                    @php
+                                        $optLabel = $option['label'] ?? $option;
+                                    @endphp
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs text-zinc-600 dark:text-zinc-400">
                                         <span class="font-mono text-zinc-400">{{ $optIndex + 1 }}.</span>
-                                        {{ $option }}
+                                        {{ $optLabel }}
                                     </span>
                                 @endforeach
                             </div>

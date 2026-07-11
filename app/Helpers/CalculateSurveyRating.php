@@ -6,54 +6,66 @@ use App\Models\SurveyQuestion;
 
 class CalculateSurveyRating
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Calcula el promedio de las respuestas numéricas basándose en la estructura de la plantilla.
-     *
-     * * @param int $templateId ID de la plantilla para validar tipos de campo
-     * @param  array  $answers  Estructura tipica de respuestas: [$questionId => ['value' => X]] o [$questionId => X]
-     * @return float|null Retorna el promedio o null si no se respondieron preguntas numéricas
-     */
     public static function execute(int $templateId, array $answers): ?float
     {
-        // 1. Cargamos las preguntas de la plantilla que sean estrictamente de tipo numérico
-        $numericQuestionIds = SurveyQuestion::where('survey_template_id', $templateId)
-            ->where('field_type', 'number')
-            ->pluck('id')
-            ->toArray();
+        $questions = SurveyQuestion::where('survey_template_id', $templateId)
+            ->whereIn('field_type', ['number', 'radio', 'select'])
+            ->get()
+            ->keyBy('id');
 
-        if (empty($numericQuestionIds)) {
+        if ($questions->isEmpty()) {
             return null;
         }
 
         $sum = 0;
         $count = 0;
 
-        // 2. Iteramos solo sobre las respuestas numéricas válidas enviadas por el front-end
-        foreach ($numericQuestionIds as $questionId) {
+        foreach ($questions as $questionId => $question) {
             if (! isset($answers[$questionId])) {
                 continue;
             }
 
-            // Normalizamos el formato de la data (por si viene directo o dentro de un sub-array 'value')
             $rawData = $answers[$questionId];
             $value = is_array($rawData) ? ($rawData['value'] ?? null) : $rawData;
 
-            // Validamos que sea un número real para evitar brechas de tipos en PHP
-            if (is_numeric($value)) {
-                $sum += (float) $value;
-                $count++;
+            if ($question->field_type === 'number') {
+                if (is_numeric($value)) {
+                    $sum += (float) $value;
+                    $count++;
+                }
+            } else {
+                $weight = self::resolveWeight($question, $value);
+                if ($weight !== null) {
+                    $sum += $weight;
+                    $count++;
+                }
             }
         }
 
-        // 3. Retornamos el promedio redondeado a dos decimales (puerta abierta a cualquier escala: 1-5, 1-10, etc.)
         return $count > 0 ? round($sum / $count, 2) : null;
+    }
+
+    public static function resolveWeight(SurveyQuestion $question, string $answerValue): ?float
+    {
+        $options = $question->options ?? [];
+        if (empty($options)) {
+            return null;
+        }
+
+        $normalized = self::normalize($answerValue);
+        foreach ($options as $opt) {
+            if (self::normalize($opt['label'] ?? '') === $normalized) {
+                return (float) ($opt['weight'] ?? 0);
+            }
+        }
+
+        return null;
+    }
+
+    public static function normalize(string $value): string
+    {
+        $value = mb_strtolower(trim($value));
+        $value = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'u', 'n'], $value);
+        return preg_replace('/\s+/', ' ', $value);
     }
 }

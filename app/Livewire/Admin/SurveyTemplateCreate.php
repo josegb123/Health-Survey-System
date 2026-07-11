@@ -52,7 +52,10 @@ class SurveyTemplateCreate extends Component
     $optionText = trim($this->questions[$questionIndex]['new_option_text'] ?? '');
 
     if ($optionText !== '') {
-      $this->questions[$questionIndex]['options'][] = $optionText;
+      $this->questions[$questionIndex]['options'][] = [
+        'label' => $optionText,
+        'weight' => 5,
+      ];
       $this->questions[$questionIndex]['new_option_text'] = '';
     }
   }
@@ -61,6 +64,11 @@ class SurveyTemplateCreate extends Component
   {
     unset($this->questions[$questionIndex]['options'][$optionIndex]);
     $this->questions[$questionIndex]['options'] = array_values($this->questions[$questionIndex]['options']);
+  }
+
+  public function updateOptionWeight(int $questionIndex, int $optionIndex, float $weight): void
+  {
+    $this->questions[$questionIndex]['options'][$optionIndex]['weight'] = max(0, min(5, (float) $weight));
   }
 
   public function moveQuestionUp(int $index): void
@@ -91,15 +99,19 @@ class SurveyTemplateCreate extends Component
   {
     $this->questions[$index]['field_type'] = $type;
 
-    // Si es select y no hay opciones, precargar opciones por defecto en español
     if ($type === 'select' && empty($this->questions[$index]['options'])) {
-      $this->questions[$index]['options'] = [
+      $labels = [
         __('Very Good'),
         __('Good'),
         __('Fair'),
         __('Bad'),
         __('Very Bad'),
       ];
+      $count = count($labels);
+      $this->questions[$index]['options'] = array_map(fn($label, $i) => [
+        'label' => $label,
+        'weight' => $count > 1 ? round(5 - $i * (4 / ($count - 1)), 2) : 5,
+      ], $labels, array_keys($labels));
     }
   }
 
