@@ -36,7 +36,7 @@ class MinistrySettings extends Component
     {
         $this->preview = [];
 
-        if (!$this->survey_template_id) {
+        if (! $this->survey_template_id) {
             return;
         }
 
@@ -44,7 +44,7 @@ class MinistrySettings extends Component
             $q->whereIn('field_type', ['radio', 'select'])->orderBy('order');
         }])->find($this->survey_template_id);
 
-        if (!$template) {
+        if (! $template) {
             return;
         }
 
@@ -60,8 +60,9 @@ class MinistrySettings extends Component
 
     public function saveConfig(): void
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             $this->redirect(route('dashboard'));
+
             return;
         }
 
@@ -77,7 +78,7 @@ class MinistrySettings extends Component
 
     public function render()
     {
-        if (!auth()->user()->isAdmin()) {
+        if (! auth()->user()->isAdmin()) {
             $this->redirect(route('dashboard'));
         }
 

@@ -55,11 +55,11 @@ return new class extends Migration
             }
 
             $first = $options[0] ?? null;
-            if (!is_array($first) || !isset($first['label'])) {
+            if (! is_array($first) || ! isset($first['label'])) {
                 continue;
             }
 
-            $question->options = array_map(fn($opt) => $opt['label'], $options);
+            $question->options = array_map(fn ($opt) => $opt['label'], $options);
             $question->save();
         }
     }

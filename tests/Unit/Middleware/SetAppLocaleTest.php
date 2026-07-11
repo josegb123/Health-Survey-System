@@ -16,7 +16,7 @@ class SetAppLocaleTest extends TestCase
     {
         SystemSetting::set()->update(['language' => 'en']);
 
-        $middleware = new SetAppLocale();
+        $middleware = new SetAppLocale;
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, function () {
@@ -30,7 +30,7 @@ class SetAppLocaleTest extends TestCase
     {
         SystemSetting::set()->update(['language' => '']);
 
-        $middleware = new SetAppLocale();
+        $middleware = new SetAppLocale;
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, function () {

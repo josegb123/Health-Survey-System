@@ -28,6 +28,7 @@ class PublicApiTest extends TestCase
             'field_type' => 'text',
             'is_required' => false,
         ]);
+
         return $template;
     }
 

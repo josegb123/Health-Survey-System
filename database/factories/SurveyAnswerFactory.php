@@ -24,7 +24,7 @@ class SurveyAnswerFactory extends Factory
         $mockAnswer = match ($question->field_type) {
             'number' => (string) $this->faker->numberBetween(1, 5),
             'radio', 'select' => $this->faker->randomElement(
-                array_map(fn($opt) => $opt['label'] ?? $opt, $question->options ?? [])
+                array_map(fn ($opt) => $opt['label'] ?? $opt, $question->options ?? [])
             ),
             default => $this->faker->sentence(6),
         };

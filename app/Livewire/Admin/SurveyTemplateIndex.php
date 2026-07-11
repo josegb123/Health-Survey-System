@@ -91,6 +91,7 @@ class SurveyTemplateIndex extends Component
     {
         if (! auth()->user()->isAdmin()) {
             $this->redirect(route('dashboard'));
+
             return;
         }
 
@@ -154,6 +155,7 @@ class SurveyTemplateIndex extends Component
     {
         if (! auth()->user()->isAdmin()) {
             $this->redirect(route('dashboard'));
+
             return;
         }
 
@@ -190,6 +192,7 @@ class SurveyTemplateIndex extends Component
     {
         if (! auth()->user()->isAdmin()) {
             $this->redirect(route('dashboard'));
+
             return;
         }
 
@@ -215,6 +218,7 @@ class SurveyTemplateIndex extends Component
     {
         if (! auth()->user()->isAdmin()) {
             $this->redirect(route('dashboard'));
+
             return;
         }
 

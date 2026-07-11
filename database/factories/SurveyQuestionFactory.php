@@ -32,7 +32,7 @@ class SurveyQuestionFactory extends Factory
         // Flujo alternativo: Si es radio o select, generamos un array de opciones válidas
         $labels = [__('Excellent'), __('Good'), __('Regular'), __('Bad')];
         $options = in_array($fieldType, ['radio', 'select'])
-            ? array_map(fn($label, $i) => [
+            ? array_map(fn ($label, $i) => [
                 'label' => $label,
                 'weight' => round(5 - $i * (4 / (count($labels) - 1)), 2),
             ], $labels, array_keys($labels))

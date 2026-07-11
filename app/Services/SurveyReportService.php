@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Survey;
 use App\Models\SystemSetting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -45,8 +46,8 @@ class SurveyReportService
             'companyName' => $settings->company_name ?? config('app.name'),
         ];
 
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.surveys-pdf', $data);
+        if (class_exists(Pdf::class)) {
+            $pdf = Pdf::loadView('reports.surveys-pdf', $data);
             $pdf->setPaper('letter', 'landscape');
 
             return $pdf;
@@ -54,7 +55,9 @@ class SurveyReportService
 
         // Fallback fake PDF for environments without the DomPDF facade (e.g., tests)
         $html = view('reports.surveys-pdf', $data)->render();
-        return new class ($html) {
+
+        return new class($html)
+        {
             private string $html;
 
             public function __construct(string $html)
@@ -69,7 +72,7 @@ class SurveyReportService
 
             public function output(): string
             {
-                return "%PDF-FAKE\n" . $this->html;
+                return "%PDF-FAKE\n".$this->html;
             }
         };
     }
@@ -128,15 +131,17 @@ class SurveyReportService
             'companyName' => $settings->company_name ?? config('app.name'),
         ];
 
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.statistics-pdf', $data);
+        if (class_exists(Pdf::class)) {
+            $pdf = Pdf::loadView('reports.statistics-pdf', $data);
             $pdf->setPaper('letter', 'portrait');
 
             return $pdf;
         }
 
         $html = view('reports.statistics-pdf', $data)->render();
-        return new class ($html) {
+
+        return new class($html)
+        {
             private string $html;
 
             public function __construct(string $html)
@@ -151,7 +156,7 @@ class SurveyReportService
 
             public function output(): string
             {
-                return "%PDF-FAKE\n" . $this->html;
+                return "%PDF-FAKE\n".$this->html;
             }
         };
     }
@@ -197,11 +202,11 @@ class SurveyReportService
                 $question = $answer->question ?? $survey->template?->questions
                     ->firstWhere('id', $answer->survey_question_id);
 
-                if (!$question) {
+                if (! $question) {
                     continue;
                 }
 
-                if ($question->field_type === 'radio' && !empty($question->options)) {
+                if ($question->field_type === 'radio' && ! empty($question->options)) {
                     $key = mb_strtoupper(trim($answer->answer_value));
 
                     // Try direct match against ministry experience options
@@ -252,7 +257,7 @@ class SurveyReportService
             }
 
             // Fallback: use survey rating for experience if not already answered
-            if (!$answeredExp && $survey->rating !== null) {
+            if (! $answeredExp && $survey->rating !== null) {
                 $bucket = match (true) {
                     $survey->rating >= 4.5 => 'MUY BUENA',
                     $survey->rating >= 3.5 => 'BUENA',
@@ -265,7 +270,7 @@ class SurveyReportService
             }
 
             // Fallback: derive recommendation from rating
-            if (!$answeredRec && $survey->rating !== null) {
+            if (! $answeredRec && $survey->rating !== null) {
                 if ($survey->rating >= 3.5) {
                     $recMap['DEFINITIVAMENTE SÍ']++;
                 } else {
@@ -274,10 +279,10 @@ class SurveyReportService
                 $answeredRec = true;
             }
 
-            if (!$answeredExp) {
+            if (! $answeredExp) {
                 $expNoAnswer++;
             }
-            if (!$answeredRec) {
+            if (! $answeredRec) {
                 $recNoAnswer++;
             }
         }

@@ -16,7 +16,7 @@ class CheckMaintenanceModeTest extends TestCase
     {
         SystemSetting::set()->update(['is_maintenance_mode' => false]);
 
-        $middleware = new CheckMaintenanceMode();
+        $middleware = new CheckMaintenanceMode;
         $request = Request::create('/api/test', 'GET');
 
         $response = $middleware->handle($request, function () {
@@ -30,7 +30,7 @@ class CheckMaintenanceModeTest extends TestCase
     {
         SystemSetting::set()->update(['is_maintenance_mode' => true]);
 
-        $middleware = new CheckMaintenanceMode();
+        $middleware = new CheckMaintenanceMode;
         $request = Request::create('/api/test', 'GET');
 
         $response = $middleware->handle($request, function () {

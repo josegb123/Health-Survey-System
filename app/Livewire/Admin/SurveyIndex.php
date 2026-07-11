@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SurveyIndex extends Component
@@ -139,7 +140,7 @@ class SurveyIndex extends Component
         $filename = 'reporte-encuestas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer = new Xlsx($spreadsheet);
             $writer->setPreCalculateFormulas(false);
             $writer->save('php://output');
         }, $filename);
@@ -159,7 +160,7 @@ class SurveyIndex extends Component
         }, $filename);
     }
 
-    public function downloadMinistryReport(): StreamedResponse|null
+    public function downloadMinistryReport(): ?StreamedResponse
     {
         $this->validate([
             'reportStartDate' => 'required|date',

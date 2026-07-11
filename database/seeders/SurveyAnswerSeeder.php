@@ -14,6 +14,7 @@ class SurveyAnswerSeeder extends Seeder
 
         if ($surveys->isEmpty()) {
             $this->command->warn(__('No surveys found to seed answers for. Run SurveySeeder first.'));
+
             return;
         }
 
@@ -24,7 +25,7 @@ class SurveyAnswerSeeder extends Seeder
                 $answerValue = match ($question->field_type) {
                     'number' => (string) rand(4, 5),
                     'radio', 'select' => $question->options
-                        ? fake()->randomElement(array_map(fn($o) => $o['label'] ?? $o, $question->options))
+                        ? fake()->randomElement(array_map(fn ($o) => $o['label'] ?? $o, $question->options))
                         : 'Yes',
                     default => __('Everything was excellent during the medical appointment.'),
                 };

@@ -144,6 +144,7 @@ class SystemSettings extends Component
     {
         if ($this->confirmText !== $this->expectedConfirmText) {
             $this->addError('confirmText', __('The confirmation text does not match.'));
+
             return;
         }
 

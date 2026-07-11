@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Patient;
-use App\Models\Survey;
-use App\Models\SurveyAnswer;
-use App\Models\SurveyTemplate;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -77,11 +74,12 @@ class SystemSetting extends Model
             });
         } catch (\Exception $e) {
             Log::error('Survey purge failed: '.$e->getMessage());
+
             return __('An error occurred while trying to purge old surveys: :error', ['error' => $e->getMessage()]);
         }
     }
 
-    public function defaultTemplate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function defaultTemplate(): BelongsTo
     {
         return $this->belongsTo(SurveyTemplate::class, 'default_survey_template_id');
     }
@@ -90,6 +88,7 @@ class SystemSetting extends Model
     {
         $data = Cache::rememberForever(self::CACHE_KEY, function () {
             $setting = self::firstOrCreate(['id' => 1]);
+
             return $setting->toArray();
         });
 

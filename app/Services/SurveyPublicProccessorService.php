@@ -83,8 +83,8 @@ class SurveyPublicProccessorService
             throw new \InvalidArgumentException('The provided signature is not a valid base64 string.');
         }
 
-        $filename = Str::uuid() . '.png';
-        $path = 'signatures/' . $filename;
+        $filename = Str::uuid().'.png';
+        $path = 'signatures/'.$filename;
 
         Storage::disk('local')->put($path, $decoded);
 

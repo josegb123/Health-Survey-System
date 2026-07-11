@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Livewire\Admin\SurveyIndex;
 use App\Models\MinistryReportConfig;
 use App\Models\Patient;
 use App\Models\Survey;
@@ -12,7 +13,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\TestCase;
 
 class ReportsTest extends TestCase
@@ -68,13 +71,13 @@ class ReportsTest extends TestCase
 
         $this->actingAs($this->user);
 
-        $component = app(\App\Livewire\Admin\SurveyIndex::class);
+        $component = app(SurveyIndex::class);
         $component->reportStartDate = Carbon::now()->startOfMonth()->format('Y-m-d');
         $component->reportEndDate = Carbon::now()->endOfMonth()->format('Y-m-d');
 
         $response = $component->downloadSurveysReport();
 
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition') ?? '');
     }
 
@@ -93,13 +96,13 @@ class ReportsTest extends TestCase
 
         $this->actingAs($this->user);
 
-        $component = app(\App\Livewire\Admin\SurveyIndex::class);
+        $component = app(SurveyIndex::class);
         $component->reportStartDate = Carbon::now()->startOfMonth()->format('Y-m-d');
         $component->reportEndDate = Carbon::now()->endOfMonth()->format('Y-m-d');
 
         $response = $component->downloadStatisticsReport();
 
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertStringContainsString('.pdf', $response->headers->get('Content-Disposition') ?? '');
     }
 
@@ -120,14 +123,14 @@ class ReportsTest extends TestCase
 
         $this->actingAs($this->user);
 
-        $component = app(\App\Livewire\Admin\SurveyIndex::class);
+        $component = app(SurveyIndex::class);
         $component->reportStartDate = Carbon::now()->startOfMonth()->format('Y-m-d');
         $component->reportEndDate = Carbon::now()->endOfMonth()->format('Y-m-d');
         $component->reportConsecutive = 102;
 
         $response = $component->downloadMinistryReport();
 
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertStringContainsString('.txt', $response->headers->get('Content-Disposition') ?? '');
     }
 
@@ -135,7 +138,7 @@ class ReportsTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $component = \Livewire\Livewire::test(\App\Livewire\Admin\SurveyIndex::class);
+        $component = Livewire::test(SurveyIndex::class);
         $component->set('reportStartDate', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $component->set('reportEndDate', Carbon::now()->endOfMonth()->format('Y-m-d'));
         $component->set('reportConsecutive', 102);
@@ -148,7 +151,7 @@ class ReportsTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $component = app(\App\Livewire\Admin\SurveyIndex::class);
+        $component = app(SurveyIndex::class);
         $component->reportStartDate = 'invalid-date';
         $component->reportEndDate = '2024-01-01';
         $component->reportPeriod = 'custom';
@@ -156,7 +159,7 @@ class ReportsTest extends TestCase
         try {
             $component->downloadSurveysReport();
             $this->fail('Expected validation exception');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->assertArrayHasKey('reportStartDate', $e->errors());
         }
     }
@@ -165,7 +168,7 @@ class ReportsTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $component = app(\App\Livewire\Admin\SurveyIndex::class);
+        $component = app(SurveyIndex::class);
         $component->reportStartDate = '2024-12-01';
         $component->reportEndDate = '2024-01-01';
         $component->reportPeriod = 'custom';
@@ -173,7 +176,7 @@ class ReportsTest extends TestCase
         try {
             $component->downloadSurveysReport();
             $this->fail('Expected validation exception');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             $this->assertArrayHasKey('reportEndDate', $e->errors());
         }
     }

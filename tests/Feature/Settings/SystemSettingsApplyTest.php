@@ -2,13 +2,14 @@
 
 namespace Tests\Feature\Settings;
 
+use App\Livewire\Admin\SystemSettings;
 use App\Models\MinistryReportConfig;
 use App\Models\SurveyTemplate;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Providers\AppServiceProvider;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -46,7 +47,7 @@ class SystemSettingsApplyTest extends TestCase
     public function test_settings_are_persisted_after_save(): void
     {
         Livewire::actingAs($this->user)
-            ->test(\App\Livewire\Admin\SystemSettings::class)
+            ->test(SystemSettings::class)
             ->set('company_name', 'Updated Clinic')
             ->set('company_dni', '987654321')
             ->set('turnstile_site_key', 'new-site-key')
@@ -74,7 +75,7 @@ class SystemSettingsApplyTest extends TestCase
     {
         SystemSetting::set()->update(['session_timeout_minutes' => 45]);
 
-        $provider = app()->register(\App\Providers\AppServiceProvider::class);
+        $provider = app()->register(AppServiceProvider::class);
         $provider->boot();
 
         $this->assertEquals(45, config('session.lifetime'));
@@ -87,7 +88,7 @@ class SystemSettingsApplyTest extends TestCase
             'mail_from_name' => 'Test Clinic',
         ]);
 
-        $provider = app()->register(\App\Providers\AppServiceProvider::class);
+        $provider = app()->register(AppServiceProvider::class);
         $provider->boot();
 
         $this->assertEquals('test@clinic.com', config('mail.from.address'));
@@ -133,7 +134,7 @@ class SystemSettingsApplyTest extends TestCase
         $template = SurveyTemplate::factory()->create(['title' => 'Default', 'is_active' => true]);
 
         Livewire::actingAs($this->user)
-            ->test(\App\Livewire\Admin\SystemSettings::class)
+            ->test(SystemSettings::class)
             ->set('default_survey_template_id', $template->id)
             ->call('saveSettings')
             ->assertHasNoErrors();
@@ -153,7 +154,7 @@ class SystemSettingsApplyTest extends TestCase
         MinistryReportConfig::set()->update(['survey_template_id' => $template->id]);
 
         Livewire::actingAs($this->user)
-            ->test(\App\Livewire\Admin\SystemSettings::class)
+            ->test(SystemSettings::class)
             ->set('default_survey_template_id', null)
             ->call('saveSettings')
             ->assertHasNoErrors();

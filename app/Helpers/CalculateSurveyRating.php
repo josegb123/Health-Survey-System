@@ -66,6 +66,7 @@ class CalculateSurveyRating
     {
         $value = mb_strtolower(trim($value));
         $value = str_replace(['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'], ['a', 'e', 'i', 'o', 'u', 'u', 'n'], $value);
+
         return preg_replace('/\s+/', ' ', $value);
     }
 }

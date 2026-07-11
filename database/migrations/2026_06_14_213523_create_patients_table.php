@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('dni')->unique();
             $table->string('name');
             $table->string('email')->nullable();
-            $table->string('nationality')->default('Colombiana');
+            $table->string('nationality')->nullable()->default('Colombiana');
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->foreignId('insurer_id')->nullable()->constrained('insurers')->onDelete('restrict');
