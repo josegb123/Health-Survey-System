@@ -2,13 +2,17 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
 use App\Services\SurveyTemplateBuilderService;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SurveyTemplateIndex extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     // Propiedades para hidratar modales de confirmación
@@ -188,6 +192,12 @@ class SurveyTemplateIndex extends Component
         $this->modal('status-modal')->show();
     }
 
+    public function showImportModal(): void
+    {
+        $this->importFile = null;
+        $this->modal('import-modal')->show();
+    }
+
     public function toggleStatus(): void
     {
         if (! auth()->user()->isAdmin()) {
@@ -237,6 +247,89 @@ class SurveyTemplateIndex extends Component
         $this->modal('delete-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
         $this->dispatch('toast', type: 'success', text: __('Template deleted successfully.'));
+    }
+
+    /**
+     * Exporta una plantilla completa como archivo JSON para descarga.
+     */
+    public function exportTemplate(int $id): StreamedResponse
+    {
+        $template = SurveyTemplate::with(['questions' => fn ($q) => $q->orderBy('order')])->findOrFail($id);
+
+        $data = [
+            'version' => 1,
+            'exported_at' => now()->toIso8601String(),
+            'template' => [
+                'title' => $template->title,
+                'is_active' => $template->is_active,
+            ],
+            'questions' => $template->questions->map(fn (SurveyQuestion $q) => [
+                'question_text' => $q->question_text,
+                'field_type' => $q->field_type,
+                'options' => $q->options,
+                'is_required' => $q->is_required,
+            ])->toArray(),
+        ];
+
+        $filename = 'plantilla-'.$template->id.'-'.str()->slug($template->title).'.json';
+
+        return response()->streamDownload(function () use ($data) {
+            echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }, $filename, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    /**
+     * Importa una plantilla desde un archivo JSON subido.
+     */
+    public $importFile;
+
+    public function importTemplate(SurveyTemplateBuilderService $builderService): void
+    {
+        if (! auth()->user()->isAdmin()) {
+            $this->redirect(route('dashboard'));
+
+            return;
+        }
+
+        if (! $this->importFile) {
+            $this->dispatch('toast', type: 'error', text: __('Please select a JSON file to import.'));
+
+            return;
+        }
+
+        try {
+            $json = $this->importFile->get();
+            $data = json_decode($json, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception(__('Invalid JSON file.'));
+            }
+
+            if (empty($data['template']['title']) || empty($data['questions'])) {
+                throw new \Exception(__('The JSON file does not contain a valid template structure.'));
+            }
+
+            foreach ($data['questions'] as $question) {
+                if (empty($question['question_text']) || empty($question['field_type'])) {
+                    throw new \Exception(__('Each question must have question_text and field_type.'));
+                }
+            }
+
+            $templateData = [
+                'title' => $data['template']['title'],
+                'is_active' => $data['template']['is_active'] ?? true,
+            ];
+
+            $builderService->createWithQuestions($templateData, $data['questions']);
+
+            $this->importFile = null;
+            $this->dispatch('toast', type: 'success', text: __('Template imported successfully.'));
+
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Error importing template: ').$e->getMessage());
+        }
     }
 
     public function render()

@@ -7,9 +7,14 @@
         </div>
 
         @if (auth()->user()->isAdmin())
-            <a href="{{ route('admin.survey-templates.create') }}">
-                <flux:button variant="primary" icon="plus">{{ __('New Template') }}</flux:button>
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.survey-templates.create') }}">
+                    <flux:button variant="primary" icon="plus">{{ __('New Template') }}</flux:button>
+                </a>
+                <flux:button variant="outline" icon="arrow-up-tray" wire:click="showImportModal()">
+                    {{ __('Import JSON') }}
+                </flux:button>
+            </div>
         @endif
     </div>
 

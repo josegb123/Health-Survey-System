@@ -41,8 +41,20 @@
                                 {{ __('View Detail') }}
                             </flux:menu.item>
 
+                            <flux:menu.item icon="arrow-down-tray" wire:click="exportTemplate({{ $template->id }})">
+                                {{ __('Export JSON') }}
+                            </flux:menu.item>
+
                             @if (auth()->user()->isAdmin())
                                 <flux:menu.separator />
+
+                                <flux:menu.item
+                                    tag="a"
+                                    href="{{ route('admin.survey-templates.edit', $template->id) }}"
+                                    icon="pencil">
+                                    {{ __('Edit') }}
+                                </flux:menu.item>
+
                                 <flux:menu.item
                                     wire:click="confirmToggleStatus({{ $template->id }}, '{{ addslashes($template->title) }}')"
                                     icon="arrow-path">
