@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\MinistryReportConfig;
 use App\Models\Survey;
 use App\Models\SystemSetting;
+use App\Services\MinistryReportGeneratorService;
 use App\Services\SurveyReportService;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
@@ -32,6 +34,8 @@ class SurveyIndex extends Component
     public ?int $reportMonth = null;
 
     public ?int $reportQuarter = null;
+
+    public ?int $reportConsecutive = null;
 
     public ?string $ministryConfigError = null;
 
@@ -75,6 +79,7 @@ class SurveyIndex extends Component
     public function openReportModal(): void
     {
         $this->setReportDateRange();
+        $this->reportConsecutive = null;
         $this->modal('report-modal')->show();
     }
 
@@ -153,7 +158,11 @@ class SurveyIndex extends Component
 
     public function downloadMinistryReport(): StreamedResponse|null
     {
-        $this->validateReportDates();
+        $this->validate([
+            'reportStartDate' => 'required|date',
+            'reportEndDate' => 'required|date|after_or_equal:reportStartDate',
+            'reportConsecutive' => 'required|integer|min:1',
+        ]);
 
         $settings = SystemSetting::set();
         $missing = [];
@@ -177,8 +186,21 @@ class SurveyIndex extends Component
             return null;
         }
 
-        $service = app(SurveyReportService::class);
-        $content = $service->generateMinistryReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod);
+        $config = MinistryReportConfig::set();
+        if (! $config->survey_template_id) {
+            $this->ministryConfigError = __('Please configure the Ministry Report settings first.');
+            $this->modal('ministry-config-error-modal')->show();
+
+            return null;
+        }
+
+        $service = app(MinistryReportGeneratorService::class);
+        $content = $service->generate(
+            $config->survey_template_id,
+            $this->reportStartDate,
+            $this->reportEndDate,
+            $this->reportConsecutive
+        );
 
         $filename = 'reporte-ministerio-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.txt';
 

@@ -81,20 +81,30 @@
                 </div>
 
                 {{-- Report 3: Ministry of Health --}}
-                <div class="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 rounded-lg">
-                            <flux:icon name="building-office" variant="outline" class="h-5 w-5" />
-                        </div>
-                        <div>
-                            <span class="font-medium text-sm text-zinc-900 dark:text-white">{{ __('Export Ministry of Health') }}</span>
-                            <p class="text-xs text-zinc-400">{{ __('Formatted TXT file for the Ministry of Health.') }}</p>
+                <div class="p-4 bg-white dark:bg-zinc-900 border border-purple-200 dark:border-purple-900/50 rounded-lg space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 rounded-lg">
+                                <flux:icon name="building-office" variant="outline" class="h-5 w-5" />
+                            </div>
+                            <div>
+                                <span class="font-medium text-sm text-zinc-900 dark:text-white">{{ __('Export Ministry of Health') }}</span>
+                                <p class="text-xs text-zinc-400">{{ __('Formatted TXT file for the Ministry of Health.') }}</p>
+                            </div>
                         </div>
                     </div>
-                    <flux:button size="sm" variant="primary" wire:click="downloadMinistryReport" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="downloadMinistryReport">{{ __('TXT') }}</span>
-                        <span wire:loading wire:target="downloadMinistryReport">{{ __('Generating...') }}</span>
-                    </flux:button>
+
+                    <div class="max-w-xs">
+                        <flux:input type="number" wire:model="reportConsecutive" label="{{ __('Consecutive') }}" min="1"
+                            placeholder="{{ __('E.g.: 102') }}" :error="$errors->first('reportConsecutive')" />
+                    </div>
+
+                    <div class="flex justify-end">
+                        <flux:button size="sm" variant="primary" wire:click="downloadMinistryReport" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="downloadMinistryReport">{{ __('TXT') }}</span>
+                            <span wire:loading wire:target="downloadMinistryReport">{{ __('Generating...') }}</span>
+                        </flux:button>
+                    </div>
                 </div>
             </div>
         </div>
