@@ -9,7 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable('survey_id', 'survey_question_id', 'answer_value')]
+#[Fillable('survey_id', 'survey_question_id', 'answer_value', 'weighted_value')]
+
+    protected function casts(): array
+    {
+        return [
+            'weighted_value' => 'decimal:2',
+        ];
+    }
 class SurveyAnswer extends Model
 {
     /** @use HasFactory<SurveyAnswerFactory> */
