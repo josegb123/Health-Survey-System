@@ -18,11 +18,18 @@ class SurveyReportService
 
     public function getSurveysInRange(string $startDate, string $endDate): Collection
     {
-        return Survey::with(['patient.insurer', 'template', 'answers.question'])
+        $settings = $this->getSettings();
+        $templateId = $settings->default_survey_template_id;
+
+        $query = Survey::with(['patient.insurer', 'template', 'answers.question'])
             ->where('status', 'completed')
-            ->whereBetween('created_at', [$startDate, Carbon::parse($endDate)->endOfDay()])
-            ->latest()
-            ->get();
+            ->whereBetween('created_at', [$startDate, Carbon::parse($endDate)->endOfDay()]);
+
+        if ($templateId) {
+            $query->where('survey_template_id', $templateId);
+        }
+
+        return $query->latest()->get();
     }
 
     public function generateSurveysReport(string $startDate, string $endDate, string $period)
@@ -72,17 +79,20 @@ class SurveyReportService
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
         $settings = $this->getSettings();
+        $templateId = $settings->default_survey_template_id;
 
-        $totalSurveys = Survey::where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
-            ->count();
+        $surveysQuery = Survey::where('status', 'completed')
+            ->whereBetween('surveys.created_at', [$start, $end]);
 
-        $averageRating = (float) Survey::where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
-            ->avg('rating') ?? 0.0;
+        if ($templateId) {
+            $surveysQuery->where('survey_template_id', $templateId);
+        }
 
-        $templateBreakdown = Survey::where('status', 'completed')
-            ->whereBetween('surveys.created_at', [$start, $end])
+        $totalSurveys = (clone $surveysQuery)->count();
+
+        $averageRating = (float) (clone $surveysQuery)->avg('rating') ?? 0.0;
+
+        $templateBreakdown = (clone $surveysQuery)
             ->join('survey_templates', 'surveys.survey_template_id', '=', 'survey_templates.id')
             ->selectRaw('survey_templates.title, COUNT(*) as total')
             ->groupBy('survey_templates.title')
@@ -90,8 +100,7 @@ class SurveyReportService
             ->get()
             ->toArray();
 
-        $insurerBreakdown = Survey::where('surveys.status', 'completed')
-            ->whereBetween('surveys.created_at', [$start, $end])
+        $insurerBreakdown = (clone $surveysQuery)
             ->join('patients', 'surveys.patient_id', '=', 'patients.id')
             ->join('insurers', 'patients.insurer_id', '=', 'insurers.id')
             ->selectRaw('insurers.name, COUNT(*) as total')
@@ -100,9 +109,8 @@ class SurveyReportService
             ->get()
             ->toArray();
 
-        $dailyTrend = Survey::where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
-            ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+        $dailyTrend = (clone $surveysQuery)
+            ->selectRaw('DATE(surveys.created_at) as date, COUNT(*) as count')
             ->groupBy('date')
             ->orderBy('date')
             ->pluck('count', 'date')

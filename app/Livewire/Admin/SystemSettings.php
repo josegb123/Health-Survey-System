@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\MinistryReportConfig;
 use App\Models\SystemSetting;
 use Flux\Flux;
 use Livewire\Component;
@@ -39,6 +40,8 @@ class SystemSettings extends Component
 
     public ?string $surveys_purge_last_run = null;
 
+    public ?int $default_survey_template_id = null;
+
     public int $purgeStep = 0;
 
     public string $purgeResult = '';
@@ -62,6 +65,7 @@ class SystemSettings extends Component
         'session_timeout_minutes' => 'nullable|integer|min:1',
         'is_maintenance_mode' => 'nullable|boolean',
         'survey_monthly_goal' => 'nullable|integer|min:1',
+        'default_survey_template_id' => 'nullable|integer|exists:survey_templates,id',
     ];
 
     /**
@@ -101,7 +105,14 @@ class SystemSettings extends Component
             'session_timeout_minutes' => $this->session_timeout_minutes,
             'is_maintenance_mode' => $this->is_maintenance_mode,
             'survey_monthly_goal' => $this->survey_monthly_goal,
+            'default_survey_template_id' => $this->default_survey_template_id,
         ]);
+
+        if ($this->default_survey_template_id) {
+            MinistryReportConfig::set()->update([
+                'survey_template_id' => $this->default_survey_template_id,
+            ]);
+        }
 
         // Tu observer estático borra la caché 'global_system_settings' en este punto.
 

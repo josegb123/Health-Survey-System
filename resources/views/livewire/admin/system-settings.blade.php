@@ -25,6 +25,22 @@
             </div>
         </div>
 
+        {{-- SECTION 1B: Default Survey Template --}}
+        <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
+            <flux:heading size="md">{{ __('Default Survey Template') }}</flux:heading>
+            <flux:text size="sm" class="text-zinc-500">
+                {{ __('Select the template that will be used as the default for all reports: survey exports (Excel), statistics (PDF), and the Ministry of Health report. Only completed surveys using this template will be included.') }}
+            </flux:text>
+            <flux:select wire:model="default_survey_template_id" label="{{ __('Template') }}">
+                <option value="">-- {{ __('Select a template') }} --</option>
+                @foreach (\App\Models\SurveyTemplate::withCount('questions')->latest()->get() as $template)
+                    <option value="{{ $template->id }}">
+                        {{ $template->title }} ({{ $template->questions_count }} {{ __('questions') }})
+                    </option>
+                @endforeach
+            </flux:select>
+        </div>
+
         {{-- SECTION 2: Preferences & Metrics --}}
         <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
             <flux:heading size="md">{{ __('Preferences & Metrics') }}</flux:heading>

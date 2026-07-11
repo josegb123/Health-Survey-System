@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
+use App\Models\SurveyTemplate;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable('theme', 'language', 'turnstile_site_key', 'turnstile_secret_key', 'rate_limit_requests', 'company_name', 'company_dni', 'entity_type', 'registry_type', 'mail_from_address', 'mail_from_name', 'session_timeout_minutes', 'is_maintenance_mode', 'survey_monthly_goal', 'surveys_purge_last_run')]
+#[Fillable('theme', 'language', 'turnstile_site_key', 'turnstile_secret_key', 'rate_limit_requests', 'company_name', 'company_dni', 'entity_type', 'registry_type', 'mail_from_address', 'mail_from_name', 'session_timeout_minutes', 'is_maintenance_mode', 'survey_monthly_goal', 'surveys_purge_last_run', 'default_survey_template_id')]
 class SystemSetting extends Model
 {
     const CACHE_KEY = 'global_system_settings';
@@ -78,6 +79,11 @@ class SystemSetting extends Model
             Log::error('Survey purge failed: '.$e->getMessage());
             return __('An error occurred while trying to purge old surveys: :error', ['error' => $e->getMessage()]);
         }
+    }
+
+    public function defaultTemplate(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(SurveyTemplate::class, 'default_survey_template_id');
     }
 
     public static function set(): self
