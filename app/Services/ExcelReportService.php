@@ -60,10 +60,12 @@ class ExcelReportService
             $options = $question->options ?? [];
             $hasOptions = in_array($question->field_type, ['radio', 'select']) && ! empty($options);
 
+            // 1. Configuración de anchos base
             $ws->getColumnDimension('A')->setWidth(3);
-            $ws->getColumnDimension('B')->setWidth(12);
-            $ws->getColumnDimension('C')->setWidth(46);
+            $ws->getColumnDimension('B')->setWidth(12); // ID
+            $ws->getColumnDimension('C')->setWidth(46); // PACIENTE
 
+            // 2. Configuración de anchos para las opciones (si existen)
             if ($hasOptions) {
                 $colLetter = 'D';
                 foreach ($options as $opt) {
@@ -71,20 +73,23 @@ class ExcelReportService
                     $colLetter++;
                 }
             }
-            $respuestaCol = $hasOptions
-                ? $this->lastColLetter(4 + count($options) - 1)
+
+            // 3. Mapeo dinámico y correcto de las columnas restantes tras las opciones
+            $ponderadoCol = $hasOptions
+                ? $this->lastColLetter(4 + count($options))
                 : 'D';
-            $ws->getColumnDimension($respuestaCol)->setWidth(16);
-            $valorCol = $this->lastColLetter($this->colIndex($respuestaCol) + 1);
-            $ws->getColumnDimension($valorCol)->setWidth(10);
-            $fechaCol = $this->lastColLetter($this->colIndex($valorCol) + 1);
+            $ws->getColumnDimension($ponderadoCol)->setWidth(14);
+
+            $fechaCol = $this->lastColLetter($this->colIndex($ponderadoCol) + 1);
             $ws->getColumnDimension($fechaCol)->setWidth(14);
+
             $obsCol = $this->lastColLetter($this->colIndex($fechaCol) + 1);
             $ws->getColumnDimension($obsCol)->setWidth(28);
 
             $totalCols = $this->colIndex($obsCol);
             $lastCol = $this->lastColLetter($totalCols);
 
+            // Cabeceras principales
             $ws->mergeCells('B2:'.$lastCol.'2');
             $ws->setCellValue('B2', 'TABULACION ENCUESTA DE SATISFACCION');
             $ws->getStyle('B2')->getFont()->setBold(true)->setSize(12)->setName('Aptos Narrow');
@@ -102,6 +107,7 @@ class ExcelReportService
             $ws->getStyle('B4')->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
             $ws->getStyle('B4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
 
+            // Estructura de la tabla (Fila 5 y 6 modificadas)
             $headerRow = 5;
             $ws->mergeCells('B'.$headerRow.':B'.($headerRow + 1));
             $ws->setCellValue('B'.$headerRow, 'ID');
@@ -140,8 +146,9 @@ class ExcelReportService
             $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
             $ws->setCellValue($colLetter.$headerRow, 'OBSERVACIONES');
             $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle($colLetter.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $ws->getStyle('B'.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
+            // Renderizado de datos por cada fila
             $row = 7;
             foreach ($surveys as $survey) {
                 $patient = $survey->patient;
@@ -172,15 +179,12 @@ class ExcelReportService
                         }
                         $colLetter++;
                     }
-
-                    $ws->setCellValue($colLetter.$row, $matchedAnswer->answer_value);
-                    $ws->getStyle($colLetter.$row)->getFont()->setSize(11)->setName('Aptos Narrow');
-                    $ws->getStyle($colLetter.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    $colLetter++;
                 } elseif ($hasOptions) {
-                    $colLetter = $this->lastColLetter(4 + count($options) - 1 + 2);
+                    // Si tiene opciones pero no hay respuesta, salta las columnas de las opciones
+                    $colLetter = $this->lastColLetter(4 + count($options));
                 }
 
+                // Columna PONDERADO / VALOR
                 if ($matchedAnswer !== null && $matchedAnswer->weighted_value !== null) {
                     $ws->setCellValue($colLetter.$row, $matchedAnswer->weighted_value);
                     $ws->getStyle($colLetter.$row)->getNumberFormat()->setFormatCode('0.00');
@@ -196,6 +200,7 @@ class ExcelReportService
                 }
                 $colLetter++;
 
+                // Columna FECHA
                 if ($survey->created_at) {
                     $ws->setCellValue($colLetter.$row, $survey->created_at);
                     $ws->getStyle($colLetter.$row)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
@@ -203,6 +208,7 @@ class ExcelReportService
                 }
                 $colLetter++;
 
+                // Columna OBSERVACIONES
                 $ws->setCellValue($colLetter.$row, '');
                 $ws->getStyle($colLetter.$row)->getFont()->setSize(11)->setName('Aptos Narrow');
 
