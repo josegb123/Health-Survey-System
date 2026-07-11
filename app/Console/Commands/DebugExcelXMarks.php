@@ -71,9 +71,10 @@ class DebugExcelXMarks extends Command
             if ($hasOptions && $surveys->isNotEmpty()) {
                 $xCount = 0;
                 foreach ($surveys as $survey) {
+                    $this->line("  Survey #{$survey->id}: answers_loaded={$survey->answers->count()}");
                     $matchedAnswer = null;
                     foreach ($survey->answers as $answer) {
-                        if ($answer->survey_question_id === $question->id) {
+                        if ((int) $answer->survey_question_id === $question->id) {
                             $matchedAnswer = $answer;
                             break;
                         }
