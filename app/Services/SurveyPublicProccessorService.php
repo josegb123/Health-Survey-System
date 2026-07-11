@@ -52,6 +52,7 @@ class SurveyPublicProccessorService
                 'survey_template_id' => $templateId,
                 'patient_id' => $patient->id,
                 'status' => 'completed',
+                'completed_at' => now(),
                 'rating' => $calculatedRating,
                 'signature_path' => $signaturePath,
             ]);
