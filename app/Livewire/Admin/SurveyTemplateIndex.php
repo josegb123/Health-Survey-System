@@ -209,9 +209,8 @@ class SurveyTemplateIndex extends Component
         if (! $this->selectedTemplateId) {
             return;
         }
-        SurveyTemplate::findOrFail($this->selectedTemplateId)->update([
-            'is_active' => ! SurveyTemplate::findOrFail($this->selectedTemplateId)->is_active,
-        ]);
+        $tmpl = SurveyTemplate::findOrFail($this->selectedTemplateId);
+        $tmpl->update(['is_active' => ! $tmpl->is_active]);
         $this->modal('status-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
         $this->dispatch('toast', type: 'success', text: __('Template status updated.'));
