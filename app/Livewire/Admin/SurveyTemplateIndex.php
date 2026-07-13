@@ -29,13 +29,6 @@ class SurveyTemplateIndex extends Component
 
     public ?SurveyTemplate $viewingTemplate = null;
 
-    public function mount(): void
-    {
-        if (session('success')) {
-            $this->dispatch('toast', type: 'success', text: session('success'));
-        }
-    }
-
     // Reglas de validación para el formulario compuesto
     protected array $rules = [
         'title' => 'required|string|max:255',

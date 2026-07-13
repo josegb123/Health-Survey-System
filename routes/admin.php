@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\MinistrySettings;
 use App\Livewire\Admin\SurveyIndex;
+use App\Livewire\Admin\SurveyTemplateCreate;
 use App\Livewire\Admin\SurveyTemplateIndex;
 use App\Livewire\Admin\SystemSettings;
 use App\Livewire\User\Index;
@@ -15,7 +16,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Gestión de Plantillas de Encuestas
     Route::get('/survey-templates', SurveyTemplateIndex::class)->name('survey-templates.index');
-    Route::get('/survey-templates/create', SurveyTemplateIndex::class)->name('survey-templates.create');
+    Route::get('/survey-templates/create', SurveyTemplateCreate::class)->name('survey-templates.create');
+    Route::get('/survey-templates/{templateId}/edit', SurveyTemplateCreate::class)->name('survey-templates.edit');
 
     // Configuración Global de la fila única del sistema
     Route::get('/settings', SystemSettings::class)->name('settings');
