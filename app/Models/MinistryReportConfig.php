@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MinistryReportConfig extends Model
 {
-    protected $fillable = ['survey_template_id'];
+    protected $fillable = ['survey_template_id', 'pipe_mapping'];
+
+    protected function casts(): array
+    {
+        return [
+            'pipe_mapping' => 'array',
+        ];
+    }
 
     public function template(): BelongsTo
     {

@@ -100,6 +100,42 @@
             </div>
         @endif
 
+        @if (!empty($counterOptions))
+            <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="adjustments-horizontal" variant="outline" class="h-5 w-5 text-zinc-500" />
+                    <flux:heading size="md">{{ __('Pipe Position Mapping') }}</flux:heading>
+                </div>
+
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Assign each counter (question option) to a pipe position (1-10). Unassigned counters will be placed automatically.') }}
+                </flux:text>
+
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                    @foreach ($counterOptions as $key => $label)
+                        <div class="flex items-center gap-3 p-2.5 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+                            <div class="flex-1 min-w-0">
+                                <span class="text-sm text-zinc-700 dark:text-zinc-300 truncate block">{{ $label }}</span>
+                            </div>
+                            <flux:select wire:model.live="pipeMapping.{{ $key }}" class="w-32 flex-shrink-0">
+                                <option value="">— {{ __('Auto') }} —</option>
+                                @foreach (range(1, 10) as $pos)
+                                    <option value="{{ $pos }}">
+                                        {{ __('Pipe') }} #{{ $pos }}
+                                    </option>
+                                @endforeach
+                            </flux:select>
+                            @if (isset($pipeMapping[$key]))
+                                <button wire:click="$set('pipeMapping.{{ $key }}', '')" class="text-zinc-400 hover:text-red-500 flex-shrink-0">
+                                    <flux:icon name="x-mark" class="h-4 w-4" />
+                                </button>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <div class="flex justify-end gap-2 pt-2">
             <a href="{{ route('dashboard') }}">
                 <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
