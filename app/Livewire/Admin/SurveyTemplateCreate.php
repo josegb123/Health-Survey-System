@@ -133,11 +133,6 @@ class SurveyTemplateCreate extends Component
         }
     }
 
-    public function confirmSave(): void
-    {
-        $this->modal('confirm-save-modal')->show();
-    }
-
     public function saveTemplate(): void
     {
         if (! auth()->user()->isAdmin()) {
@@ -160,6 +155,11 @@ class SurveyTemplateCreate extends Component
         }
     }
 
+    private function closeAndRedirect(): void
+    {
+        $this->dispatch('redirect-to-index');
+    }
+
     private function createNewTemplate(): void
     {
         $builderService = app(SurveyTemplateBuilderService::class);
@@ -169,7 +169,7 @@ class SurveyTemplateCreate extends Component
         ], $this->questions);
 
         $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
-        $this->redirect(route('admin.survey-templates.index'));
+        $this->closeAndRedirect();
     }
 
     private function updateExistingTemplate(): void
@@ -195,7 +195,7 @@ class SurveyTemplateCreate extends Component
         }
 
         $this->dispatch('toast', type: 'success', text: __('Template updated successfully.'));
-        $this->redirect(route('admin.survey-templates.index'));
+        $this->closeAndRedirect();
     }
 
     public function render()

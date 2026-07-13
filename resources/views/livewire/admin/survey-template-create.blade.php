@@ -1,4 +1,6 @@
-<div class="space-y-6 p-6 max-w-4xl">
+<div class="space-y-6 p-6 max-w-4xl"
+    x-data="{}"
+    x-on:redirect-to-index.window="window.location.href = '{{ route('admin.survey-templates.index') }}'">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <flux:heading size="xl">{{ $templateId ? __('Edit Survey Template') : __('Create Survey Template') }}</flux:heading>
@@ -15,7 +17,7 @@
 
     <flux:separator />
 
-    <form wire:submit.prevent="confirmSave" class="space-y-6">
+    <form wire:submit.prevent="saveTemplate" class="space-y-6">
         <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
             <flux:heading size="md">{{ __('Template Information') }}</flux:heading>
             <div class="grid grid-cols-1 gap-4">
@@ -247,31 +249,9 @@
             <a href="{{ route('admin.survey-templates.index') }}">
                 <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
             </a>
-            <flux:button type="submit" variant="primary" icon="check" :disabled="empty($questions)">
+            <flux:button type="submit" variant="primary" icon="check">
                 {{ $templateId ? __('Update Template') : __('Save Template') }}
             </flux:button>
         </div>
     </form>
-
-    <flux:modal name="confirm-save-modal" class="max-w-md">
-        <div class="space-y-6">
-            <div>
-                <flux:heading size="lg">{{ $templateId ? __('Confirm update template?') : __('Confirm save template?') }}</flux:heading>
-                <flux:text class="mt-2">{{ $templateId ? __('You are about to update the template:') : __('You are about to create the template:') }} <strong
-                        class="text-zinc-800 dark:text-zinc-200">{{ $title }}</strong>
-                </flux:text>
-                <flux:text size="sm" class="mt-2 text-zinc-500">
-                    {{ __('The template will contain :count questions.', ['count' => count($questions)]) }}
-                </flux:text>
-            </div>
-
-            <div class="flex gap-2">
-                <flux:spacer />
-                <flux:modal.close>
-                    <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
-                </flux:modal.close>
-                <flux:button wire:click="saveTemplate" variant="primary">{{ __('Confirm and Save') }}</flux:button>
-            </div>
-        </div>
-    </flux:modal>
 </div>
