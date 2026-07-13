@@ -104,6 +104,12 @@
                         </div>
                     </div>
 
+                    <p class="text-xs text-purple-600 dark:text-purple-400">
+                        {{ __('Uses the template configured in') }}
+                        <a href="{{ route('admin.ministry-settings') }}" class="underline">{{ __('Ministry Report Settings') }}</a>.
+                        {{ __('The template selected above only applies to Excel and PDF reports.') }}
+                    </p>
+
                     <div class="max-w-xs">
                         <flux:input type="number" wire:model="reportConsecutive" label="{{ __('Consecutive') }}" min="1"
                             placeholder="{{ __('E.g.: 102') }}" :error="$errors->first('reportConsecutive')" />
