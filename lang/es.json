@@ -470,5 +470,17 @@
     "Each question must have question_text and field_type.": "Cada pregunta debe tener question_text y field_type.",
     "Template imported successfully.": "Plantilla importada exitosamente.",
     "Error importing template: ": "Error al importar plantilla: ",
-    "Edit": "Editar"
+    "Edit": "Editar",
+
+    "Pipe Position Mapping": "Asignación de Posiciones en el Pipe",
+    "Assign each counter (question option) to a pipe position (1-10). Unassigned counters will be placed automatically.": "Asigne cada contador (opción de pregunta) a una posición del pipe (1-10). Los contadores no asignados se colocarán automáticamente.",
+    "Auto": "Auto",
+    "Pipe": "Pipe",
+
+    "Uses the template configured in": "Usa la plantilla configurada en",
+    "The template selected above only applies to Excel and PDF reports.": "La plantilla seleccionada arriba solo aplica para los reportes de Excel y PDF.",
+    "Survey Template": "Plantilla de Encuesta",
+    "Survey Template": "Plantilla de Encuesta",
+
+    "No templates available": "No hay plantillas disponibles"
 }
