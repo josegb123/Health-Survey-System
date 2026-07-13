@@ -56,13 +56,13 @@
         </div>
 
         <div>
-            <flux:file.upload
+            <flux:input
+                type="file"
                 wire:model="importFile"
                 accept=".json"
-                multiple="false"
                 label="{{ __('Select JSON file') }}"
-                help="{{ __('JSON format (.json) only') }}"
             />
+            <p class="mt-1 text-xs text-zinc-500">{{ __('JSON format (.json) only') }}</p>
         </div>
 
         <div class="flex gap-2">
