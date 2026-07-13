@@ -151,7 +151,7 @@ class SurveyIndex extends Component
         $this->validateReportDates();
 
         $service = app(ExcelReportService::class);
-        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate, $this->reportTemplateId);
+        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate);
 
         $filename = 'reporte-encuestas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.xlsx';
 
@@ -167,7 +167,7 @@ class SurveyIndex extends Component
         $this->validateReportDates();
 
         $service = app(SurveyReportService::class);
-        $pdf = $service->generateStatisticsReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod, $this->reportTemplateId);
+        $pdf = $service->generateStatisticsReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod);
 
         $filename = 'reporte-estadisticas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.pdf';
 

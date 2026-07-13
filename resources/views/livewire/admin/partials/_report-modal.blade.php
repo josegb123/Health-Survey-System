@@ -40,16 +40,6 @@
             <flux:input type="date" wire:model="reportEndDate" label="{{ __('End Date') }}" />
         </div>
 
-        <div>
-            <flux:select wire:model.live="reportTemplateId" label="{{ __('Survey Template') }}">
-                @forelse ($templates as $tpl)
-                    <flux:select.option :value="$tpl['id']">{{ $tpl['title'] }} ({{ $tpl['questions_count'] }} {{ __('questions') }})</flux:select.option>
-                @empty
-                    <flux:select.option :value="null" disabled>{{ __('No templates available') }}</flux:select.option>
-                @endforelse
-            </flux:select>
-        </div>
-
         <flux:separator />
 
         <div class="space-y-3">
@@ -103,12 +93,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <p class="text-xs text-purple-600 dark:text-purple-400">
-                        {{ __('Uses the template configured in') }}
-                        <a href="{{ route('admin.ministry-settings') }}" class="underline">{{ __('Ministry Report Settings') }}</a>.
-                        {{ __('The template selected above only applies to Excel and PDF reports.') }}
-                    </p>
 
                     <div class="max-w-xs">
                         <flux:input type="number" wire:model="reportConsecutive" label="{{ __('Consecutive') }}" min="1"
