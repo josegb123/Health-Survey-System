@@ -33,6 +33,14 @@
         ];
 
         $platformMenu[] = [
+            'label' => 'Insurers',
+            'route' => 'admin.insurers.index',
+            'active_pattern' => 'admin.insurers.*',
+            'icon' => 'building-storefront',
+            'navigate' => true,
+        ];
+
+        $platformMenu[] = [
             'label' => 'System Settings',
             'route' => 'admin.settings',
             'active_pattern' => 'admin.settings*',

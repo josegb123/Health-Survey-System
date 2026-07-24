@@ -10,7 +10,9 @@ use App\Services\ExcelReportService;
 use App\Services\MinistryReportGeneratorService;
 use App\Services\SurveyReportService;
 use Carbon\Carbon;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -45,6 +47,17 @@ class SurveyIndex extends Component
     public ?string $ministryConfigError = null;
 
     public array $templates = [];
+
+    // --- Delete flow ---
+    public int $selectedSurveyId = 0;
+
+    public string $selectedSurveyName = '';
+
+    public int $deleteStep = 0;
+
+    public string $deleteConfirmText = '';
+
+    public int $answerCount = 0;
 
     public function clearFilters(): void
     {
@@ -90,6 +103,76 @@ class SurveyIndex extends Component
         ])->findOrFail($id);
 
         $this->modal('view-survey-flyout')->show();
+    }
+
+    public function confirmDeleteSurvey(int $id): void
+    {
+        $survey = Survey::with('patient')->findOrFail($id);
+        $this->selectedSurveyId = $id;
+        $this->selectedSurveyName = $survey->patient?->name ?? __('Anonymous');
+        $this->answerCount = $survey->answers()->count();
+        $this->deleteStep = 1;
+        $this->deleteConfirmText = '';
+        $this->modal('delete-survey-modal')->show();
+    }
+
+    public function cancelDeleteSurvey(): void
+    {
+        $this->deleteStep = 0;
+        $this->deleteConfirmText = '';
+        $this->answerCount = 0;
+        $this->selectedSurveyId = 0;
+        $this->selectedSurveyName = '';
+        $this->modal('delete-survey-modal')->close();
+    }
+
+    public function proceedToDeleteStep2(): void
+    {
+        $this->deleteStep = 2;
+    }
+
+    public function deleteSurvey(): void
+    {
+        if (! auth()->user()->isAdmin()) {
+            return;
+        }
+
+        if ($this->selectedSurveyId === 0) {
+            return;
+        }
+
+        if ($this->deleteConfirmText !== __('DELETE ALL')) {
+            $this->addError('deleteConfirmText', __('The confirmation text does not match.'));
+
+            return;
+        }
+
+        try {
+            $survey = Survey::withTrashed()->with('patient')->findOrFail($this->selectedSurveyId);
+
+            if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
+                Storage::disk('local')->delete($survey->signature_path);
+            }
+
+            $survey->answers()->forceDelete();
+            $patient = $survey->patient;
+
+            $survey->forceDelete();
+
+            if ($patient && $patient->surveys()->withTrashed()->count() === 0) {
+                $patient->forceDelete();
+            }
+
+            $this->deleteStep = 0;
+            $this->deleteConfirmText = '';
+            $this->answerCount = 0;
+            $this->selectedSurveyId = 0;
+            $this->selectedSurveyName = '';
+            $this->modal('delete-survey-modal')->close();
+            Flux::toast(variant: 'success', text: __('Survey deleted successfully.'));
+        } catch (\Exception $e) {
+            Flux::toast(variant: 'danger', text: __('Failed to delete survey: :error', ['error' => $e->getMessage()]));
+        }
     }
 
     public function openReportModal(): void
@@ -151,7 +234,7 @@ class SurveyIndex extends Component
         $this->validateReportDates();
 
         $service = app(ExcelReportService::class);
-        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate, $this->reportTemplateId);
+        $spreadsheet = $service->generate($this->reportStartDate, $this->reportEndDate);
 
         $filename = 'reporte-encuestas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.xlsx';
 
@@ -167,7 +250,7 @@ class SurveyIndex extends Component
         $this->validateReportDates();
 
         $service = app(SurveyReportService::class);
-        $pdf = $service->generateStatisticsReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod, $this->reportTemplateId);
+        $pdf = $service->generateStatisticsReport($this->reportStartDate, $this->reportEndDate, $this->reportPeriod);
 
         $filename = 'reporte-estadisticas-'.$this->reportStartDate.'-a-'.$this->reportEndDate.'.pdf';
 

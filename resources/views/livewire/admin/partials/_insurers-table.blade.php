@@ -1,36 +1,44 @@
-<flux:table :paginate="$templates">
+<flux:table :paginate="$insurers">
     <flux:table.columns>
-        <flux:table.column>{{ __('Survey Title') }}</flux:table.column>
-        <flux:table.column class="text-center">{{ __('Questions') }}</flux:table.column>
+        <flux:table.column class="w-16">{{ __('ID') }}</flux:table.column>
+        <flux:table.column>{{ __('Name') }}</flux:table.column>
+        <flux:table.column>{{ __('Type') }}</flux:table.column>
+        <flux:table.column class="text-center">{{ __('Patients') }}</flux:table.column>
         <flux:table.column>{{ __('Status') }}</flux:table.column>
-        <flux:table.column>{{ __('Creation Date') }}</flux:table.column>
         <flux:table.column class="text-right">{{ __('Actions') }}</flux:table.column>
     </flux:table.columns>
 
     <flux:table.rows>
-        @forelse ($templates as $template)
-            <flux:table.row :key="$template->id">
+        @forelse ($insurers as $insurer)
+            <flux:table.row :key="$insurer->id">
+                <flux:table.cell>
+                    <span class="text-zinc-400 dark:text-zinc-500 text-xs font-mono">#{{ $insurer->id }}</span>
+                </flux:table.cell>
+
                 <flux:table.cell class="font-medium text-zinc-900 dark:text-white">
-                    <span class="text-zinc-400 dark:text-zinc-500 text-xs font-mono">#{{ $template->id }}</span>
-                    {{ $template->title }}
+                    {{ $insurer->name }}
+                </flux:table.cell>
+
+                <flux:table.cell>
+                    @if ($insurer->type === 'contributory')
+                        <flux:badge size="sm" color="blue" inset="top bottom">{{ __('Contributory') }}</flux:badge>
+                    @else
+                        <flux:badge size="sm" color="amber" inset="top bottom">{{ __('Subsidized') }}</flux:badge>
+                    @endif
                 </flux:table.cell>
 
                 <flux:table.cell class="text-center">
                     <flux:badge size="sm" color="zinc" inset="top bottom">
-                        {{ $template->questions_count }}
+                        {{ $insurer->patients_count }}
                     </flux:badge>
                 </flux:table.cell>
 
                 <flux:table.cell>
-                    @if ($template->is_active)
+                    @if ($insurer->is_active)
                         <flux:badge size="sm" color="green" inset="top bottom">{{ __('Active') }}</flux:badge>
                     @else
                         <flux:badge size="sm" color="red" inset="top bottom">{{ __('Inactive') }}</flux:badge>
                     @endif
-                </flux:table.cell>
-
-                <flux:table.cell class="text-sm text-zinc-500">
-                    {{ $template->created_at->format('d/m/Y H:i') }}
                 </flux:table.cell>
 
                 <flux:table.cell class="text-right">
@@ -38,25 +46,21 @@
                         <flux:button variant="ghost" icon="ellipsis-horizontal" size="sm" />
 
                         <flux:menu>
-                            <flux:menu.item wire:click="viewTemplate({{ $template->id }})" icon="eye">
-                                {{ __('View Detail') }}
-                            </flux:menu.item>
-
-                            <flux:menu.item icon="arrow-down-tray" wire:click="exportTemplate({{ $template->id }})">
-                                {{ __('Export JSON') }}
+                            <flux:menu.item wire:click="openEditModal({{ $insurer->id }})" icon="pencil">
+                                {{ __('Edit') }}
                             </flux:menu.item>
 
                             @if (auth()->user()->isAdmin())
                                 <flux:menu.item
-                                    wire:click="confirmToggleStatus({{ $template->id }}, '{{ addslashes($template->title) }}')"
+                                    wire:click="confirmToggleStatus({{ $insurer->id }}, '{{ addslashes($insurer->name) }}')"
                                     icon="arrow-path">
-                                    {{ $template->is_active ? __('Deactivate') : __('Activate') }}
+                                    {{ $insurer->is_active ? __('Deactivate') : __('Activate') }}
                                 </flux:menu.item>
 
                                 <flux:menu.separator />
 
                                 <flux:menu.item
-                                    wire:click="confirmDelete({{ $template->id }}, '{{ addslashes($template->title) }}')"
+                                    wire:click="confirmDelete({{ $insurer->id }}, '{{ addslashes($insurer->name) }}')"
                                     icon="trash" variant="danger">
                                     {{ __('Delete') }}
                                 </flux:menu.item>
@@ -67,8 +71,8 @@
             </flux:table.row>
         @empty
             <flux:table.row>
-                <flux:table.cell colspan="5" class="text-center py-8 text-zinc-400 italic">
-                    {{ __('No survey templates registered in the system.') }}
+                <flux:table.cell colspan="6" class="text-center py-8 text-zinc-400 italic">
+                    {{ __('No insurers registered in the system.') }}
                 </flux:table.cell>
             </flux:table.row>
         @endforelse

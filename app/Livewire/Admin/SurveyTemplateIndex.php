@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Survey;
 use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
 use App\Services\SurveyTemplateBuilderService;
+use Flux\Flux;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -28,6 +31,16 @@ class SurveyTemplateIndex extends Component
     public array $questions = []; // Colección dinámica de preguntas
 
     public ?SurveyTemplate $viewingTemplate = null;
+
+    // --- Delete flow ---
+    public int $deleteStep = 0;
+
+    public string $deleteConfirmText = '';
+
+    public int $deleteSurveyCount = 0;
+
+    // --- Duplicate name ---
+    public string $duplicateName = '';
 
     // Reglas de validación para el formulario compuesto
     protected array $rules = [
@@ -165,6 +178,17 @@ class SurveyTemplateIndex extends Component
 
         $this->validate();
 
+        $exists = SurveyTemplate::withTrashed()
+            ->whereRaw('LOWER(title) = ?', [mb_strtolower($this->title)])
+            ->exists();
+
+        if ($exists) {
+            $this->duplicateName = $this->title;
+            $this->modal('duplicate-name-modal')->show();
+
+            return;
+        }
+
         try {
             $templateData = [
                 'title' => $this->title,
@@ -177,10 +201,10 @@ class SurveyTemplateIndex extends Component
             $this->modal('create-template-flyout')->close();
             $this->reset(['title', 'is_active', 'questions']);
 
-            $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
+            Flux::toast(variant: 'success', text: __('Template and questions created successfully.'));
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error processing template: ').$e->getMessage());
+            Flux::toast(variant: 'danger', text: __('Error processing template: ').$e->getMessage());
         }
     }
 
@@ -209,19 +233,35 @@ class SurveyTemplateIndex extends Component
         if (! $this->selectedTemplateId) {
             return;
         }
-        SurveyTemplate::findOrFail($this->selectedTemplateId)->update([
-            'is_active' => ! SurveyTemplate::findOrFail($this->selectedTemplateId)->is_active,
-        ]);
+        $tmpl = SurveyTemplate::findOrFail($this->selectedTemplateId);
+        $tmpl->update(['is_active' => ! $tmpl->is_active]);
         $this->modal('status-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-        $this->dispatch('toast', type: 'success', text: __('Template status updated.'));
+        Flux::toast(variant: 'success', text: __('Template status updated.'));
     }
 
     public function confirmDelete(int $id, string $title): void
     {
         $this->selectedTemplateId = $id;
         $this->selectedTemplateTitle = $title;
+        $this->deleteSurveyCount = Survey::withTrashed()->where('survey_template_id', $id)->count();
+        $this->deleteStep = 1;
+        $this->deleteConfirmText = '';
         $this->modal('delete-modal')->show();
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->deleteStep = 0;
+        $this->deleteConfirmText = '';
+        $this->deleteSurveyCount = 0;
+        $this->modal('delete-modal')->close();
+        $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
+    }
+
+    public function proceedToDeleteStep2(): void
+    {
+        $this->deleteStep = 2;
     }
 
     public function deleteTemplate(): void
@@ -235,18 +275,37 @@ class SurveyTemplateIndex extends Component
         if (! $this->selectedTemplateId) {
             return;
         }
-        $template = SurveyTemplate::findOrFail($this->selectedTemplateId);
-        if ($template->surveys()->exists()) {
-            $this->modal('delete-modal')->close();
-            $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-            $this->dispatch('toast', type: 'error', text: __('Cannot delete a template that already has clinical responses.'));
+
+        if ($this->deleteSurveyCount > 0 && $this->deleteConfirmText !== __('DELETE ALL')) {
+            $this->addError('deleteConfirmText', __('The confirmation text does not match.'));
 
             return;
         }
-        $template->delete();
-        $this->modal('delete-modal')->close();
-        $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-        $this->dispatch('toast', type: 'success', text: __('Template deleted successfully.'));
+
+        try {
+            $template = SurveyTemplate::withTrashed()->findOrFail($this->selectedTemplateId);
+
+            if ($this->deleteSurveyCount > 0) {
+                $surveys = Survey::withTrashed()->where('survey_template_id', $template->id)->get();
+
+                foreach ($surveys as $survey) {
+                    if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
+                        Storage::disk('local')->delete($survey->signature_path);
+                    }
+                }
+            }
+
+            $template->forceDelete();
+
+            $this->deleteStep = 0;
+            $this->deleteConfirmText = '';
+            $this->deleteSurveyCount = 0;
+            $this->modal('delete-modal')->close();
+            $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
+            Flux::toast(variant: 'success', text: __('Template deleted successfully.'));
+        } catch (\Exception $e) {
+            Flux::toast(variant: 'danger', text: __('Failed to delete template: :error', ['error' => $e->getMessage()]));
+        }
     }
 
     /**
@@ -294,7 +353,7 @@ class SurveyTemplateIndex extends Component
         }
 
         if (! $this->importFile) {
-            $this->dispatch('toast', type: 'error', text: __('Please select a JSON file to import.'));
+            Flux::toast(variant: 'danger', text: __('Please select a JSON file to import.'));
 
             return;
         }
@@ -322,13 +381,26 @@ class SurveyTemplateIndex extends Component
                 'is_active' => $data['template']['is_active'] ?? true,
             ];
 
+            $exists = SurveyTemplate::withTrashed()
+                ->whereRaw('LOWER(title) = ?', [mb_strtolower($templateData['title'])])
+                ->exists();
+
+            if ($exists) {
+                $this->duplicateName = $templateData['title'];
+                $this->modal('import-modal')->close();
+                $this->modal('duplicate-name-modal')->show();
+
+                return;
+            }
+
             $builderService->createWithQuestions($templateData, $data['questions']);
 
+            $this->modal('import-modal')->close();
             $this->importFile = null;
-            $this->dispatch('toast', type: 'success', text: __('Template imported successfully.'));
+            Flux::toast(variant: 'success', text: __('Template imported successfully.'));
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error importing template: ').$e->getMessage());
+            Flux::toast(variant: 'danger', text: __('Error importing template: ').$e->getMessage());
         }
     }
 

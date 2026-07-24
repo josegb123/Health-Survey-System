@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
 use App\Services\SurveyTemplateBuilderService;
+use Flux\Flux;
 use Livewire\Component;
 
 class SurveyTemplateCreate extends Component
@@ -133,11 +134,6 @@ class SurveyTemplateCreate extends Component
         }
     }
 
-    public function confirmSave(): void
-    {
-        $this->modal('confirm-save-modal')->show();
-    }
-
     public function saveTemplate(): void
     {
         if (! auth()->user()->isAdmin()) {
@@ -156,8 +152,13 @@ class SurveyTemplateCreate extends Component
             }
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error processing template: ').$e->getMessage());
+            Flux::toast(variant: 'danger', text: __('Error processing template: ').$e->getMessage());
         }
+    }
+
+    private function closeAndRedirect(): void
+    {
+        $this->dispatch('redirect-to-index');
     }
 
     private function createNewTemplate(): void
@@ -168,8 +169,8 @@ class SurveyTemplateCreate extends Component
             'is_active' => $this->is_active,
         ], $this->questions);
 
-        $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
-        $this->redirect(route('admin.survey-templates.index'));
+        Flux::toast(variant: 'success', text: __('Template and questions created successfully.'));
+        $this->closeAndRedirect();
     }
 
     private function updateExistingTemplate(): void
@@ -194,8 +195,8 @@ class SurveyTemplateCreate extends Component
             ]);
         }
 
-        $this->dispatch('toast', type: 'success', text: __('Template updated successfully.'));
-        $this->redirect(route('admin.survey-templates.index'));
+        Flux::toast(variant: 'success', text: __('Template updated successfully.'));
+        $this->closeAndRedirect();
     }
 
     public function render()

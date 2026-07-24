@@ -1,0 +1,168 @@
+[11-Jul-2026 18:13:57 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:19:14 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:19:20 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:19:32 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:19:52 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:19:59 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:20:10 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:20:16 UTC] PHP Fatal error:  Uncaught ReflectionException: Class "Kernel" does not exist in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1125
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(1125): ReflectionClass->__construct()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#5 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#6 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [Kernel] does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php:1127
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(936): Illuminate\Container\Container->build()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1078): Illuminate\Container\Container->resolve()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php(864): Illuminate\Foundation\Application->resolve()
+#3 /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1058): Illuminate\Container\Container->make()
+#4 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(12): Illuminate\Foundation\Application->make()
+#5 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Container/Container.php on line 1127
+[11-Jul-2026 18:22:08 UTC] PHP Fatal error:  Uncaught BadMethodCallException: Method Illuminate\Foundation\Application::bootstrap does not exist. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:117
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(15): Illuminate\Foundation\Application->__call()
+#1 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php on line 117
+[11-Jul-2026 18:22:56 UTC] PHP Fatal error:  Uncaught RuntimeException: A facade root has not been set. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:360
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/app/Models/SystemSetting.php(89): Illuminate\Support\Facades\Facade::__callStatic()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(22): App\Models\SystemSetting::set()
+#2 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 360
+[11-Jul-2026 18:24:54 UTC] PHP Fatal error:  Uncaught RuntimeException: A facade root has not been set. in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:360
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(21): Illuminate\Support\Facades\Facade::__callStatic()
+#1 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 360

@@ -27,41 +27,74 @@ class MinistryReportGeneratorService
             ->whereBetween('created_at', [$start, $end])
             ->get();
 
-        $counters = [];
-        $totalCounterSlots = 10;
+        $pipeMapping = \App\Models\MinistryReportConfig::set()->pipe_mapping ?? [];
 
+        // Build indexed counters: key = "{question_id}_{option_index}" => count
+        $indexedCounters = [];
         foreach ($questions as $question) {
             $options = $question->options ?? [];
-            $optionCounts = array_fill(0, count($options), 0);
+            foreach ($options as $i => $opt) {
+                $indexedCounters[$question->id . '_' . $i] = 0;
+            }
+        }
 
-            foreach ($surveys as $survey) {
-                foreach ($survey->answers as $answer) {
-                    if ((int) $answer->survey_question_id !== $question->id) {
-                        continue;
-                    }
+        foreach ($surveys as $survey) {
+            foreach ($survey->answers as $answer) {
+                $question = $questions->firstWhere('id', $answer->survey_question_id);
+                if (! $question) {
+                    continue;
+                }
 
-                    foreach ($options as $i => $opt) {
-                        $label = $opt['label'] ?? $opt;
-                        if (CalculateSurveyRating::normalize($answer->answer_value) === CalculateSurveyRating::normalize($label)) {
-                            $optionCounts[$i]++;
-                            break;
-                        }
+                $options = $question->options ?? [];
+                foreach ($options as $i => $opt) {
+                    $label = $opt['label'] ?? $opt;
+                    if (CalculateSurveyRating::normalize($answer->answer_value) === CalculateSurveyRating::normalize($label)) {
+                        $key = $question->id . '_' . $i;
+                        $indexedCounters[$key] = ($indexedCounters[$key] ?? 0) + 1;
+                        break;
                     }
                 }
             }
-
-            array_push($counters, ...$optionCounts);
         }
 
-        $counters = array_pad($counters, $totalCounterSlots, 0);
-        $counters = array_slice($counters, 0, $totalCounterSlots);
+        $totalCounterSlots = 10;
+        $result = array_fill(0, $totalCounterSlots, 0);
+        $touchedSlots = array_fill(0, $totalCounterSlots, false);
+
+        $assigned = [];
+        foreach ($pipeMapping as $key => $position) {
+            $position = (int) $position;
+            if ($position < 1 || $position > $totalCounterSlots) {
+                continue;
+            }
+            $idx = $position - 1;
+            $result[$idx] = ($indexedCounters[$key] ?? 0);
+            $touchedSlots[$idx] = true;
+            $assigned[$key] = true;
+        }
+
+        $nextSlot = 0;
+        foreach ($indexedCounters as $key => $count) {
+            if (isset($assigned[$key])) {
+                continue;
+            }
+            while ($nextSlot < $totalCounterSlots && $touchedSlots[$nextSlot]) {
+                $nextSlot++;
+            }
+            if ($nextSlot >= $totalCounterSlots) {
+                break;
+            }
+            $result[$nextSlot] = $count;
+            $touchedSlots[$nextSlot] = true;
+            $nextSlot++;
+        }
 
         return implode('|', [
             $settings->registry_type ?? 3,
             $consecutive,
             $settings->entity_type ?? 'NI',
             $settings->company_dni ?? '',
-            ...$counters,
+            ...$result,
         ]);
     }
 }

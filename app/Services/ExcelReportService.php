@@ -7,241 +7,259 @@ use App\Models\Survey;
 use App\Models\SurveyTemplate;
 use App\Models\SystemSetting;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class ExcelReportService
 {
+    // Constant for unified font configuration across all sheets
+    private const DEFAULT_FONT_NAME = 'Aptos Narrow';
+
+    /**
+     * Entry point to generate the satisfaction survey Excel report.
+     */
     public function generate(string $startDate, string $endDate, ?int $templateId = null): Spreadsheet
     {
-        $start = Carbon::parse($startDate)->startOfDay();
-        $end = Carbon::parse($endDate)->endOfDay();
+        // Define the start and end of the requested date range
+        $startOfDay = Carbon::parse($startDate)->startOfDay();
+        $endOfDay = Carbon::parse($endDate)->endOfDay();
 
-        if (! $templateId) {
-            $settings = SystemSetting::set();
-            $templateId = $settings->default_survey_template_id;
+        // Fallback to the system's default template if no template ID is provided
+        if (!$templateId) {
+            $systemSettings = SystemSetting::set();
+            $templateId = $systemSettings?->default_survey_template_id;
         }
 
-        if (! $templateId) {
-            $spreadsheet = new Spreadsheet;
+        $spreadsheet = new Spreadsheet;
+
+        // Graceful error handling: If no template ID is defined, return an informative sheet
+        if (!$templateId) {
             $spreadsheet->getActiveSheet()->setCellValue('A1', __('No default survey template configured.'));
 
             return $spreadsheet;
         }
 
-        $template = SurveyTemplate::with(['surveyQuestions' => function ($q) {
-            $q->orderBy('order');
-        }])->find($templateId);
+        // Fetch survey template along with its ordered questions
+        $surveyTemplate = SurveyTemplate::with([
+            'surveyQuestions' => function ($query) {
+                $query->orderBy('order');
+            }
+        ])->find($templateId);
 
-        if (! $template) {
-            $spreadsheet = new Spreadsheet;
+        // Graceful error handling: If the template ID is invalid, return an informative sheet
+        if (!$surveyTemplate) {
             $spreadsheet->getActiveSheet()->setCellValue('A1', __('Default template not found.'));
 
             return $spreadsheet;
         }
 
-        $questions = $template->surveyQuestions;
+        $questions = $surveyTemplate->surveyQuestions;
 
-        $surveys = Survey::with(['patient', 'answers'])
-            ->where('survey_template_id', $template->id)
+        // Fetch completed surveys within the date range, eager loading patient and answers relationships
+        $completedSurveys = Survey::with(['patient', 'answers'])
+            ->where('survey_template_id', $surveyTemplate->id)
             ->where('status', 'completed')
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('created_at', [$startOfDay, $endOfDay])
             ->orderBy('created_at')
             ->get();
 
-        $spreadsheet = new Spreadsheet;
+        // Remove the default initial worksheet created automatically by PhpSpreadsheet
         $spreadsheet->removeSheetByIndex(0);
 
-        foreach ($questions as $qIndex => $question) {
-            $sheetName = 'PREGUNTA '.($qIndex + 1);
-            $ws = $spreadsheet->createSheet($qIndex);
-            $ws->setTitle($sheetName);
-
-            $options = $question->options ?? [];
-            $hasOptions = in_array($question->field_type, ['radio', 'select']) && ! empty($options);
-
-            // 1. Configuración de anchos base
-            $ws->getColumnDimension('A')->setWidth(3);
-            $ws->getColumnDimension('B')->setWidth(12); // ID
-            $ws->getColumnDimension('C')->setWidth(46); // PACIENTE
-
-            // 2. Configuración de anchos para las opciones (si existen)
-            if ($hasOptions) {
-                $colLetter = 'D';
-                foreach ($options as $opt) {
-                    $ws->getColumnDimension($colLetter)->setWidth(max(16, mb_strlen($opt['label'] ?? $opt) + 4));
-                    $colLetter++;
-                }
-            }
-
-            // 3. Mapeo dinámico y correcto de las columnas restantes tras las opciones
-            $ponderadoCol = $hasOptions
-                ? $this->lastColLetter(4 + count($options))
-                : 'D';
-            $ws->getColumnDimension($ponderadoCol)->setWidth(14);
-
-            $fechaCol = $this->lastColLetter($this->colIndex($ponderadoCol) + 1);
-            $ws->getColumnDimension($fechaCol)->setWidth(14);
-
-            $obsCol = $this->lastColLetter($this->colIndex($fechaCol) + 1);
-            $ws->getColumnDimension($obsCol)->setWidth(28);
-
-            $totalCols = $this->colIndex($obsCol);
-            $lastCol = $this->lastColLetter($totalCols);
-
-            // Cabeceras principales
-            $ws->mergeCells('B2:'.$lastCol.'2');
-            $ws->setCellValue('B2', 'TABULACION ENCUESTA DE SATISFACCION');
-            $ws->getStyle('B2')->getFont()->setBold(true)->setSize(12)->setName('Aptos Narrow');
-            $ws->getStyle('B2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            $ws->mergeCells('B3:'.$lastCol.'3');
-            $dt = Carbon::parse($startDate);
-            $ws->setCellValue('B3', $dt);
-            $ws->getStyle('B3')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-            $ws->getStyle('B3')->getFont()->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle('B3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            $ws->mergeCells('B4:'.$lastCol.'4');
-            $ws->setCellValue('B4', ($qIndex + 1).'. '.mb_strtoupper($question->question_text));
-            $ws->getStyle('B4')->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle('B4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
-
-            // Estructura de la tabla (Fila 5 y 6 modificadas)
-            $headerRow = 5;
-            $ws->mergeCells('B'.$headerRow.':B'.($headerRow + 1));
-            $ws->setCellValue('B'.$headerRow, 'ID');
-            $ws->getStyle('B'.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle('B'.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            $ws->mergeCells('C'.$headerRow.':C'.($headerRow + 1));
-            $ws->setCellValue('C'.$headerRow, 'PACIENTE');
-            $ws->getStyle('C'.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle('C'.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            $colLetter = 'D';
-            if ($hasOptions) {
-                foreach ($options as $opt) {
-                    $label = $opt['label'] ?? $opt;
-                    $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
-                    $ws->setCellValue($colLetter.$headerRow, $label);
-                    $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-                    $ws->getStyle($colLetter.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
-                    $colLetter++;
-                }
-            }
-
-            $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
-            $ws->setCellValue($colLetter.$headerRow, 'PONDERADO');
-            $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle($colLetter.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $colLetter++;
-
-            $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
-            $ws->setCellValue($colLetter.$headerRow, 'FECHA');
-            $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle($colLetter.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $colLetter++;
-
-            $ws->mergeCells($colLetter.$headerRow.':'.$colLetter.($headerRow + 1));
-            $ws->setCellValue($colLetter.$headerRow, 'OBSERVACIONES');
-            $ws->getStyle($colLetter.$headerRow)->getFont()->setBold(true)->setSize(11)->setName('Aptos Narrow');
-            $ws->getStyle('B'.$headerRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            // Renderizado de datos por cada fila
-            $row = 7;
-            foreach ($surveys as $survey) {
-                $patient = $survey->patient;
-                $ws->setCellValue('B'.$row, $patient->id);
-                $ws->getStyle('B'.$row)->getFont()->setSize(11)->setName('Aptos Narrow');
-                $ws->getStyle('B'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-                $patientName = ($patient->dni ?? '').' '.($patient->name ?? '');
-                $ws->setCellValue('C'.$row, $patientName);
-                $ws->getStyle('C'.$row)->getFont()->setSize(11)->setName('Aptos Narrow');
-                $ws->getStyle('C'.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
-                $matchedAnswer = null;
-                foreach ($survey->answers as $answer) {
-                    if ((int) $answer->survey_question_id === $question->id) {
-                        $matchedAnswer = $answer;
-                        break;
-                    }
-                }
-
-                $colLetter = 'D';
-                if ($hasOptions && $matchedAnswer) {
-                    foreach ($options as $opt) {
-                        $label = $opt['label'] ?? $opt;
-                        if (CalculateSurveyRating::normalize($matchedAnswer->answer_value) === CalculateSurveyRating::normalize($label)) {
-                            $ws->setCellValue($colLetter.$row, 'X');
-                            $ws->getStyle($colLetter.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                        }
-                        $colLetter++;
-                    }
-                } elseif ($hasOptions) {
-                    // Si tiene opciones pero no hay respuesta, salta las columnas de las opciones
-                    $colLetter = $this->lastColLetter(4 + count($options));
-                }
-
-                // Columna PONDERADO / VALOR
-                if ($matchedAnswer !== null && $matchedAnswer->weighted_value !== null) {
-                    $ws->setCellValue($colLetter.$row, $matchedAnswer->weighted_value);
-                    $ws->getStyle($colLetter.$row)->getNumberFormat()->setFormatCode('0.00');
-                    $ws->getStyle($colLetter.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                } elseif ($question->field_type === 'number' && $matchedAnswer && is_numeric($matchedAnswer->answer_value)) {
-                    $ws->setCellValue($colLetter.$row, (float) $matchedAnswer->answer_value);
-                    $ws->getStyle($colLetter.$row)->getNumberFormat()->setFormatCode('0.00');
-                    $ws->getStyle($colLetter.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                } elseif ($question->field_type === 'text' && $matchedAnswer) {
-                    $ws->setCellValue($colLetter.$row, $matchedAnswer->answer_value);
-                    $ws->getStyle($colLetter.$row)->getFont()->setSize(11)->setName('Aptos Narrow');
-                    $ws->getStyle($colLetter.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-                }
-                $colLetter++;
-
-                // Columna FECHA
-                if ($survey->created_at) {
-                    $ws->setCellValue($colLetter.$row, $survey->created_at);
-                    $ws->getStyle($colLetter.$row)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-                    $ws->getStyle($colLetter.$row)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                }
-                $colLetter++;
-
-                // Columna OBSERVACIONES
-                $ws->setCellValue($colLetter.$row, '');
-                $ws->getStyle($colLetter.$row)->getFont()->setSize(11)->setName('Aptos Narrow');
-
-                $row++;
-            }
-
-            $ws->getRowDimension(2)->setRowHeight(15.75);
-            $ws->getRowDimension(4)->setRowHeight(15);
+        // Generate one worksheet per survey question
+        foreach ($questions as $questionIndex => $question) {
+            $this->buildQuestionWorksheet($spreadsheet, $question, $completedSurveys, $questionIndex, $startOfDay);
         }
 
         return $spreadsheet;
     }
 
-    private function lastColLetter(int $colIndex): string
-    {
-        $letter = '';
-        while ($colIndex > 0) {
-            $colIndex--;
-            $letter = chr(65 + ($colIndex % 26)).$letter;
-            $colIndex = intdiv($colIndex, 26);
+    /**
+     * Builds and styles a single worksheet corresponding to one survey question.
+     */
+    private function buildQuestionWorksheet(
+        Spreadsheet $spreadsheet,
+        object $question,
+        Collection $completedSurveys,
+        int $questionIndex,
+        Carbon $startDateCarbon
+    ): void {
+        // Create a new worksheet tab for the current question index
+        $worksheet = $spreadsheet->createSheet($questionIndex);
+        $worksheet->setTitle('PREGUNTA ' . ($questionIndex + 1));
+
+        $questionOptions = $question->options ?? [];
+        $isChoiceQuestion = in_array($question->field_type, ['radio', 'select']) && !empty($questionOptions);
+        $isTextQuestion = $question->field_type === 'text';
+
+        // 1. Build dynamic column specifications based on question type
+        $columnConfigurations = [
+            'ID' => ['label' => 'ID', 'width' => 12, 'align' => Alignment::HORIZONTAL_CENTER],
+            'PATIENT' => ['label' => 'PACIENTE', 'width' => 46, 'align' => Alignment::HORIZONTAL_LEFT],
+        ];
+
+        // Append option columns if it is a choice question
+        if ($isChoiceQuestion) {
+            foreach ($questionOptions as $option) {
+                $optionLabel = $option['label'] ?? $option;
+                $columnConfigurations['OPT_' . $optionLabel] = [
+                    'label' => $optionLabel,
+                    'width' => max(16, mb_strlen($optionLabel) + 4),
+                    'align' => Alignment::HORIZONTAL_CENTER,
+                    'is_option' => true,
+                ];
+            }
         }
 
-        return $letter;
-    }
-
-    private function colIndex(string $colLetter): int
-    {
-        $index = 0;
-        $len = strlen($colLetter);
-        for ($i = 0; $i < $len; $i++) {
-            $index = $index * 26 + (ord($colLetter[$i]) - 64);
+        // Append answer column if it is a text-based question
+        if ($isTextQuestion) {
+            $columnConfigurations['TEXT_ANSWER'] = [
+                'label' => 'RESPUESTA',
+                'width' => 40,
+                'align' => Alignment::HORIZONTAL_LEFT,
+            ];
         }
 
-        return $index;
+        // Standard trailing columns for ratings and metadata
+        $columnConfigurations['WEIGHTED'] = ['label' => 'PONDERADO', 'width' => 14, 'align' => Alignment::HORIZONTAL_CENTER];
+        $columnConfigurations['DATE'] = ['label' => 'FECHA', 'width' => 14, 'align' => Alignment::HORIZONTAL_CENTER];
+        $columnConfigurations['OBSERVATIONS'] = ['label' => 'OBSERVACIONES', 'width' => 28, 'align' => Alignment::HORIZONTAL_LEFT];
+
+        // Set left margin spacing in Column A
+        $worksheet->getColumnDimension('A')->setWidth(3);
+
+        // Map column identifiers to physical Excel column letters (starting at B)
+        $currentColumnIndex = 2;
+        $columnLetterMapping = [];
+
+        foreach ($columnConfigurations as $columnKey => $columnConfig) {
+            $columnLetter = Coordinate::stringFromColumnIndex($currentColumnIndex);
+            $columnLetterMapping[$columnKey] = $columnLetter;
+            $worksheet->getColumnDimension($columnLetter)->setWidth($columnConfig['width']);
+            $currentColumnIndex++;
+        }
+
+        $firstDataColumnLetter = 'B';
+        $lastDataColumnLetter = Coordinate::stringFromColumnIndex($currentColumnIndex - 1);
+
+        // 2. Render Report Main Headers (Rows 2, 3, and 4)
+        $headerRows = [
+            2 => 'TABULACION ENCUESTA DE SATISFACCION',
+            3 => Date::dateTimeToExcel($startDateCarbon),
+            4 => ($questionIndex + 1) . '. ' . mb_strtoupper($question->question_text),
+        ];
+
+        // Apply unified alignment and font to the entire header region at once
+        $headerRange = "{$firstDataColumnLetter}2:{$lastDataColumnLetter}4";
+        $worksheet->getStyle($headerRange)->getFont()->setName(self::DEFAULT_FONT_NAME);
+        $worksheet->getStyle($headerRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        foreach ($headerRows as $rowNumber => $value) {
+            $cellCoordinate = "{$firstDataColumnLetter}{$rowNumber}";
+            $rowRange = "{$cellCoordinate}:{$lastDataColumnLetter}{$rowNumber}";
+
+            $worksheet->mergeCells($rowRange);
+            $worksheet->setCellValue($cellCoordinate, $value);
+        }
+
+        // Specific styling rules per header row
+        $worksheet->getStyle("{$firstDataColumnLetter}2")->getFont()->setBold(true)->setSize(12);
+        $worksheet->getStyle("{$firstDataColumnLetter}3")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+        $worksheet->getStyle("{$firstDataColumnLetter}4")->getFont()->setBold(true);
+        $worksheet->getStyle("{$firstDataColumnLetter}4")->getAlignment()->setWrapText(true);
+
+        // Apply visual styles to main headers
+        $worksheet->getStyle("{$firstDataColumnLetter}2:{$lastDataColumnLetter}4")->getFont()->setName(self::DEFAULT_FONT_NAME);
+        $worksheet->getStyle("{$firstDataColumnLetter}4")->getFont()->setBold(true);
+        $worksheet->getStyle("{$firstDataColumnLetter}4")->getAlignment()->setWrapText(true);
+
+        // 3. Render Table Column Headers (Rows 5 and 6)
+        $headerStartRow = 5;
+        foreach ($columnConfigurations as $columnKey => $columnConfig) {
+            $columnLetter = $columnLetterMapping[$columnKey];
+
+            $worksheet->mergeCells("{$columnLetter}{$headerStartRow}:{$columnLetter}" . ($headerStartRow + 1));
+            $worksheet->setCellValue("{$columnLetter}{$headerStartRow}", $columnConfig['label']);
+
+            $worksheet->getStyle("{$columnLetter}{$headerStartRow}")
+                ->getFont()->setBold(true)->setSize(11)->setName(self::DEFAULT_FONT_NAME);
+            $worksheet->getStyle("{$columnLetter}{$headerStartRow}")
+                ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
+        }
+
+        // 4. Render Survey Data Rows (Starting at Row 7)
+        $currentRow = 7;
+        foreach ($completedSurveys as $survey) {
+            $patient = $survey->patient;
+
+            // Direct index lookup for the answer related to the current question (O(1) in memory)
+            $matchedAnswer = $survey->answers->firstWhere('survey_question_id', $question->id);
+
+            // Populate Patient ID (Column B)
+            $worksheet->setCellValue($columnLetterMapping['ID'] . $currentRow, $patient->id ?? 'N/A');
+
+            // Populate Patient Full Identifier (Column C)
+            $patientFullName = trim(($patient->dni ?? '') . ' ' . ($patient->name ?? ''));
+            $worksheet->setCellValue($columnLetterMapping['PATIENT'] . $currentRow, $patientFullName);
+
+            // Render choice selections ('X') if applicable
+            if ($isChoiceQuestion && $matchedAnswer) {
+                $normalizedAnswerValue = CalculateSurveyRating::normalize($matchedAnswer->answer_value);
+                foreach ($questionOptions as $option) {
+                    $optionLabel = $option['label'] ?? $option;
+                    if (CalculateSurveyRating::normalize($optionLabel) === $normalizedAnswerValue) {
+                        $worksheet->setCellValue($columnLetterMapping['OPT_' . $optionLabel] . $currentRow, 'X');
+                    }
+                }
+            }
+
+            // Render text answer if question type is text
+            if ($isTextQuestion) {
+                $textValue = $matchedAnswer ? trim((string) $matchedAnswer->answer_value) : '';
+                $worksheet->setCellValue($columnLetterMapping['TEXT_ANSWER'] . $currentRow, $textValue);
+            }
+
+            // Calculate and render Weighted Score
+            if ($isTextQuestion) {
+                // For text questions: 5.00 if responded, 1.00 if unanswered or empty
+                $hasTextAnswer = $matchedAnswer && !empty(trim((string) $matchedAnswer->answer_value));
+                $weightedScore = $hasTextAnswer ? 5.00 : 1.00;
+
+                $worksheet->setCellValue($columnLetterMapping['WEIGHTED'] . $currentRow, $weightedScore);
+                $worksheet->getStyle($columnLetterMapping['WEIGHTED'] . $currentRow)->getNumberFormat()->setFormatCode('0.00');
+            } elseif ($matchedAnswer !== null && $matchedAnswer->weighted_value !== null) {
+                $worksheet->setCellValue($columnLetterMapping['WEIGHTED'] . $currentRow, (float) $matchedAnswer->weighted_value);
+                $worksheet->getStyle($columnLetterMapping['WEIGHTED'] . $currentRow)->getNumberFormat()->setFormatCode('0.00');
+            } elseif ($question->field_type === 'number' && $matchedAnswer && is_numeric($matchedAnswer->answer_value)) {
+                $worksheet->setCellValue($columnLetterMapping['WEIGHTED'] . $currentRow, (float) $matchedAnswer->answer_value);
+                $worksheet->getStyle($columnLetterMapping['WEIGHTED'] . $currentRow)->getNumberFormat()->setFormatCode('0.00');
+            }
+
+            // Populate Survey Submission Date
+            if ($survey->created_at) {
+                $worksheet->setCellValue($columnLetterMapping['DATE'] . $currentRow, Date::dateTimeToExcel($survey->created_at));
+                $worksheet->getStyle($columnLetterMapping['DATE'] . $currentRow)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_DDMMYYYY);
+            }
+
+            // Populate Observations (Empty placeholder)
+            $worksheet->setCellValue($columnLetterMapping['OBSERVATIONS'] . $currentRow, '');
+
+            // Apply fonts and horizontal alignment to the entire row cells
+            foreach ($columnConfigurations as $columnKey => $columnConfig) {
+                $cellAddress = $columnLetterMapping[$columnKey] . $currentRow;
+                $worksheet->getStyle($cellAddress)->getFont()->setName(self::DEFAULT_FONT_NAME)->setSize(11);
+                $worksheet->getStyle($cellAddress)->getAlignment()->setHorizontal($columnConfig['align']);
+            }
+
+            $currentRow++;
+        }
+
+        // Adjust row heights to match target design
+        $worksheet->getRowDimension(2)->setRowHeight(15.75);
+        $worksheet->getRowDimension(4)->setRowHeight(15);
     }
 }

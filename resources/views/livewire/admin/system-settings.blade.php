@@ -35,7 +35,7 @@
                 <option value="">-- {{ __('Select a template') }} --</option>
                 @foreach (\App\Models\SurveyTemplate::withCount('questions')->latest()->get() as $template)
                     <option value="{{ $template->id }}">
-                        {{ $template->title }} ({{ $template->questions_count }} {{ __('questions') }})
+                        #{{ $template->id }} — {{ $template->title }} ({{ $template->questions_count }} {{ __('questions') }})
                     </option>
                 @endforeach
             </flux:select>
@@ -216,5 +216,218 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    {{-- SECTION 7: Delete All Signatures --}}
+    <div class="p-6 bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-900/50 rounded-xl space-y-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-full">
+                <flux:icon name="pencil-square" variant="outline" class="h-5 w-5" />
+            </div>
+            <div>
+                <flux:heading size="md">{{ __('Delete All Signatures') }}</flux:heading>
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Permanently delete all signature image files stored on disk. The signature_path references in surveys will remain but the files will no longer exist.') }}
+                </flux:text>
+            </div>
+        </div>
+
+        <flux:separator />
+
+        @if ($signatureStep === 0)
+            <div class="flex justify-end">
+                <flux:button variant="danger" wire:click="startSignatureDelete">
+                    {{ __('Delete All Signatures') }}
+                </flux:button>
+            </div>
+        @elseif ($signatureStep === 1)
+            <div class="space-y-4">
+                <div class="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="exclamation-triangle" variant="outline" class="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-amber-700 dark:text-amber-300 space-y-3">
+                            <p class="font-semibold">{{ __('Final Confirmation') }}</p>
+                            <p>{{ __('To proceed, type the following text exactly:') }}</p>
+                            <p class="font-mono font-bold text-base bg-amber-100 dark:bg-amber-900/40 px-3 py-1.5 rounded inline-block">
+                                {{ __('DELETE ALL') }}
+                            </p>
+                            <div>
+                                <flux:input
+                                    wire:model="signatureConfirmText"
+                                    placeholder="{{ __('Type the confirmation text here') }}"
+                                    :error="$errors->first('signatureConfirmText')"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <flux:button variant="ghost" wire:click="cancelSignatureDelete">
+                        {{ __('Cancel') }}
+                    </flux:button>
+                    <flux:button variant="danger" wire:click="confirmSignatureDelete">
+                        {{ __('Permanently Delete') }}
+                    </flux:button>
+                </div>
+            </div>
+        @elseif ($signatureStep === 2)
+            <div class="space-y-4">
+                <div class="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="check-circle" variant="outline" class="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-green-700 dark:text-green-300">
+                            <p class="font-semibold">{{ __('Result') }}</p>
+                            <p>{{ $signatureResult }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <flux:button variant="primary" wire:click="cancelSignatureDelete">
+                        {{ __('Done') }}
+                    </flux:button>
+                </div>
+            </div>
+        @endif
+    </div>
+
+    {{-- SECTION 8: Reset Database --}}
+    <div class="p-6 bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900/50 rounded-xl space-y-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-full">
+                <flux:icon name="arrow-path" variant="outline" class="h-5 w-5" />
+            </div>
+            <div>
+                <flux:heading size="md">{{ __('Reset Database') }}</flux:heading>
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Permanently delete ALL patients, surveys, survey answers, and signature files. Users and permissions are preserved. This action cannot be undone.') }}
+                </flux:text>
+            </div>
+        </div>
+
+        <flux:separator />
+
+        @if ($resetStep === 0)
+            <div class="flex justify-end">
+                <flux:button variant="danger" wire:click="startReset">
+                    {{ __('Reset Database') }}
+                </flux:button>
+            </div>
+        @elseif ($resetStep === 1)
+            <div class="space-y-4">
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="exclamation-triangle" variant="outline" class="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-red-700 dark:text-red-300 space-y-3">
+                            <p class="font-semibold">{{ __('Warning: This action is irreversible') }}</p>
+                            <p>{{ __('This will permanently delete ALL patients, surveys, survey answers, and signature files from the system. Users and configuration will be preserved. This data cannot be recovered.') }}</p>
+                            <p>{{ __('To proceed, type the following text exactly:') }}</p>
+                            <p class="font-mono font-bold text-base bg-red-100 dark:bg-red-900/40 px-3 py-1.5 rounded inline-block">
+                                {{ __('DELETE ALL') }}
+                            </p>
+                            <div>
+                                <flux:input
+                                    wire:model="resetConfirmText"
+                                    placeholder="{{ __('Type the confirmation text here') }}"
+                                    :error="$errors->first('resetConfirmText')"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <flux:button variant="ghost" wire:click="cancelReset">
+                        {{ __('Cancel') }}
+                    </flux:button>
+                    <flux:button variant="danger" wire:click="confirmReset">
+                        {{ __('Permanently Delete All Data') }}
+                    </flux:button>
+                </div>
+            </div>
+        @elseif ($resetStep === 2)
+            <div class="space-y-4">
+                <div class="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="check-circle" variant="outline" class="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-green-700 dark:text-green-300">
+                            <p class="font-semibold">{{ __('Result') }}</p>
+                            <p>{{ $resetResult }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <flux:button variant="primary" wire:click="cancelReset">
+                        {{ __('Done') }}
+                    </flux:button>
+                </div>
+            </div>
+        @endif
+    </div>
+
+    {{-- SECTION 9: Export / Import Settings --}}
+    <div class="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-full">
+                <flux:icon name="arrow-down-tray" variant="outline" class="h-5 w-5" />
+            </div>
+            <div>
+                <flux:heading size="md">{{ __('Export / Import Settings') }}</flux:heading>
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Export the current system settings and ministry report configuration as a JSON file, or import a previously exported configuration.') }}
+                </flux:text>
+            </div>
+        </div>
+
+        <flux:separator />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- Export --}}
+            <div class="p-4 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200 dark:border-zinc-700 rounded-lg space-y-3">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="arrow-up-tray" variant="outline" class="h-4 w-4 text-zinc-500" />
+                    <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Export') }}</span>
+                </div>
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Download a JSON file with all system and ministry report settings.') }}
+                </flux:text>
+                <flux:button variant="primary" wire:click="exportSettings" class="w-full">
+                    {{ __('Download Configuration') }}
+                </flux:button>
+            </div>
+
+            {{-- Import --}}
+            <div class="p-4 bg-zinc-50 dark:bg-zinc-800/30 border border-zinc-200 dark:border-zinc-700 rounded-lg space-y-3">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="arrow-down-tray" variant="outline" class="h-4 w-4 text-zinc-500" />
+                    <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ __('Import') }}</span>
+                </div>
+                <flux:text size="sm" class="text-zinc-500">
+                    {{ __('Upload a JSON configuration file. This will overwrite current settings.') }}
+                </flux:text>
+                <div class="space-y-2">
+                    <input
+                        type="file"
+                        wire:model="importFile"
+                        accept=".json"
+                        class="block w-full text-sm text-zinc-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-950/40 dark:file:text-blue-300 dark:hover:file:bg-blue-950/60 file:cursor-pointer"
+                    />
+                    @error('importFile')
+                        <p class="text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <flux:button
+                    variant="primary"
+                    wire:click="importSettings"
+                    wire:confirm="{{ __('This will overwrite your current configuration. Are you sure?') }}"
+                    :disabled="! $importFile"
+                    class="w-full"
+                >
+                    {{ __('Import Configuration') }}
+                </flux:button>
+            </div>
+        </div>
     </div>
 </div>

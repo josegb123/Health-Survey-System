@@ -81,10 +81,24 @@
                     </flux:table.cell>
 
                     <flux:table.cell class="text-right">
-                        <flux:button size="sm" variant="subtle" icon="eye"
-                            wire:click="viewSurvey({{ $survey->id }})">
-                            {{ __('View Detail') }}
-                        </flux:button>
+                        @if (auth()->user()->isAdmin())
+                            <flux:dropdown position="bottom-end">
+                                <flux:button size="sm" icon="ellipsis-vertical" variant="subtle" />
+                                <flux:menu>
+                                    <flux:menu.item icon="eye" wire:click="viewSurvey({{ $survey->id }})">
+                                        {{ __('View Detail') }}
+                                    </flux:menu.item>
+                                    <flux:menu.item icon="trash" wire:click="confirmDeleteSurvey({{ $survey->id }})" class="text-red-600 dark:text-red-400">
+                                        {{ __('Delete') }}
+                                    </flux:menu.item>
+                                </flux:menu>
+                            </flux:dropdown>
+                        @else
+                            <flux:button size="sm" variant="subtle" icon="eye"
+                                wire:click="viewSurvey({{ $survey->id }})">
+                                {{ __('View Detail') }}
+                            </flux:button>
+                        @endif
                     </flux:table.cell>
                 </flux:table.row>
             @empty
@@ -122,6 +136,78 @@
                     <flux:button variant="primary">{{ __('Accept') }}</flux:button>
                 </flux:modal.close>
             </div>
+        </div>
+    </flux:modal>
+
+    {{-- Delete survey modal --}}
+    <flux:modal name="delete-survey-modal" class="max-w-lg">
+        <div class="space-y-6">
+            @if ($deleteStep === 1)
+                <div>
+                    <flux:heading size="lg" class="text-red-600 dark:text-red-400">
+                        {{ __('Delete survey?') }}</flux:heading>
+                    <flux:text class="mt-2">
+                        {{ __('You are about to delete the survey from') }}
+                        <strong class="text-zinc-800 dark:text-zinc-200">{{ $selectedSurveyName }}</strong>.
+                    </flux:text>
+                </div>
+
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <flux:icon name="exclamation-triangle" variant="outline" class="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
+                        <div class="text-sm text-red-700 dark:text-red-300">
+                            <p class="font-semibold mb-1">{{ __('This will permanently remove:') }}</p>
+                            <ul class="list-disc list-inside space-y-0.5">
+                                <li>{{ __('The survey record') }}</li>
+                                <li>{{ __('Associated answers (:count)', ['count' => $answerCount]) }}</li>
+                                <li>{{ __('Digital signature file (if exists)') }}</li>
+                            </ul>
+                            <p class="mt-2 font-semibold">{{ __('The patient record will be removed only if they have no other surveys.') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="cancelDeleteSurvey" variant="ghost">{{ __('Cancel') }}</flux:button>
+                    <flux:button wire:click="proceedToDeleteStep2" variant="danger">
+                        {{ __('Continue') }}
+                    </flux:button>
+                </div>
+
+            @elseif ($deleteStep === 2)
+                <div>
+                    <flux:heading size="lg" class="text-red-600 dark:text-red-400">
+                        {{ __('Final Confirmation') }}</flux:heading>
+                    <flux:text class="mt-2">
+                        {{ __('This action is irreversible. Type the following text to confirm the deletion of') }}
+                        <strong class="text-zinc-800 dark:text-zinc-200">{{ $selectedSurveyName }}'s</strong>
+                        {{ __('survey.') }}
+                    </flux:text>
+                </div>
+
+                <div class="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-lg space-y-3">
+                    <p class="text-sm text-red-700 dark:text-red-300">{{ __('To proceed, type the following text exactly:') }}</p>
+                    <p class="font-mono font-bold text-base bg-red-100 dark:bg-red-900/40 px-3 py-1.5 rounded inline-block text-red-700 dark:text-red-300">
+                        {{ __('DELETE ALL') }}
+                    </p>
+                    <div>
+                        <flux:input
+                            wire:model="deleteConfirmText"
+                            placeholder="{{ __('Type the confirmation text here') }}"
+                            :error="$errors->first('deleteConfirmText')"
+                        />
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:spacer />
+                    <flux:button wire:click="cancelDeleteSurvey" variant="ghost">{{ __('Cancel') }}</flux:button>
+                    <flux:button wire:click="deleteSurvey" variant="danger">
+                        {{ __('Permanently Delete') }}
+                    </flux:button>
+                </div>
+            @endif
         </div>
     </flux:modal>
 
