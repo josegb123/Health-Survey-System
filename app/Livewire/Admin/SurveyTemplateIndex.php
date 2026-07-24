@@ -281,26 +281,30 @@ class SurveyTemplateIndex extends Component
             return;
         }
 
-        $template = SurveyTemplate::withTrashed()->findOrFail($this->selectedTemplateId);
+        try {
+            $template = SurveyTemplate::withTrashed()->findOrFail($this->selectedTemplateId);
 
-        if ($this->deleteSurveyCount > 0) {
-            $surveys = Survey::withTrashed()->where('survey_template_id', $template->id)->get();
+            if ($this->deleteSurveyCount > 0) {
+                $surveys = Survey::withTrashed()->where('survey_template_id', $template->id)->get();
 
-            foreach ($surveys as $survey) {
-                if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
-                    Storage::disk('local')->delete($survey->signature_path);
+                foreach ($surveys as $survey) {
+                    if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
+                        Storage::disk('local')->delete($survey->signature_path);
+                    }
                 }
             }
+
+            $template->forceDelete();
+
+            $this->deleteStep = 0;
+            $this->deleteConfirmText = '';
+            $this->deleteSurveyCount = 0;
+            $this->modal('delete-modal')->close();
+            $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
+            $this->dispatch('toast', type: 'success', text: __('Template deleted successfully.'));
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Failed to delete template: :error', ['error' => $e->getMessage()]));
         }
-
-        $template->forceDelete();
-
-        $this->deleteStep = 0;
-        $this->deleteConfirmText = '';
-        $this->deleteSurveyCount = 0;
-        $this->modal('delete-modal')->close();
-        $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-        $this->dispatch('toast', type: 'success', text: __('Template deleted successfully.'));
     }
 
     /**

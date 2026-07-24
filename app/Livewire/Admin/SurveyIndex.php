@@ -146,28 +146,32 @@ class SurveyIndex extends Component
             return;
         }
 
-        $survey = Survey::withTrashed()->with('patient')->findOrFail($this->selectedSurveyId);
+        try {
+            $survey = Survey::withTrashed()->with('patient')->findOrFail($this->selectedSurveyId);
 
-        if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
-            Storage::disk('local')->delete($survey->signature_path);
+            if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
+                Storage::disk('local')->delete($survey->signature_path);
+            }
+
+            $survey->answers()->forceDelete();
+            $patient = $survey->patient;
+
+            $survey->forceDelete();
+
+            if ($patient && $patient->surveys()->withTrashed()->count() === 0) {
+                $patient->forceDelete();
+            }
+
+            $this->deleteStep = 0;
+            $this->deleteConfirmText = '';
+            $this->answerCount = 0;
+            $this->selectedSurveyId = 0;
+            $this->selectedSurveyName = '';
+            $this->modal('delete-survey-modal')->close();
+            $this->dispatch('toast', type: 'success', text: __('Survey deleted successfully.'));
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Failed to delete survey: :error', ['error' => $e->getMessage()]));
         }
-
-        $survey->answers()->forceDelete();
-        $patient = $survey->patient;
-
-        $survey->forceDelete();
-
-        if ($patient && $patient->surveys()->withTrashed()->count() === 0) {
-            $patient->forceDelete();
-        }
-
-        $this->deleteStep = 0;
-        $this->deleteConfirmText = '';
-        $this->answerCount = 0;
-        $this->selectedSurveyId = 0;
-        $this->selectedSurveyName = '';
-        $this->modal('delete-survey-modal')->close();
-        $this->dispatch('toast', type: 'success', text: __('Survey deleted successfully.'));
     }
 
     public function openReportModal(): void

@@ -90,15 +90,19 @@ class InsurerIndex extends Component
             return;
         }
 
-        Insurer::create([
-            'name' => $this->name,
-            'type' => $this->type,
-            'is_active' => $this->is_active,
-        ]);
+        try {
+            Insurer::create([
+                'name' => $this->name,
+                'type' => $this->type,
+                'is_active' => $this->is_active,
+            ]);
 
-        $this->modal('create-insurer-modal')->close();
-        $this->reset(['name', 'type', 'is_active']);
-        $this->dispatch('toast', type: 'success', text: __('Insurer created successfully.'));
+            $this->modal('create-insurer-modal')->close();
+            $this->reset(['name', 'type', 'is_active']);
+            $this->dispatch('toast', type: 'success', text: __('Insurer created successfully.'));
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Failed to create insurer: :error', ['error' => $e->getMessage()]));
+        }
     }
 
     public function updateInsurer(): void
@@ -124,15 +128,19 @@ class InsurerIndex extends Component
             return;
         }
 
-        $insurer->update([
-            'name' => $this->editName,
-            'type' => $this->editType,
-            'is_active' => $this->editIsActive,
-        ]);
+        try {
+            $insurer->update([
+                'name' => $this->editName,
+                'type' => $this->editType,
+                'is_active' => $this->editIsActive,
+            ]);
 
-        $this->modal('edit-insurer-modal')->close();
-        $this->reset(['selectedInsurerId', 'editName', 'editType', 'editIsActive']);
-        $this->dispatch('toast', type: 'success', text: __('Insurer updated successfully.'));
+            $this->modal('edit-insurer-modal')->close();
+            $this->reset(['selectedInsurerId', 'editName', 'editType', 'editIsActive']);
+            $this->dispatch('toast', type: 'success', text: __('Insurer updated successfully.'));
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Failed to update insurer: :error', ['error' => $e->getMessage()]));
+        }
     }
 
     public function confirmToggleStatus(int $id, string $name): void
@@ -144,11 +152,15 @@ class InsurerIndex extends Component
 
     public function toggleStatus(): void
     {
-        $insurer = Insurer::findOrFail($this->selectedInsurerId);
-        $insurer->update(['is_active' => ! $insurer->is_active]);
-        $this->modal('status-modal')->close();
-        $this->reset(['selectedInsurerId', 'selectedInsurerName']);
-        $this->dispatch('toast', type: 'success', text: __('Insurer status updated.'));
+        try {
+            $insurer = Insurer::findOrFail($this->selectedInsurerId);
+            $insurer->update(['is_active' => ! $insurer->is_active]);
+            $this->modal('status-modal')->close();
+            $this->reset(['selectedInsurerId', 'selectedInsurerName']);
+            $this->dispatch('toast', type: 'success', text: __('Insurer status updated.'));
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Failed to update status: :error', ['error' => $e->getMessage()]));
+        }
     }
 
     public function confirmDelete(int $id, string $name): void
@@ -166,20 +178,24 @@ class InsurerIndex extends Component
             return;
         }
 
-        $insurer = Insurer::findOrFail($this->selectedInsurerId);
+        try {
+            $insurer = Insurer::findOrFail($this->selectedInsurerId);
 
-        if ($insurer->patients()->exists()) {
+            if ($insurer->patients()->exists()) {
+                $this->modal('delete-modal')->close();
+                $this->reset(['selectedInsurerId', 'selectedInsurerName']);
+                $this->dispatch('toast', type: 'error', text: __('Cannot delete an insurer that has associated patients.'));
+
+                return;
+            }
+
+            $insurer->delete();
             $this->modal('delete-modal')->close();
             $this->reset(['selectedInsurerId', 'selectedInsurerName']);
-            $this->dispatch('toast', type: 'error', text: __('Cannot delete an insurer that has associated patients.'));
-
-            return;
+            $this->dispatch('toast', type: 'success', text: __('Insurer deleted successfully.'));
+        } catch (\Exception $e) {
+            $this->dispatch('toast', type: 'error', text: __('Failed to delete insurer: :error', ['error' => $e->getMessage()]));
         }
-
-        $insurer->delete();
-        $this->modal('delete-modal')->close();
-        $this->reset(['selectedInsurerId', 'selectedInsurerName']);
-        $this->dispatch('toast', type: 'success', text: __('Insurer deleted successfully.'));
     }
 
     public function exportInsurers(): StreamedResponse
