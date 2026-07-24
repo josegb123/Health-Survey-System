@@ -36,6 +36,7 @@
 
                             <div class="flex items-start justify-between gap-2">
                                 <span class="font-medium text-zinc-900 dark:text-white text-sm">
+                                    <span class="font-mono text-[10px] bg-zinc-200 dark:bg-zinc-700 px-1 py-0.5 rounded mr-1">#{{ $question->id }}</span>
                                     {{ $question->order }}. {{ $question->question_text }}
                                     @if ($question->is_required)
                                         <span class="text-red-500 font-bold">*</span>
