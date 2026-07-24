@@ -6,9 +6,13 @@ use App\Models\MinistryReportConfig;
 use App\Models\SystemSetting;
 use Flux\Flux;
 use Livewire\Component;
+use Livewire\WithFileUploads;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SystemSettings extends Component
 {
+    use WithFileUploads;
+
     // Propiedades enlazadas directamente con las columnas del modelo
     public string $theme = 'system';
 
@@ -49,6 +53,25 @@ class SystemSettings extends Component
     public string $confirmText = '';
 
     public string $expectedConfirmText = '';
+
+    // --- Firma: paso y resultado ---
+    public int $signatureStep = 0;
+
+    public string $signatureResult = '';
+
+    public string $signatureConfirmText = '';
+
+    // --- Reset DB: paso y resultado ---
+    public int $resetStep = 0;
+
+    public string $resetResult = '';
+
+    public string $resetConfirmText = '';
+
+    // --- Import/Export ---
+    public mixed $importFile = null;
+
+    public string $importResult = '';
 
     protected array $rules = [
         'theme' => 'nullable|string|in:light,dark,system',
@@ -119,6 +142,10 @@ class SystemSettings extends Component
         Flux::toast(variant: 'success', text: __('System settings updated successfully.'));
     }
 
+    // ====================================================================
+    //  PURGE: Eliminar encuestas antiguas (>6 meses)
+    // ====================================================================
+
     public function startPurge(): void
     {
         $this->purgeStep = 1;
@@ -150,6 +177,117 @@ class SystemSettings extends Component
 
         $this->purgeResult = SystemSetting::purgeOldSurveys();
         $this->purgeStep = 3;
+    }
+
+    // ====================================================================
+    //  SIGNATURES: Eliminar todos los archivos de firmas
+    // ====================================================================
+
+    public function startSignatureDelete(): void
+    {
+        $this->signatureStep = 1;
+        $this->signatureResult = '';
+        $this->signatureConfirmText = '';
+    }
+
+    public function cancelSignatureDelete(): void
+    {
+        $this->signatureStep = 0;
+        $this->signatureResult = '';
+        $this->signatureConfirmText = '';
+    }
+
+    public function confirmSignatureDelete(): void
+    {
+        if ($this->signatureConfirmText !== __('DELETE ALL')) {
+            $this->addError('signatureConfirmText', __('The confirmation text does not match.'));
+
+            return;
+        }
+
+        $this->signatureResult = SystemSetting::deleteAllSignatures();
+        $this->signatureStep = 2;
+    }
+
+    // ====================================================================
+    //  RESET DB: Reestablecer base de datos completa
+    // ====================================================================
+
+    public function startReset(): void
+    {
+        $this->resetStep = 1;
+        $this->resetResult = '';
+        $this->resetConfirmText = '';
+    }
+
+    public function cancelReset(): void
+    {
+        $this->resetStep = 0;
+        $this->resetResult = '';
+        $this->resetConfirmText = '';
+    }
+
+    public function confirmReset(): void
+    {
+        if ($this->resetConfirmText !== __('DELETE ALL')) {
+            $this->addError('resetConfirmText', __('The confirmation text does not match.'));
+
+            return;
+        }
+
+        $this->resetResult = SystemSetting::resetDatabase();
+        $this->resetStep = 2;
+    }
+
+    // ====================================================================
+    //  EXPORT / IMPORT: Configuración en JSON
+    // ====================================================================
+
+    public function exportSettings(): StreamedResponse
+    {
+        $data = SystemSetting::exportAllSettings();
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $filename = 'configuracion-'.now()->format('Y-m-d').'.json';
+
+        return response()->streamDownload(function () use ($json) {
+            echo $json;
+        }, $filename, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
+
+    public function importSettings(): void
+    {
+        $this->validate(['importFile' => 'required|file|json|max:512']);
+
+        $content = file_get_contents($this->importFile->getRealPath());
+
+        if ($content === false) {
+            $this->addError('importFile', __('Could not read the uploaded file.'));
+
+            return;
+        }
+
+        $data = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->addError('importFile', __('The uploaded file is not valid JSON.'));
+
+            return;
+        }
+
+        if (! isset($data['system_settings']) && ! isset($data['ministry_report_config'])) {
+            $this->addError('importFile', __('The JSON file does not contain valid configuration data.'));
+
+            return;
+        }
+
+        $this->importResult = SystemSetting::importSettings($data);
+        $this->importFile = null;
+
+        $this->mount();
+
+        Flux::toast(variant: 'success', text: $this->importResult);
     }
 
     public function render()

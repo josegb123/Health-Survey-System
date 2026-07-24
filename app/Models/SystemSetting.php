@@ -98,4 +98,125 @@ class SystemSetting extends Model
 
         return $instance;
     }
+
+    public static function deleteAllSignatures(): string
+    {
+        try {
+            $directory = Storage::disk('local')->path('signatures');
+
+            if (! is_dir($directory)) {
+                return __('The signatures directory does not exist.');
+            }
+
+            $files = glob($directory.'/*.png');
+
+            if ($files === false) {
+                return __('Could not read the signatures directory.');
+            }
+
+            $count = count($files);
+
+            if ($count === 0) {
+                return __('No signature files found to delete.');
+            }
+
+            foreach ($files as $file) {
+                unlink($file);
+            }
+
+            Log::info("Deleted {$count} signature files from disk.");
+
+            return __(':count signature file(s) have been permanently deleted.', ['count' => $count]);
+        } catch (\Exception $e) {
+            Log::error('Signature cleanup failed: '.$e->getMessage());
+
+            return __('An error occurred while deleting signatures: :error', ['error' => $e->getMessage()]);
+        }
+    }
+
+    public static function resetDatabase(): string
+    {
+        try {
+            return DB::transaction(function () {
+                $surveys = Survey::withTrashed()->get();
+                $signatureCount = 0;
+
+                foreach ($surveys as $survey) {
+                    if ($survey->signature_path && Storage::disk('local')->exists($survey->signature_path)) {
+                        Storage::disk('local')->delete($survey->signature_path);
+                        $signatureCount++;
+                    }
+                }
+
+                $answerCount = SurveyAnswer::withTrashed()->forceDelete();
+                $surveyCount = Survey::withTrashed()->forceDelete();
+                $patientCount = Patient::withTrashed()->forceDelete();
+
+                Cache::forget(self::CACHE_KEY);
+
+                Log::info("Database reset: deleted {$surveyCount} surveys, {$answerCount} answers, {$patientCount} patients, {$signatureCount} signatures.");
+
+                return __('Database has been reset: :surveys surveys, :answers answers, :patients patients, and :signatures signature files have been deleted.', [
+                    'surveys' => $surveyCount,
+                    'answers' => $answerCount,
+                    'patients' => $patientCount,
+                    'signatures' => $signatureCount,
+                ]);
+            });
+        } catch (\Exception $e) {
+            Log::error('Database reset failed: '.$e->getMessage());
+
+            return __('An error occurred while resetting the database: :error', ['error' => $e->getMessage()]);
+        }
+    }
+
+    public static function exportAllSettings(): array
+    {
+        $systemSettings = self::set()->toArray();
+        $ministryConfig = MinistryReportConfig::set()->toArray();
+
+        return [
+            'version' => 1,
+            'exported_at' => now()->toIso8601String(),
+            'system_settings' => $systemSettings,
+            'ministry_report_config' => $ministryConfig,
+        ];
+    }
+
+    public static function importSettings(array $data): string
+    {
+        try {
+            return DB::transaction(function () use ($data) {
+                if (isset($data['system_settings'])) {
+                    $settings = self::set();
+                    $allowed = [
+                        'theme', 'language', 'turnstile_site_key', 'turnstile_secret_key',
+                        'rate_limit_requests', 'company_name', 'company_dni', 'entity_type',
+                        'registry_type', 'mail_from_address', 'mail_from_name',
+                        'session_timeout_minutes', 'is_maintenance_mode', 'survey_monthly_goal',
+                        'default_survey_template_id',
+                    ];
+                    $filtered = array_intersect_key($data['system_settings'], array_flip($allowed));
+                    $settings->update($filtered);
+                }
+
+                if (isset($data['ministry_report_config'])) {
+                    $config = MinistryReportConfig::set();
+                    $ministryAllowed = ['survey_template_id', 'pipe_mapping'];
+                    $filtered = array_intersect_key($data['ministry_report_config'], array_flip($ministryAllowed));
+                    $config->update($filtered);
+                }
+
+                Cache::forget(self::CACHE_KEY);
+
+                Log::info('Settings imported successfully from JSON.');
+
+                return __('Configuration has been imported and applied successfully.');
+            });
+        } catch (\Exception $e) {
+            Log::error('Settings import failed: '.$e->getMessage());
+
+            return __('An error occurred while importing settings: :error', ['error' => $e->getMessage()]);
+        }
+    }
 }
