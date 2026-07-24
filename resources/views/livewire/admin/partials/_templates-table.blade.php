@@ -11,6 +11,7 @@
         @forelse ($templates as $template)
             <flux:table.row :key="$template->id">
                 <flux:table.cell class="font-medium text-zinc-900 dark:text-white">
+                    <span class="text-zinc-400 dark:text-zinc-500 text-xs font-mono">#{{ $template->id }}</span>
                     {{ $template->title }}
                 </flux:table.cell>
 

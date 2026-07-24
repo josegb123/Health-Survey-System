@@ -5,7 +5,10 @@
             <div class="space-y-6 overflow-y-auto pr-2">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <flux:heading size="lg">{{ $viewingTemplate->title }}</flux:heading>
+                        <flux:heading size="lg">
+                            <span class="text-zinc-400 dark:text-zinc-500 text-sm font-mono">#{{ $viewingTemplate->id }}</span>
+                            {{ $viewingTemplate->title }}
+                        </flux:heading>
                         <flux:text class="mt-1">
                             {{ __('Static audit view for survey quality control.') }}</flux:text>
                     </div>

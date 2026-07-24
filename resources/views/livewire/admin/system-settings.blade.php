@@ -35,7 +35,7 @@
                 <option value="">-- {{ __('Select a template') }} --</option>
                 @foreach (\App\Models\SurveyTemplate::withCount('questions')->latest()->get() as $template)
                     <option value="{{ $template->id }}">
-                        {{ $template->title }} ({{ $template->questions_count }} {{ __('questions') }})
+                        #{{ $template->id }} — {{ $template->title }} ({{ $template->questions_count }} {{ __('questions') }})
                     </option>
                 @endforeach
             </flux:select>
