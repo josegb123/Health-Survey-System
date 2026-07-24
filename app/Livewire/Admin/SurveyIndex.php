@@ -10,6 +10,7 @@ use App\Services\ExcelReportService;
 use App\Services\MinistryReportGeneratorService;
 use App\Services\SurveyReportService;
 use Carbon\Carbon;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -168,9 +169,9 @@ class SurveyIndex extends Component
             $this->selectedSurveyId = 0;
             $this->selectedSurveyName = '';
             $this->modal('delete-survey-modal')->close();
-            $this->dispatch('toast', type: 'success', text: __('Survey deleted successfully.'));
+            Flux::toast(variant: 'success', text: __('Survey deleted successfully.'));
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Failed to delete survey: :error', ['error' => $e->getMessage()]));
+            Flux::toast(variant: 'danger', text: __('Failed to delete survey: :error', ['error' => $e->getMessage()]));
         }
     }
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Dashboard;
 use App\Models\SystemSetting;
 use App\Services\DashboardMetricsService;
 use Carbon\Carbon;
+use Flux\Flux;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -88,7 +89,7 @@ class StatsCards extends Component
 
         $this->modal('edit-goal-modal')->close();
         $this->loadMetrics($metricsService);
-        $this->dispatch('toast', type: 'success', text: __('System goal updated in global settings.'));
+        Flux::toast(variant: 'success', text: __('System goal updated in global settings.'));
     }
 
     public function render()

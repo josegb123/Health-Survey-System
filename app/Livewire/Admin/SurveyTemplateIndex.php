@@ -6,6 +6,7 @@ use App\Models\Survey;
 use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
 use App\Services\SurveyTemplateBuilderService;
+use Flux\Flux;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -200,10 +201,10 @@ class SurveyTemplateIndex extends Component
             $this->modal('create-template-flyout')->close();
             $this->reset(['title', 'is_active', 'questions']);
 
-            $this->dispatch('toast', type: 'success', text: __('Template and questions created successfully.'));
+            Flux::toast(variant: 'success', text: __('Template and questions created successfully.'));
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error processing template: ').$e->getMessage());
+            Flux::toast(variant: 'danger', text: __('Error processing template: ').$e->getMessage());
         }
     }
 
@@ -236,7 +237,7 @@ class SurveyTemplateIndex extends Component
         $tmpl->update(['is_active' => ! $tmpl->is_active]);
         $this->modal('status-modal')->close();
         $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-        $this->dispatch('toast', type: 'success', text: __('Template status updated.'));
+        Flux::toast(variant: 'success', text: __('Template status updated.'));
     }
 
     public function confirmDelete(int $id, string $title): void
@@ -301,9 +302,9 @@ class SurveyTemplateIndex extends Component
             $this->deleteSurveyCount = 0;
             $this->modal('delete-modal')->close();
             $this->reset(['selectedTemplateId', 'selectedTemplateTitle']);
-            $this->dispatch('toast', type: 'success', text: __('Template deleted successfully.'));
+            Flux::toast(variant: 'success', text: __('Template deleted successfully.'));
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Failed to delete template: :error', ['error' => $e->getMessage()]));
+            Flux::toast(variant: 'danger', text: __('Failed to delete template: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -352,7 +353,7 @@ class SurveyTemplateIndex extends Component
         }
 
         if (! $this->importFile) {
-            $this->dispatch('toast', type: 'error', text: __('Please select a JSON file to import.'));
+            Flux::toast(variant: 'danger', text: __('Please select a JSON file to import.'));
 
             return;
         }
@@ -396,10 +397,10 @@ class SurveyTemplateIndex extends Component
 
             $this->modal('import-modal')->close();
             $this->importFile = null;
-            $this->dispatch('toast', type: 'success', text: __('Template imported successfully.'));
+            Flux::toast(variant: 'success', text: __('Template imported successfully.'));
 
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Error importing template: ').$e->getMessage());
+            Flux::toast(variant: 'danger', text: __('Error importing template: ').$e->getMessage());
         }
     }
 

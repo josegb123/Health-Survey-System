@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Insurer;
+use Flux\Flux;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -99,9 +100,9 @@ class InsurerIndex extends Component
 
             $this->modal('create-insurer-modal')->close();
             $this->reset(['name', 'type', 'is_active']);
-            $this->dispatch('toast', type: 'success', text: __('Insurer created successfully.'));
+            Flux::toast(variant: 'success', text: __('Insurer created successfully.'));
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Failed to create insurer: :error', ['error' => $e->getMessage()]));
+            Flux::toast(variant: 'danger', text: __('Failed to create insurer: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -137,9 +138,9 @@ class InsurerIndex extends Component
 
             $this->modal('edit-insurer-modal')->close();
             $this->reset(['selectedInsurerId', 'editName', 'editType', 'editIsActive']);
-            $this->dispatch('toast', type: 'success', text: __('Insurer updated successfully.'));
+            Flux::toast(variant: 'success', text: __('Insurer updated successfully.'));
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Failed to update insurer: :error', ['error' => $e->getMessage()]));
+            Flux::toast(variant: 'danger', text: __('Failed to update insurer: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -157,9 +158,9 @@ class InsurerIndex extends Component
             $insurer->update(['is_active' => ! $insurer->is_active]);
             $this->modal('status-modal')->close();
             $this->reset(['selectedInsurerId', 'selectedInsurerName']);
-            $this->dispatch('toast', type: 'success', text: __('Insurer status updated.'));
+            Flux::toast(variant: 'success', text: __('Insurer status updated.'));
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Failed to update status: :error', ['error' => $e->getMessage()]));
+            Flux::toast(variant: 'danger', text: __('Failed to update status: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -184,7 +185,7 @@ class InsurerIndex extends Component
             if ($insurer->patients()->exists()) {
                 $this->modal('delete-modal')->close();
                 $this->reset(['selectedInsurerId', 'selectedInsurerName']);
-                $this->dispatch('toast', type: 'error', text: __('Cannot delete an insurer that has associated patients.'));
+                Flux::toast(variant: 'danger', text: __('Cannot delete an insurer that has associated patients.'));
 
                 return;
             }
@@ -192,9 +193,9 @@ class InsurerIndex extends Component
             $insurer->delete();
             $this->modal('delete-modal')->close();
             $this->reset(['selectedInsurerId', 'selectedInsurerName']);
-            $this->dispatch('toast', type: 'success', text: __('Insurer deleted successfully.'));
+            Flux::toast(variant: 'success', text: __('Insurer deleted successfully.'));
         } catch (\Exception $e) {
-            $this->dispatch('toast', type: 'error', text: __('Failed to delete insurer: :error', ['error' => $e->getMessage()]));
+            Flux::toast(variant: 'danger', text: __('Failed to delete insurer: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -285,7 +286,7 @@ class InsurerIndex extends Component
             'skipped' => $skipped,
         ]);
 
-        $this->dispatch('toast', type: $created > 0 ? 'success' : 'warning', text: $message);
+        Flux::toast(variant: $created > 0 ? 'success' : 'warning', text: $message);
     }
 
     public function render()
