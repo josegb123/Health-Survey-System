@@ -28,7 +28,7 @@ class SurveyPublicProccessorService
 
             $insurerId = $patientData['insurer_id'] ?? null;
 
-            if (! $insurerId && ! empty($patientData['insurer_name'])) {
+            if (!$insurerId && !empty($patientData['insurer_name'])) {
                 $insurerId = $this->resolveOrCreateInsurer($patientData['insurer_name']);
             }
 
@@ -36,17 +36,17 @@ class SurveyPublicProccessorService
                 ['dni' => $patientData['dni']],
                 [
                     'name' => $patientData['name'],
-                    'email' => $patientData['email'] ?? null,
-                    'document_type' => $patientData['document_type'] ?? null,
-                    'nationality' => $patientData['nationality'] ?? null,
-                    'address' => $patientData['address'] ?? null,
-                    'phone' => $patientData['phone'] ?? null,
+                    'email' => $patientData['email'] ?? "",
+                    'document_type' => $patientData['document_type'] ?? "",
+                    'nationality' => $patientData['nationality'] ?? "",
+                    'address' => $patientData['address'] ?? "",
+                    'phone' => $patientData['phone'] ?? "",
                     'insurer_id' => $insurerId,
                     'password' => bcrypt(Str::random(16)),
                 ]
             );
 
-            $signaturePath = $signature ? $this->storeSignatureFile($signature) : null;
+            $signaturePath = $signature ? $this->storeSignatureFile($signature) : "";
 
             $survey = Survey::create([
                 'survey_template_id' => $templateId,
@@ -110,8 +110,8 @@ class SurveyPublicProccessorService
             throw new \InvalidArgumentException('The provided signature is not a valid base64 string.');
         }
 
-        $filename = Str::uuid().'.png';
-        $path = 'signatures/'.$filename;
+        $filename = Str::uuid() . '.png';
+        $path = 'signatures/' . $filename;
 
         Storage::disk('local')->put($path, $decoded);
 
