@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\Dashboard;
 use App\Models\Survey;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,18 +16,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('admin/dashboard', Dashboard::class)->name('dashboard');
 
     // Módulo de Administración
-    require __DIR__.'/admin.php';
+    require __DIR__ . '/admin.php';
 
     // Ajustes del sistema
-    require __DIR__.'/settings.php';
+    require __DIR__ . '/settings.php';
 
     // Servir firma digital privada (solo usuarios autenticados)
     Route::get('/survey/{survey}/signature', function (Survey $survey) {
-        if (! $survey->signature_path || ! Storage::disk('local')->exists($survey->signature_path)) {
+        if (!$survey->signature_path || !Storage::disk('local')->exists($survey->signature_path)) {
             abort(404);
         }
 
-        return Storage::disk('local')->response($survey->signature_path);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('local');
+
+        return $disk->response($survey->signature_path);
     })->name('surveys.signature');
 });
 
