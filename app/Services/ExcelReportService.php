@@ -172,11 +172,6 @@ class ExcelReportService
         $worksheet->getStyle("{$firstDataColumnLetter}4")->getFont()->setBold(true);
         $worksheet->getStyle("{$firstDataColumnLetter}4")->getAlignment()->setWrapText(true);
 
-        // Apply visual styles to main headers
-        $worksheet->getStyle("{$firstDataColumnLetter}2:{$lastDataColumnLetter}4")->getFont()->setName(self::DEFAULT_FONT_NAME);
-        $worksheet->getStyle("{$firstDataColumnLetter}4")->getFont()->setBold(true);
-        $worksheet->getStyle("{$firstDataColumnLetter}4")->getAlignment()->setWrapText(true);
-
         // 3. Render Table Column Headers (Rows 5 and 6)
         $headerStartRow = 5;
         foreach ($columnConfigurations as $columnKey => $columnConfig) {
@@ -192,7 +187,9 @@ class ExcelReportService
         }
 
         // 4. Render Survey Data Rows (Starting at Row 7)
-        $currentRow = 7;
+        $startDataRow = 7;
+        $currentRow = $startDataRow;
+
         foreach ($completedSurveys as $survey) {
             $patient = $survey->patient;
 
@@ -256,6 +253,25 @@ class ExcelReportService
             }
 
             $currentRow++;
+        }
+
+        // 5. Render Average Summary Row (After loop completion)
+        $lastDataRow = $currentRow - 1;
+
+        if ($lastDataRow >= $startDataRow) {
+            $weightedCol = $columnLetterMapping['WEIGHTED'];
+
+            // Etiqueta "PROMEDIO" en la columna previa al ponderado
+            $worksheet->setCellValue("C{$currentRow}", 'PROMEDIO');
+            $worksheet->getStyle("C{$currentRow}")->getFont()->setBold(true)->setName(self::DEFAULT_FONT_NAME);
+            $worksheet->getStyle("C{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+            $worksheet->setCellValue("{$weightedCol}{$currentRow}", "=AVERAGE({$weightedCol}{$startDataRow}:{$weightedCol}{$lastDataRow})");
+
+            // Formato visual de la celda del promedio
+            $worksheet->getStyle("{$weightedCol}{$currentRow}")->getNumberFormat()->setFormatCode('0.00');
+            $worksheet->getStyle("{$weightedCol}{$currentRow}")->getFont()->setBold(true)->setName(self::DEFAULT_FONT_NAME);
+            $worksheet->getStyle("{$weightedCol}{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
 
         // Adjust row heights to match target design
