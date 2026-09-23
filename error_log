@@ -166,3 +166,16 @@ Stack trace:
 #0 /home/institu5/calidad.institutourolgicodesucre.com/debug-excel-xmarks.php(21): Illuminate\Support\Facades\Facade::__callStatic()
 #1 {main}
   thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php on line 360
+[23-Sep-2026 23:50:58 UTC] PHP Warning:  PHP Startup: Invalid date.timezone value 'UTC-05:00', using 'UTC' instead in Unknown on line 0
+[23-Sep-2026 23:51:04 UTC] PHP Warning:  PHP Startup: Invalid date.timezone value 'UTC-05:00', using 'UTC' instead in Unknown on line 0
+[23-Sep-2026 23:51:05 UTC] PHP Warning:  PHP Startup: Invalid date.timezone value 'UTC-05:00', using 'UTC' instead in Unknown on line 0
+[23-Sep-2026 23:51:05 UTC] PHP Warning:  require(/home/institu5/calidad.institutourolgicodesucre.com/vendor/composer/../thecodingmachine/safe/lib/special_cases.php): Failed to open stream: No such file or directory in /home/institu5/calidad.institutourolgicodesucre.com/vendor/composer/autoload_real.php on line 41
+[23-Sep-2026 23:51:05 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/institu5/calidad.institutourolgicodesucre.com/vendor/composer/../thecodingmachine/safe/lib/special_cases.php' (include_path='.:/opt/alt/php85/usr/share/pear:/opt/alt/php85/usr/share/php:/usr/share/pear:/usr/share/php') in /home/institu5/calidad.institutourolgicodesucre.com/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home/institu5/calidad.institutourolgicodesucre.com/vendor/composer/autoload_real.php(45): {closure:ComposerAutoloaderInit9f5346e7f863418ee13194bf8195971d::getLoader():37}()
+#1 /home/institu5/calidad.institutourolgicodesucre.com/vendor/autoload.php(22): ComposerAutoloaderInit9f5346e7f863418ee13194bf8195971d::getLoader()
+#2 /home/institu5/calidad.institutourolgicodesucre.com/artisan(10): require('/home/institu5/...')
+#3 {main}
+  thrown in /home/institu5/calidad.institutourolgicodesucre.com/vendor/composer/autoload_real.php on line 41
+[23-Sep-2026 23:51:12 UTC] PHP Warning:  PHP Startup: Invalid date.timezone value 'UTC-05:00', using 'UTC' instead in Unknown on line 0
+[23-Sep-2026 23:51:12 UTC] PHP Warning:  PHP Startup: Invalid date.timezone value 'UTC-05:00', using 'UTC' instead in Unknown on line 0
