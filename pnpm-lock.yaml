@@ -514,8 +514,8 @@ packages:
     resolution: {integrity: sha512-WkUDrojuJs0xkgGf2udWxa3yGBRxPtxUkB79i6aCZLRgc7PM8fZe9TosfPDcvEpQZbuFASnHYmRLBLUbmLOIIA==}
     engines: {node: '>= 12.0.0'}
 
-  magic-regexp@0.11.2:
-    resolution: {integrity: sha512-s4i7mq2jJnkB5J1HDX67GmdRoWrgo8tE0cL91bKO+HaquxyR5TiqkjVfLhgS2PXretsN/Gv9kSnRBgQxrLO/Qw==}
+  magic-regexp@0.11.0:
+    resolution: {integrity: sha512-LG77Z/gVnwz7oaDpD4heX6ryl+lcr4l1B2gnP4MMvt2pGhGC1Dfj7dl1pXpP4ih+VQFLuAadeKVa+lARAzfW+Q==}
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -918,7 +918,7 @@ snapshots:
     dependencies:
       '@capsizecss/unpack': 4.0.1
       css-tree: 3.2.1
-      magic-regexp: 0.11.2(rolldown@1.2.9)(vite@8.3.0(jiti@2.7.0))
+      magic-regexp: 0.11.0(rolldown@1.2.9)(vite@8.3.0(jiti@2.7.0))
       magic-string: 1.4.1
       pathe: 2.0.3
       ufo: 1.6.4
@@ -1061,9 +1061,9 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.33.0
       lightningcss-win32-x64-msvc: 1.33.0
 
-  magic-regexp@0.11.2(rolldown@1.2.9)(vite@8.3.0(jiti@2.7.0)):
+  magic-regexp@0.11.0(rolldown@1.2.9)(vite@8.3.0(jiti@2.7.0)):
     dependencies:
-      magic-string: 1.4.1
+      magic-string: 0.30.21
       regexp-tree: 0.1.27
       type-level-regexp: 0.1.17
       unplugin: 3.4.0(rolldown@1.2.9)(vite@8.3.0(jiti@2.7.0))
