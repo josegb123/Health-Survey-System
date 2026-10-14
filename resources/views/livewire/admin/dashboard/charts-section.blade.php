@@ -2,7 +2,8 @@
     {{-- Daily Trend Chart --}}
     <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-5">
         <flux:heading size="md">{{ __('Daily Survey Trend') }}</flux:heading>
-        <flux:text size="sm" class="mt-1 mb-4">{{ __('Completed surveys per day in the selected period.') }}</flux:text>
+        <flux:text size="sm" class="mt-1 mb-4">{{ __('Completed surveys per day in the selected period.') }}
+        </flux:text>
 
         @if (count($dailyTrend) > 0)
             @php
@@ -20,7 +21,7 @@
                                    background: linear-gradient(180deg, var(--color-brand-400), var(--color-brand-600));">
                         </div>
                         <span class="text-[9px] text-zinc-400 mt-1 truncate max-w-full">
-                            {{ $day['date'] }}
+                            {{ explode('/', $day['date'])[0] }}
                         </span>
                     </div>
                 @endforeach
