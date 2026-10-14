@@ -27,21 +27,32 @@ class Dashboard extends Component
         $this->dispatch('dashboard-filter-updated', [
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
-            'period' => $this->period, // <-- Línea crucial añadida
+            'period' => $this->period,
         ]);
     }
 
     private function updateDates(): void
     {
-        $this->endDate = Carbon::now()->endOfDay()->toDateTimeString();
+        $now = Carbon::now();
 
-        $this->startDate = match ($this->period) {
-            'week' => Carbon::now()->subDays(7)->startOfDay()->toDateTimeString(),
-            'quarter' => Carbon::now()->subMonths(3)->startOfDay()->toDateTimeString(),
-            'year' => Carbon::now()->subYear()->startOfDay()->toDateTimeString(),
-            default => Carbon::now()->subMonth()->startOfDay()->toDateTimeString(),
+        [$this->startDate, $this->endDate] = match ($this->period) {
+            'week' => [
+                $now->copy()->startOfWeek()->toDateTimeString(),
+                $now->copy()->endOfWeek()->toDateTimeString(),
+            ],
+            'quarter' => [
+                $now->copy()->startOfQuarter()->toDateTimeString(),
+                $now->copy()->endOfQuarter()->toDateTimeString(),
+            ],
+            'year' => [
+                $now->copy()->startOfYear()->toDateTimeString(),
+                $now->copy()->endOfYear()->toDateTimeString(),
+            ],
+            default => [
+                $now->copy()->startOfMonth()->toDateTimeString(),
+                $now->copy()->endOfMonth()->toDateTimeString(),
+            ],
         };
-
     }
 
     public function render(DashboardMetricsService $metricsService)
