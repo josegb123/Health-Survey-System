@@ -24,7 +24,7 @@ class Dashboard extends Component
         $this->updateDates();
 
         // Notifica de forma reactiva al subcomponentes hijo
-        $this->dispatch('dashboard-filter-updated', [
+        $this->dispatch('dashboard-filter-updated', dates: [
             'startDate' => $this->startDate,
             'endDate' => $this->endDate,
             'period' => $this->period,
@@ -37,12 +37,12 @@ class Dashboard extends Component
 
         [$this->startDate, $this->endDate] = match ($this->period) {
             'week' => [
-                $now->copy()->startOfWeek()->toDateTimeString(),
-                $now->copy()->endOfWeek()->toDateTimeString(),
+                $now->copy()->subDays(6)->startOfDay()->toDateTimeString(),
+                $now->copy()->endOfDay()->toDateTimeString(),
             ],
             'quarter' => [
-                $now->copy()->startOfQuarter()->toDateTimeString(),
-                $now->copy()->endOfQuarter()->toDateTimeString(),
+                $now->copy()->subDays(89)->startOfDay()->toDateTimeString(),
+                $now->copy()->endOfDay()->toDateTimeString(),
             ],
             'year' => [
                 $now->copy()->startOfYear()->toDateTimeString(),

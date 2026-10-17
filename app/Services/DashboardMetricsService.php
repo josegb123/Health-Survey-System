@@ -106,7 +106,7 @@ class DashboardMetricsService
         while ($current <= $end) {
             $key = $current->format('Y-m-d');
             $trend[] = [
-                'date' => $current->format('d/m'),
+                'date' => $current->format('d/M'),
                 'count' => (int) ($rows[$key] ?? 0),
             ];
             $current->addDay();
@@ -118,9 +118,10 @@ class DashboardMetricsService
     /**
      * Retorna el ranking de plantillas más respondidas.
      */
-    public function getTemplateRanking(int $limit = 5): Collection
+    public function getTemplateRanking(Carbon $startDate, Carbon $endDate, int $limit = 5): Collection
     {
         return Survey::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->selectRaw('survey_template_id, COUNT(*) as total')
             ->with('template')
             ->groupBy('survey_template_id')
@@ -167,7 +168,7 @@ class DashboardMetricsService
         while ($current <= $end) {
             $key = $current->format('Y-m-d');
             $trend[] = [
-                'date' => $current->format('d/m'),
+                'date' => $current->format('d/M'),
                 'avg_rating' => round((float) ($rows[$key] ?? 0), 2),
             ];
             $current->addDay();

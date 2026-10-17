@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Dashboard;
 
 use App\Services\DashboardMetricsService;
 use Carbon\Carbon;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ChartsSection extends Component
@@ -13,6 +14,8 @@ class ChartsSection extends Component
     public string $endDate;
 
     public string $period = 'month';
+
+    public string $dateRange = '';
 
     public array $dailyTrend = [];
 
@@ -37,17 +40,39 @@ class ChartsSection extends Component
         $this->endDate = $dates['endDate'];
         $this->period = $dates['period'] ?? 'month';
         $this->loadCharts($metricsService);
+        $this->dispatch(
+            'charts-update',
+            dailyTrend: $this->dailyTrend,
+            ratingTrend: $this->ratingTrend,
+        );
     }
 
     private function loadCharts(DashboardMetricsService $metricsService): void
     {
         $start = Carbon::parse($this->startDate);
         $end = Carbon::parse($this->endDate);
+        $this->dateRange = $start->translatedFormat('j M Y').' - '.$end->translatedFormat('j M Y');
 
-        $this->dailyTrend = $metricsService->getDailyTrend($start, $end);
-        $this->ratingTrend = $metricsService->getRatingTrend($start, $end);
+        $ratingTrendData = $metricsService->getRatingTrend($start, $end);
+        $dailyTrendData = $metricsService->getDailyTrend($start, $end);
 
-        $templates = $metricsService->getTemplateRanking(5);
+        $this->dailyTrend = [
+            'labels' => collect($dailyTrendData)->pluck('date')->toArray(),
+            'data' => collect($dailyTrendData)->pluck('count')->toArray(),
+            'label' => __('Completed Surveys'),
+            'hasData' => collect($dailyTrendData)->sum('count') > 0,
+        ];
+
+        $this->ratingTrend = [
+            'labels' => collect($ratingTrendData)->pluck('date')->toArray(),
+            'data' => collect($ratingTrendData)->map(function ($day) {
+                return $day['avg_rating'] > 0 ? (float) number_format($day['avg_rating'], 1, '.', '') : 0;
+            })->toArray(),
+            'label' => __('Average Rating'),
+            'hasData' => collect($ratingTrendData)->contains(fn ($day) => $day['avg_rating'] > 0),
+        ];
+
+        $templates = $metricsService->getTemplateRanking($start, $end, 5);
         $this->templateRanking = $templates->map(function ($item) {
             return [
                 'name' => $item->template?->title ?? __('Deleted Template'),
