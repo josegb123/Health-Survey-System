@@ -8,9 +8,9 @@
         <div>
             <flux:select wire:model.live="period" class="w-48">
                 <option value="week">{{ __('Last 7 days') }}</option>
-                <option value="month">{{ __('Last Month') }}</option>
-                <option value="quarter">{{ __('Last Quarter') }}</option>
-                <option value="year">{{ __('Last Year') }}</option>
+                <option value="month">{{ __('This month') }}</option>
+                <option value="quarter">{{ __('Last 90 days') }}</option>
+                <option value="year">{{ __('This year') }}</option>
             </flux:select>
         </div>
     </div>
