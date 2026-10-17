@@ -1,11 +1,8 @@
 <?php
 
-use App\Providers\AppServiceProvider;
-use App\Providers\FortifyServiceProvider;
-use Spatie\Permission\PermissionServiceProvider;
-
 return [
-    AppServiceProvider::class,
-    FortifyServiceProvider::class,
-    PermissionServiceProvider::class,
+    App\Providers\AppServiceProvider::class,
+    App\Providers\FortifyServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
+    Spatie\Permission\PermissionServiceProvider::class,
 ];
