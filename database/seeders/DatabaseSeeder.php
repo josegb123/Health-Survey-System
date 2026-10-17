@@ -24,10 +24,19 @@ class DatabaseSeeder extends Seeder
             SurveyQuestionSeeder::class,
         ]);
 
-        // Inicializa el registro único de configuraciones globales
+        // change for true or false if you need.
+        $includeSurveys = app()->environment(['local', 'staging']);
+
+        if ($includeSurveys) {
+            $this->call([
+                PatientSeeder::class,
+                SurveySeeder::class,
+                SurveyAnswerSeeder::class,
+            ]);
+        }
+
         SystemSetting::set();
 
-        // The user is created from env file vars
         User::factory()->create([
             'name' => env('ADMIN_NAME', 'Administrador por Defecto'),
             'email' => env('ADMIN_EMAIL', 'admin@admin.com'),

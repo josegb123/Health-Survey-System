@@ -20,14 +20,14 @@ class SurveyFactory extends Factory
     public function definition(): array
     {
         // Generamos fechas distribuidas en los últimos 14 meses para simular un historial real
-        $createdAt = $this->faker->dateTimeBetween('-14 months', 'now');
+        $createdAt = $this->faker->dateTimeBetween('-5 months', 'now');
         $status = $this->faker->randomElement(['completed', 'completed', 'draft']); // 66% de probabilidad de estar completada
 
         return [
             'survey_template_id' => SurveyTemplate::inRandomOrder()->first()?->id ?? SurveyTemplate::factory(),
             'patient_id' => Patient::inRandomOrder()->first()?->id ?? Patient::factory(),
             'signature_path' => $status === 'completed'
-                ? 'signatures/sig_'.$this->faker->md5.'.png'
+                ? 'signatures/sig_' . $this->faker->md5 . '.png'
                 : null,
             'status' => $status,
             'rating' => $status === 'completed'
