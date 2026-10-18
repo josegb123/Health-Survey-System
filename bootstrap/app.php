@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\BlockIpAddress;
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\SetAppLocale;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'block.ip' => BlockIpAddress::class,
         ]);
 
         $middleware->api(prepend: [

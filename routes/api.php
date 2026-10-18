@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\PublicInsurerController;
 use App\Http\Controllers\Api\PublicSurveyController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['throttle:public-surveys'])->group(function () {
+Route::middleware(['block.ip', 'throttle:public-surveys'])->group(function () {
     Route::get('/config', PublicConfigController::class);
     Route::get('/survey-templates/{id}', [PublicSurveyController::class, 'show']);
     Route::post('/surveys/{templateId}/submit', [PublicSurveyController::class, 'store']);
