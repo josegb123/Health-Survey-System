@@ -6,6 +6,7 @@ use App\Models\SurveyQuestion;
 use App\Models\SurveyTemplate;
 use App\Models\SystemSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -248,5 +249,20 @@ class PublicApiTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['website']);
+    }
+
+    public function test_blocked_ip_cannot_submit_survey(): void
+    {
+        config(['security.blocked_ips' => ['192.168.1.100']]);
+        Cache::forget('blocked_ips_list');
+
+        $template = $this->createTemplateWithQuestion();
+        $payload = $this->validPayload($template->id);
+
+        $response = $this->withServerVariables(['REMOTE_ADDR' => '192.168.1.100'])
+            ->postJson("/api/surveys/{$template->id}/submit", $payload);
+
+        $response->assertStatus(403)
+            ->assertJson(['message' => 'Access denied. Your IP address has been blocked.']);
     }
 }
