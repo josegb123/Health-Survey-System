@@ -479,5 +479,6 @@
     "October": "Octubre",
     "November": "Noviembre",
     "December": "Diciembre",
-    "No templates available": "No hay plantillas disponibles"
+    "No templates available": "No hay plantillas disponibles",
+    "Too many requests. Please wait a moment before sending another reply.": "Demasiadas solicitudes. Por favor, espere un momento antes de enviar otra respuesta."
 }

@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -63,17 +64,24 @@ class AppServiceProvider extends ServiceProvider
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            $maxAttempts = 60;
-
-            try {
-                $settings = SystemSetting::set();
-                $maxAttempts = (int) ($settings->rate_limit_requests ?? 60);
-            } catch (\Exception) {
-                // Fallback if database is not available
-            }
+            $maxAttempts = Cache::remember('system_rate_limit', now()->addMinutes(10), function () {
+                try {
+                    return (int) (SystemSetting::set()->rate_limit_requests ?? 60);
+                } catch (\Exception) {
+                    return 60;
+                }
+            });
 
             return Limit::perMinute($maxAttempts)
                 ->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('public-surveys', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip())->response(function () {
+                return response()->json([
+                    'message' => __('Too many requests. Please wait a moment before sending another reply.'),
+                ], 429);
+            });
         });
     }
 
