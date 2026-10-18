@@ -8,6 +8,7 @@ use App\Models\Patient;
 use App\Models\Survey;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
+use App\Models\SurveyTemplate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -16,19 +17,23 @@ class SurveyPublicProccessorService
 {
     public function processPublicSubmission(int $templateId, array $patientData, array $answers, ?string $signature = null): Survey
     {
-        $answersPayload = collect($answers)->pluck('value', 'question_id')->toArray();
-        $calculatedRating = CalculateSurveyRating::execute($templateId, $answersPayload);
+        $template = SurveyTemplate::where('id', $templateId)
+            ->where('is_active', true)
+            ->firstOrFail();
 
-        $questions = SurveyQuestion::where('survey_template_id', $templateId)
+        $answersPayload = collect($answers)->pluck('value', 'question_id')->toArray();
+        $calculatedRating = CalculateSurveyRating::execute($template->id, $answersPayload);
+
+        $questions = SurveyQuestion::where('survey_template_id', $template->id)
             ->whereIn('field_type', ['radio', 'select'])
             ->get()
             ->keyBy('id');
 
-        return DB::transaction(function () use ($templateId, $patientData, $answers, $calculatedRating, $signature, $questions) {
+        return DB::transaction(function () use ($template, $patientData, $answers, $calculatedRating, $signature, $questions) {
 
             $insurerId = $patientData['insurer_id'] ?? null;
 
-            if (!$insurerId && !empty($patientData['insurer_name'])) {
+            if (! $insurerId && ! empty($patientData['insurer_name'])) {
                 $insurerId = $this->resolveOrCreateInsurer($patientData['insurer_name']);
             }
 
@@ -36,20 +41,20 @@ class SurveyPublicProccessorService
                 ['dni' => $patientData['dni']],
                 [
                     'name' => $patientData['name'],
-                    'email' => $patientData['email'] ?? "",
-                    'document_type' => $patientData['document_type'] ?? "",
-                    'nationality' => $patientData['nationality'] ?? "",
-                    'address' => $patientData['address'] ?? "",
-                    'phone' => $patientData['phone'] ?? "",
+                    'email' => $patientData['email'] ?? '',
+                    'document_type' => $patientData['document_type'] ?? '',
+                    'nationality' => $patientData['nationality'] ?? '',
+                    'address' => $patientData['address'] ?? '',
+                    'phone' => $patientData['phone'] ?? '',
                     'insurer_id' => $insurerId,
                     'password' => bcrypt(Str::random(16)),
                 ]
             );
 
-            $signaturePath = $signature ? $this->storeSignatureFile($signature) : "";
+            $signaturePath = $signature ? $this->storeSignatureFile($signature) : '';
 
             $survey = Survey::create([
-                'survey_template_id' => $templateId,
+                'survey_template_id' => $template->id,
                 'patient_id' => $patient->id,
                 'status' => 'completed',
                 'completed_at' => now(),
@@ -110,8 +115,8 @@ class SurveyPublicProccessorService
             throw new \InvalidArgumentException('The provided signature is not a valid base64 string.');
         }
 
-        $filename = Str::uuid() . '.png';
-        $path = 'signatures/' . $filename;
+        $filename = Str::uuid().'.png';
+        $path = 'signatures/'.$filename;
 
         Storage::disk('local')->put($path, $decoded);
 

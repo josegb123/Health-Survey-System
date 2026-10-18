@@ -77,9 +77,15 @@ class SubmitSurveyRequest extends FormRequest
                 'remoteip' => $this->ip(),
             ]);
 
+            if (! $response->successful()) {
+                $validator->errors()->add('cf_turnstile_token', __('Human verification service is unavailable. Please try again.'));
+
+                return;
+            }
+
             $result = $response->json();
 
-            if (! $result['success'] ?? false) {
+            if (! ($result['success'] ?? false)) {
                 $validator->errors()->add('cf_turnstile_token', __('Human verification failed. Please try again.'));
             }
         });

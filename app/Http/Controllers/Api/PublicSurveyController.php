@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SubmitSurveyRequest;
 use App\Models\SurveyTemplate;
 use App\Services\SurveyPublicProccessorService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 
 class PublicSurveyController extends Controller
@@ -74,6 +75,16 @@ class PublicSurveyController extends Controller
                     'rating_assigned' => $survey->rating,
                 ],
             ], 201);
+
+        } catch (ModelNotFoundException $e) {
+            if ($e->getModel() !== SurveyTemplate::class) {
+                throw $e;
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => __('The requested template is not available or does not exist.'),
+            ], 404);
 
         } catch (\Exception $e) {
             return response()->json([
