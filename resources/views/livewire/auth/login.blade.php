@@ -10,18 +10,18 @@
         <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-5">
             @csrf
 
-            <flux:input name="email" :label="__('Email')" :value="old('email')" type="email" required
-                autofocus autocomplete="email" :placeholder="__('email@example.com')" />
+            <flux:input name="email" :label="__('Email')" :value="old('email')" type="email" required autofocus
+                autocomplete="email" :placeholder="__('email@example.com')" />
 
             <div class="relative">
                 <flux:input name="password" :label="__('Password')" type="password" required
                     autocomplete="current-password" :placeholder="__('Password')" viewable />
 
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
+                {{-- @if (Route::has('password.request'))
+                <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
+                    {{ __('Forgot your password?') }}
+                </flux:link>
+                @endif --}}
             </div>
 
             <div class="flex items-center justify-between">
