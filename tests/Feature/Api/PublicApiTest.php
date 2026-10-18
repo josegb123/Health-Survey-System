@@ -32,8 +32,11 @@ class PublicApiTest extends TestCase
         return $template;
     }
 
-    protected function validPayload(int $templateId): array
+    protected function validPayload(int $templateId, ?int $questionId = null): array
     {
+        $questionId = $questionId ?? SurveyQuestion::where('survey_template_id', $templateId)->first()?->id
+            ?? SurveyQuestion::factory()->create(['survey_template_id' => $templateId])->id;
+
         return [
             'patient' => [
                 'name' => 'Test Patient',
@@ -42,8 +45,9 @@ class PublicApiTest extends TestCase
             ],
             'signature' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
             'answers' => [
-                ['question_id' => SurveyQuestion::first()->id, 'value' => 'Test answer'],
+                ['question_id' => $questionId, 'value' => 'Test answer'],
             ],
+            'cf_turnstile_token' => 'valid-token',
         ];
     }
 
@@ -152,5 +156,81 @@ class PublicApiTest extends TestCase
 
         // Should pass validation (no Turnstile check) and fail on processing
         $this->assertNotEquals(422, $response->getStatusCode());
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tests Adicionales: Rate Limiting & Casos Borde
+    |--------------------------------------------------------------------------
+    */
+
+    public function test_survey_submission_enforces_rate_limiting(): void
+    {
+        SystemSetting::set()->update(['turnstile_secret_key' => null]);
+        $template = $this->createTemplateWithQuestion();
+        $payload = $this->validPayload($template->id);
+
+        // Realiza 5 peticiones permitidas (límite configurado en public-surveys)
+        for ($i = 0; $i < 5; $i++) {
+            $response = $this->postJson("/api/surveys/{$template->id}/submit", $payload);
+            $this->assertNotEquals(429, $response->getStatusCode());
+        }
+
+        // La 6ta petición debe retornar HTTP 429 Too Many Requests
+        $response = $this->postJson("/api/surveys/{$template->id}/submit", $payload);
+        $response->assertStatus(429)
+            ->assertJson([
+                'message' => __('Too many requests. Please wait a moment before sending another reply.'),
+            ]);
+    }
+
+    public function test_survey_submission_validates_required_patient_fields(): void
+    {
+        SystemSetting::set()->update(['turnstile_secret_key' => null]);
+        $template = $this->createTemplateWithQuestion();
+
+        $payload = $this->validPayload($template->id);
+        unset($payload['patient']['name'], $payload['patient']['dni']);
+
+        $response = $this->postJson("/api/surveys/{$template->id}/submit", $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['patient.name', 'patient.dni']);
+    }
+
+    public function test_cannot_submit_survey_for_inactive_template(): void
+    {
+        SystemSetting::set()->update(['turnstile_secret_key' => null]);
+
+        $template = SurveyTemplate::factory()->create(['is_active' => false]);
+        $question = SurveyQuestion::factory()->create(['survey_template_id' => $template->id]);
+
+        $payload = $this->validPayload($template->id, $question->id);
+
+        $response = $this->postJson("/api/surveys/{$template->id}/submit", $payload);
+
+        $response->assertNotFound()
+            ->assertJson([
+                'success' => false,
+                'message' => __('The requested template is not available or does not exist.'),
+            ]);
+    }
+
+    public function test_handles_cloudflare_turnstile_timeout_gracefully(): void
+    {
+        Http::fake([
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response(null, 500),
+        ]);
+
+        SystemSetting::set()->update(['turnstile_secret_key' => 'test-secret']);
+        $template = $this->createTemplateWithQuestion();
+
+        $payload = $this->validPayload($template->id);
+        $payload['cf_turnstile_token'] = 'timeout-token';
+
+        $response = $this->postJson("/api/surveys/{$template->id}/submit", $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['cf_turnstile_token']);
     }
 }
