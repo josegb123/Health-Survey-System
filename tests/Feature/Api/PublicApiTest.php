@@ -233,4 +233,20 @@ class PublicApiTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['cf_turnstile_token']);
     }
+
+    public function test_survey_submission_rejects_honeypot_spam(): void
+    {
+        SystemSetting::set()->update(['turnstile_secret_key' => null]);
+
+        $template = $this->createTemplateWithQuestion();
+        $payload = $this->validPayload($template->id);
+
+        // Simula un bot rellenando el campo oculto
+        $payload['website'] = 'http://spam-bot-link.com';
+
+        $response = $this->postJson("/api/surveys/{$template->id}/submit", $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['website']);
+    }
 }

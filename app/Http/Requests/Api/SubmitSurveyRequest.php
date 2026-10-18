@@ -41,6 +41,8 @@ class SubmitSurveyRequest extends FormRequest
 
             // Token de Cloudflare Turnstile
             'cf_turnstile_token' => ['required', 'string'],
+            // Honeypot
+            'website' => ['nullable', 'prohibited'],
         ];
 
         $requiredQuestionIds = SurveyQuestion::where('survey_template_id', $templateId)
